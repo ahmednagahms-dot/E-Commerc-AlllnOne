@@ -3,6 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ForgotPassword from "./pages/ForgotPassword";
+import Profile from "./pages/profile";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
    
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/profile" element={<Profile />} />
 
     </Routes>
   );
