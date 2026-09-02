@@ -1,12 +1,22 @@
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, ShoppingBag } from "lucide-react";
+const STORE_LOGO_URL =
+  "https://res.cloudinary.com/iuc91bdy/image/upload/v1788294261/akybn7rcd5gmyfvdqx1i.png";
+const DASHBOARD_LOGO_URL =
+  "https://res.cloudinary.com/iuc91bdy/image/upload/v1788347185/anjtiwvsm9xcnrxmufdv.png";
 
 export default function LoginBanner() {
   return (
-    <div className="hidden lg:flex w-1/2 bg-sidebar text-white flex-col justify-between p-10">
+    <div className="hidden lg:flex w-1/2 bg-slate-950 bg-[radial-gradient(circle_at_top_right,_rgba(99,102,241,0.25),_transparent_50%),radial-gradient(circle_at_bottom_left,_rgba(168,85,247,0.3),_transparent_55%)] text-white flex-col justify-between p-10">
       <div className="flex items-center gap-2">
-        <div className="w-9 h-9 bg-primary-500 rounded-lg flex items-center justify-center font-bold">K</div>
+        <div className="w-20 h-15 rounded-lg overflow-hidden shrink-0">
+          <img
+            src={STORE_LOGO_URL}
+            alt="ShopEase"
+            className="w-full h-full object-center"
+          />
+        </div>
         <div>
-          <h1 className="font-semibold text-sm">Koda Store</h1>
+          <h1 className="font-semibold text-sm">ShopEase</h1>
           <p className="text-xs text-white/50">E-commerce Admin</p>
         </div>
       </div>
@@ -15,15 +25,25 @@ export default function LoginBanner() {
         <h2 className="text-3xl font-bold leading-tight">
           Manage smarter.
           <br />
-          <span className="text-primary-400">Sell more.</span>
+          <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Sell more.
+          </span>
         </h2>
         <p className="text-white/60 mt-3 text-sm max-w-xs">
-          Powerful tools and insights to help you run your store, grow your business, and delight your customers.
+          Powerful tools and insights to help you run your store, grow your
+          business, and delight your customers.
         </p>
+        <div className="mx-15 mt-5">
+          <img
+            src={DASHBOARD_LOGO_URL}
+            alt=""
+            className="w-full h-auto rounded-xl"
+          />
+        </div>
       </div>
 
       <div className="flex items-center gap-2 bg-white/5 p-3 rounded-lg text-sm text-white/70">
-        <ShieldCheck size={18} className="text-primary-400" />
+        <ShieldCheck size={26} className="text-primary-400" />
         <div>
           <p className="font-medium text-white">Secure. Fast. Reliable.</p>
           <p className="text-xs">Your store. Your data. Always protected.</p>

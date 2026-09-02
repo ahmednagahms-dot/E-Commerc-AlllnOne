@@ -196,7 +196,7 @@ export default function ForgotPassword() {
           <div className="text-center mt-7">
 
             {/* Icon */}
-            <div className="mx-auto mb-6 w-16 h-16 rounded-[20px] bg-indigo-50 flex items-center justify-center">
+            <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-50 text-primary-600 rounded-2xl flex items-center justify-center">
               {step === "email" ? (
                 <Lock className="w-7 h-7 text-indigo-600" />
               ) : (
@@ -296,7 +296,7 @@ export default function ForgotPassword() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-sm font-semibold flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
