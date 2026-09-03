@@ -1,4 +1,4 @@
-// ProfilePage.jsx
+
 import { Camera } from 'lucide-react';
 import { useState } from 'react';
 
