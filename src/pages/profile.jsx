@@ -19,21 +19,21 @@ export default function Profile() {
     defaultValues: { username: user?.username, phone: user?.phone },
   });
 
-const handleAvatarChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  try {
-    setUploading(true);
-    const url = await uploadToCloudinary(file);
-    setAvatar(url);
-  } catch (err) {
-    alert("Failed to upload image. Please try again.");
-  } finally {
-    setUploading(false);
-    e.target.value = "";
-  }
-};
+    try {
+      setUploading(true);
+      const url = await uploadToCloudinary(file);
+      setAvatar(url);
+    } catch (err) {
+      alert("Failed to upload image. Please try again.");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   const onSubmit = async (formData) => {
     try {
