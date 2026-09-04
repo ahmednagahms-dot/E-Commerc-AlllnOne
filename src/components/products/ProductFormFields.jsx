@@ -1,196 +1,114 @@
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { useState } from "react";
+import { ImagePlus, X } from "lucide-react";
 import Input from "../ui/Input";
-import Textarea from "../ui/Textarea";
 
-const MAX_IMAGES = 5;
-
-export default function ProductFormFields({
-  register,
-  errors,
-  existingImages,
-  imageFiles,
-  onAddImages,
-  onRemoveExistingImage,
-  onRemoveNewImage,
-  imagesError,
-}) {
-  const totalImages = existingImages.length + imageFiles.length;
-  const canAddMore = totalImages < MAX_IMAGES;
-
+export default function ProductFormFields({ register, errors, imageFiles, setImageFiles, existingImages, onDeleteExistingImage }) {
   const handleFileChange = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length) onAddImages(files);
+    const files = Array.from(e.target.files);
+    // الـ API بيقبل 5 صور بحد أقصى
+    const combined = [...imageFiles, ...files].slice(0, 5);
+    setImageFiles(combined);
     e.target.value = "";
   };
 
+  const removeNewImage = (index) => {
+    setImageFiles(imageFiles.filter((_, i) => i !== index));
+  };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-8">
-      {/* Gallery */}
-      <div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Left: Images */}
+      <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
         <div className="flex items-center gap-2 mb-1">
-          <ImagePlus size={16} className="text-gray-500" />
-          <h3 className="text-sm font-semibold text-gray-800">Gallery</h3>
+          <div className="w-9 h-9 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center">
+            <ImagePlus size={18} />
+          </div>
+          <div>
+            <h3 className="font-semibold">Gallery</h3>
+            <p className="text-xs text-gray-400">Up to 5 images. At least 1 required.</p>
+          </div>
         </div>
-        <p className="text-xs text-gray-400 mb-3">
-          Up to {MAX_IMAGES} images. At least 1 required.
-        </p>
 
-        <div className="grid grid-cols-2 gap-3">
-          {existingImages.map((url) => (
-            <div
-              key={url}
-              className="relative aspect-square rounded-lg border border-gray-200 overflow-hidden group"
-            >
-              <img src={url} alt="" className="w-full h-full object-cover" />
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          {/* الصور الموجودة فعليًا (في وضع التعديل) */}
+          {existingImages?.map((img) => (
+            <div key={img.public_id} className="relative rounded-lg overflow-hidden border border-gray-100">
+              <img src={img.url} alt="Existing" className="w-full h-32 object-cover" />
               <button
                 type="button"
-                onClick={() => onRemoveExistingImage(url)}
-                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                onClick={() => onDeleteExistingImage(img.public_id)}
+                className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 hover:bg-black/70"
               >
-                <X size={13} />
+                <X size={14} />
               </button>
             </div>
           ))}
 
-          {imageFiles.map((img, index) => (
-            <div
-              key={img.previewUrl}
-              className="relative aspect-square rounded-lg border border-gray-200 overflow-hidden group"
-            >
-              <img src={img.previewUrl} alt="" className="w-full h-full object-cover" />
-              {img.uploading && (
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <Loader2 size={18} className="text-white animate-spin" />
-                </div>
-              )}
-              {img.error && (
-                <div className="absolute inset-0 bg-red-500/70 flex items-center justify-center text-white text-[10px] text-center px-1">
-                  Upload failed
-                </div>
-              )}
+          {/* الصور الجديدة (لسه معملهاش Upload، هنبعتها مع الفورم) */}
+          {imageFiles.map((file, index) => (
+            <div key={index} className="relative rounded-lg overflow-hidden border border-gray-100">
+              <img src={URL.createObjectURL(file)} alt={`New ${index + 1}`} className="w-full h-32 object-cover" />
               <button
                 type="button"
-                onClick={() => onRemoveNewImage(index)}
-                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                onClick={() => removeNewImage(index)}
+                className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-1 hover:bg-black/70"
               >
-                <X size={13} />
+                <X size={14} />
               </button>
+              <span className="absolute bottom-0 left-0 right-0 bg-primary-500/80 text-white text-[10px] text-center py-0.5">NEW</span>
             </div>
           ))}
 
-          {canAddMore && (
-            <label className="aspect-square rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center gap-1.5 text-gray-400 text-xs cursor-pointer hover:border-primary-400 hover:text-primary-500 transition">
+          {(existingImages?.length || 0) + imageFiles.length < 5 && (
+            <label className="border-2 border-dashed border-gray-200 rounded-lg h-32 flex flex-col items-center justify-center text-gray-400 text-xs cursor-pointer hover:border-primary-400 hover:text-primary-500">
               <ImagePlus size={20} />
               Add Image
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-              />
+              <input type="file" accept="image/*" multiple onChange={handleFileChange} className="hidden" />
             </label>
           )}
         </div>
-
-        {imagesError && <p className="text-xs text-danger mt-2">{imagesError}</p>}
       </div>
 
-      {/* Product data */}
+      {/* Right: Fields */}
       <div className="flex flex-col gap-4">
-        <Input
-          label="Product Name"
-          error={errors.name?.message}
-          {...register("name", { required: "Product name is required" })}
-        />
+        <Input label="Product Name" error={errors.name?.message} {...register("name", { required: "Required", minLength: { value: 3, message: "Minimum 3 characters" } })} />
 
-        <Input
-          label="Short Description"
-          error={errors.shortDescription?.message}
-          {...register("shortDescription")}
-        />
+        <Input label="Short Description" error={errors.shortDescription?.message} {...register("shortDescription", { required: "Required", minLength: { value: 10, message: "Minimum 10 characters" } })} />
 
-        <Textarea
-          label="Description"
-          error={errors.description?.message}
-          {...register("description")}
-        />
-
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Price"
-            type="number"
-            step="0.01"
-            min="0"
-            error={errors.price?.message}
-            {...register("price", {
-              required: "Price is required",
-              min: { value: 0, message: "Price can't be negative" },
-              valueAsNumber: true,
-            })}
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            rows={3}
+            className={`px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500 ${errors.description ? "border-danger" : "border-gray-300"}`}
+            {...register("description", { required: "Required", minLength: { value: 20, message: "Minimum 20 characters" } })}
           />
-          <Input
-            label="Discount Price"
-            type="number"
-            step="0.01"
-            min="0"
-            error={errors.discountPrice?.message}
-            {...register("discountPrice", {
-              min: { value: 0, message: "Discount price can't be negative" },
-              setValueAs: (v) => (v === "" ? undefined : Number(v)),
-            })}
-          />
+          {errors.description && <span className="text-xs text-danger">{errors.description.message}</span>}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Stock"
-            type="number"
-            min="0"
-            error={errors.stock?.message}
-            {...register("stock", {
-              required: "Stock is required",
-              min: { value: 0, message: "Stock can't be negative" },
-              valueAsNumber: true,
-            })}
-          />
-          <Input label="SKU" error={errors.sku?.message} {...register("sku")} />
+          <Input label="Price" type="number" step="0.01" error={errors.price?.message} {...register("price", { required: "Required", min: 0 })} />
+          <Input label="Discount Price" type="number" step="0.01" {...register("discountPrice")} />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Category"
-            error={errors.category?.message}
-            {...register("category", { required: "Category is required" })}
-          />
-          <Input label="Subcategory" error={errors.subcategory?.message} {...register("subcategory")} />
+          <Input label="Stock" type="number" error={errors.stock?.message} {...register("stock", { required: "Required", min: 0 })} />
+          <Input label="SKU" {...register("sku")} />
         </div>
 
-        <Input label="Brand" error={errors.brand?.message} {...register("brand")} />
+        <div className="grid grid-cols-2 gap-4">
+          <Input label="Category" error={errors.category?.message} {...register("category")} />
+          <Input label="Subcategory" {...register("subcategory")} />
+        </div>
 
-        <Input
-          label="Tags (comma separated)"
-          placeholder="wireless, audio"
-          error={errors.tags?.message}
-          {...register("tags")}
-        />
+        <Input label="Brand" {...register("brand")} />
+        <Input label="Tags (comma separated)" placeholder="wireless, audio" {...register("tags")} />
 
-        <div className="flex items-center gap-6 pt-1">
-          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-            <input
-              type="checkbox"
-              className="w-4 h-4 rounded border-gray-300 accent-indigo-600"
-              {...register("featured")}
-            />
-            Featured
+        <div className="flex items-center gap-6">
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" {...register("featured")} className="w-4 h-4" /> Featured
           </label>
-          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-            <input
-              type="checkbox"
-              className="w-4 h-4 rounded border-gray-300 accent-indigo-600"
-              {...register("active")}
-            />
-            Active
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" defaultChecked {...register("isActive")} className="w-4 h-4" /> Active
           </label>
         </div>
       </div>
