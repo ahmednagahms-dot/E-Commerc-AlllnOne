@@ -3,12 +3,14 @@ import * as Icons from "lucide-react";
 import { LogOut, X, User } from "lucide-react";
 import { sidebarLinks } from "../../data/sidebarLinks";
 import { useAuth } from "../../context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 const STORE_LOGO_URL =
   "https://res.cloudinary.com/iuc91bdy/image/upload/v1788294261/akybn7rcd5gmyfvdqx1i.png";
 
 export default function Sidebar({ onClose }) {
   const { logout, user } = useAuth();
+  const t = useTranslation().t;
 
   return (
     <aside className="w-64 h-screen bg-slate-900 text-slate-300 flex flex-col">

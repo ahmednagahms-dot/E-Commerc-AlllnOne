@@ -3,6 +3,7 @@ import * as Icons from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { sidebarLinks } from "../../data/sidebarLinks";
 import { useAuth } from "../../context/AuthContext";
+import LanguageSwitcher from "../ui/LanguageSwitch";
 
 const allPages = sidebarLinks.flatMap((group) =>
   group.items.map((item) => ({ ...item, section: group.section })),
@@ -39,7 +40,9 @@ export default function Topbar({ onMenuClick }) {
         </div>
       </div>
 
+
       <div className="flex items-center gap-4">
+        <LanguageSwitcher />
         <button className="relative text-gray-500 hover:bg-gray-100 p-2 rounded-lg">
           <Bell size={18} />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500"></span>

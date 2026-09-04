@@ -22,9 +22,17 @@ i18n.use(initReactI18next).init({
   },
 });
 
-i18n.on("languageChanged", (lng) => {
-  document.documentElement.lang = lng;
-  document.documentElement.dir = lng === "ar" ? "rtl" : "ltr";
-});
+const updateDirection = (language) => {
+  const isArabic = language === "ar";
+
+  document.documentElement.lang = language;
+  document.documentElement.dir = isArabic ? "rtl" : "ltr";
+
+  document.body.dir = isArabic ? "rtl" : "ltr";
+};
+
+updateDirection(i18n.language);
+
+i18n.on("languageChanged", updateDirection);
 
 export default i18n;
