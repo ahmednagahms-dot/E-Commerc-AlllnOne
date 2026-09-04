@@ -1,0 +1,41 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading",
+    "submit": "Submit",
+    "close": "Close"
+  },
+
+  "navigation": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "users": "Users",
+    "orders": "Orders",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password",
+    "welcomeBack": "Welcome Back"
+  },
+
+  "products": {
+    "products": "Products",
+    "addProduct": "Add Product",
+    "editProduct": "Edit Product",
+    "productName": "Product Name",
+    "price": "Price",
+    "description": "Description",
+    "category": "Category",
+    "stock": "Stock"
+  }
+}

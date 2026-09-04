@@ -1,0 +1,41 @@
+{
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "loading": "جاري التحميل",
+    "submit": "إرسال",
+    "close": "إغلاق"
+  },
+
+  "navigation": {
+    "dashboard": "لوحة التحكم",
+    "products": "المنتجات",
+    "users": "المستخدمون",
+    "orders": "الطلبات",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج"
+  },
+
+  "auth": {
+    "login": "تسجيل الدخول",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور",
+    "welcomeBack": "مرحبًا بعودتك"
+  },
+
+  "products": {
+    "products": "المنتجات",
+    "addProduct": "إضافة منتج",
+    "editProduct": "تعديل المنتج",
+    "productName": "اسم المنتج",
+    "price": "السعر",
+    "description": "الوصف",
+    "category": "الفئة",
+    "stock": "المخزون"
+  }
+}
