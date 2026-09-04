@@ -35,4 +35,14 @@ updateDirection(i18n.language);
 
 i18n.on("languageChanged", updateDirection);
 
+  document.documentElement.lang = language;
+  document.documentElement.dir = isArabic ? "rtl" : "ltr";
+
+  document.body.dir = isArabic ? "rtl" : "ltr";
+};
+
+updateDirection(i18n.language);
+
+i18n.on("languageChanged", updateDirection);
+
 export default i18n;
