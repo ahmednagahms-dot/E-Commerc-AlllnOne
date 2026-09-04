@@ -5,6 +5,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/Profile";
 import ProductForm from "./pages/ProductForm";
+import Products from "./pages/Products";
 
 function App() {
   return (
@@ -14,8 +15,7 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/dashboard/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
-
-
+      <Route path="dashboard/products" element={ <ProtectedRoute><Products/> </ProtectedRoute>  } />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
      
      <Route path="/dashboard/products/new" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
