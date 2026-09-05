@@ -83,22 +83,10 @@ export default function Products() {
   const outStockCount = items.filter(i => i.stock <= 0).length
 
   const stats = [
-    { icon: "▣",
-       title: "Total Products",
-        count: totalProducts, 
-        style: "text-[#3157D5] bg-[#EEF1F7]" },
-    { icon: <Star size={19} />,
-     title: "Featured (this page)", 
-     count: featuredCount, 
-     style: "text-[#D99A16] bg-[#FFF8E8]" },
-    { icon: "✓",
-       title: "In Stock (this page)",
-        count: inStockCount,
-         style: "text-[#20A464] bg-[#EAF8F0]" },
-    { icon: "⊘", 
-      title: "Out of Stock (this page)",
-       count: outStockCount,
-        style: "text-[#D95353] bg-[#FDEEEE]" }
+    { icon: "▣", title: "Total Products", count: totalProducts, style: "text-[#3157D5] bg-[#EEF1F7]" },
+    { icon: <Star size={19} />, title: "Featured (this page)", count: featuredCount, style: "text-[#D99A16] bg-[#FFF8E8]" },
+    { icon: "✓", title: "In Stock (this page)", count: inStockCount, style: "text-[#20A464] bg-[#EAF8F0]" },
+    { icon: "⊘", title: "Out of Stock (this page)", count: outStockCount, style: "text-[#D95353] bg-[#FDEEEE]" }
   ]
 
   return (
@@ -117,8 +105,8 @@ export default function Products() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
-          gap-4 mb-7">
+        <div className="grid grid-cols-1 sm:grid-cols-2
+          lg:grid-cols-4 gap-4 mb-7">
           {stats.map((stat, index) => (
             <div key={index} className="bg-[#FCFAF7] p-5 rounded-2xl
               border border-[#E3E0DB] shadow-sm">
@@ -207,8 +195,6 @@ export default function Products() {
                 const hasDiscount = item.discountPrice && item.discountPrice < item.price
                 const displayPrice = hasDiscount ? item.discountPrice : item.price
                 const discountAmount = hasDiscount ? item.price - item.discountPrice : 0
-                const tags = Array.isArray(item.tags) ? item.tags.filter(Boolean)
-                  : typeof item.tags === "string" ? item.tags.split(",").map(t => t.trim()).filter(Boolean) : []
 
                 return (
                   <div key={item._id} className="bg-[#FCFAF7] rounded-2xl
@@ -236,52 +222,82 @@ export default function Products() {
                       </span>
                     </div>
 
-                    <div className="p-5 flex flex-col flex-1">
+                    <div className="p-5 sm:p-6 flex flex-col flex-1">
                       <h2 className="font-bold text-lg text-[#172033]">{item.name}</h2>
-                      <p className="text-[#697386] text-sm mt-1 capitalize">
-                        {item.category}{item.subcategory && ` / ${item.subcategory}`}
-                      </p>
-                      <div className="flex items-center gap-3 mt-4">
-                        <span className="font-bold text-2xl text-[#18243A]">${displayPrice}</span>
+
+                      <div className="flex flex-wrap items-center gap-x-2
+                        gap-y-1 mt-1 text-sm font-medium text-[#8A94A6]">
+                        {item.category && <span className="capitalize">{item.category}</span>}
+                        {item.subcategory && (
+                          <>
+                            <span className="text-[#C2C0BB]">•</span>
+                            <span className="capitalize">{item.subcategory}</span>
+                          </>
+                        )}
+                        {item.brand && (
+                          <>
+                            <span className="text-[#C2C0BB]">•</span>
+                            <span>{item.brand}</span>
+                          </>
+                        )}
+                      </div>
+
+                      {item.shortDescription && (
+                        <p className="text-[#344054] text-sm mt-3
+                          leading-6 font-medium line-clamp-2">
+                          {item.shortDescription}
+                        </p>
+                      )}
+
+                      <div className="flex items-end gap-3 mt-7">
+                        <span className="font-extrabold text-[30px]
+                          leading-none tracking-tight text-[#263653]">
+                          ${displayPrice}
+                        </span>
                         {hasDiscount && (
-                          <span className="text-[#20A464] text-sm
-                            font-medium">-${discountAmount} off</span>
+                          <span className="mb-0.5 text-sm font-semibold
+                            text-[#20A464]">-${discountAmount} off</span>
                         )}
                       </div>
-                      <div className="min-h-[32px] mt-3">
-                        {tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {tags.map((tag, index) => (
-                              <span key={`${item._id}-tag-${index}`} className="px-3 py-1 bg-[#F8F6F3]
-                                border border-[#D4CEC5] text-[#596273] text-xs rounded-md">{tag}</span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex items-center justify-between
-                        gap-3 mt-auto pt-5">
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button onClick={() => navigate(`/dashboard/products/${item._id}/view`)} className="h-9 px-2.5 bg-[#F3F1ED]
-                            border border-[#D9D5CF] rounded-lg text-[#405066]
-                            hover:bg-[#EAE7E1] flex items-center gap-1 text-xs whitespace-nowrap">
-                            <Eye size={14} className="text-[#1D2A43]" /> View
+
+                      <div className="mt-6 pt-4 border-t border-[#E5E1DB]">
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => navigate(`/dashboard/products/${item._id}/view`)} className="group h-10 px-3 rounded-xl
+                            border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066]
+                            flex items-center gap-1.5 text-xs font-semibold shadow-sm
+                            transition-all duration-200 hover:-translate-y-0.5
+                            hover:bg-[#263653] hover:border-[#263653] hover:text-white
+                            hover:shadow-md active:translate-y-0 active:scale-[0.97]">
+                            <Eye size={15} /> View
                           </button>
-                          <button onClick={() => navigate(`/dashboard/products/${item._id}/edit`)} className="h-9 px-2.5 bg-[#F3F1ED]
-                            border border-[#D9D5CF] rounded-lg text-[#405066]
-                            hover:bg-[#EAE7E1] flex items-center gap-1 text-xs whitespace-nowrap">
-                            <Pencil size={14} className="text-[#1D2A43]" /> Edit
+                          <button onClick={() => navigate(`/dashboard/products/${item._id}/edit`)} className="group h-10 px-3 rounded-xl
+                            border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066]
+                            flex items-center gap-1.5 text-xs font-semibold shadow-sm
+                            transition-all duration-200 hover:-translate-y-0.5
+                            hover:bg-[#EEF1F7] hover:border-[#3157D5] hover:text-[#3157D5]
+                            hover:shadow-md active:translate-y-0 active:scale-[0.97]">
+                            <Pencil size={15} /> Edit
                           </button>
-                          <button onClick={() => navigate(`/dashboard/products/${item._id}/edit`)} className="h-9 px-2.5 bg-[#F3F1ED]
-                            border border-[#D9D5CF] rounded-lg text-[#405066]
-                            hover:bg-[#EAE7E1] flex items-center gap-1 text-xs whitespace-nowrap">
-                            <SlidersHorizontal size={14} className="text-[#1D2A43]" /> Quick Edit
+                          <button onClick={() => navigate(`/dashboard/products/${item._id}/edit`)} className="group h-10 px-3 rounded-xl
+                            border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066]
+                            flex items-center gap-1.5 text-xs font-semibold shadow-sm
+                            transition-all duration-200 hover:-translate-y-0.5
+                            hover:bg-[#FFF8E8] hover:border-[#D99A16] hover:text-[#D99A16]
+                            hover:shadow-md active:translate-y-0 active:scale-[0.97]">
+                            <SlidersHorizontal size={15} /> Quick Edit
                           </button>
                         </div>
-                        <button disabled={deleting} onClick={() => handleDelete(item)} className="h-9 px-2.5 bg-[#FBEFEE]
-                          border border-[#E9C9C6] rounded-lg text-[#C94A4A]
-                          hover:bg-[#F8E3E1] flex items-center gap-1 text-xs whitespace-nowrap shrink-0">
-                          <Trash2 size={14} /> Delete
-                        </button>
+
+                        <div className="flex justify-end mt-3">
+                          <button disabled={deleting} onClick={() => handleDelete(item)} className="h-10 px-3 rounded-xl border border-[#E9C9C6]
+                            bg-[#FDF4F3] text-[#C94A4A] flex items-center justify-center
+                            gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200
+                            hover:-translate-y-0.5 hover:bg-[#C94A4A] hover:border-[#C94A4A]
+                            hover:text-white hover:shadow-md active:translate-y-0
+                            active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed">
+                            <Trash2 size={15} /> Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
