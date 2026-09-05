@@ -5,7 +5,6 @@ import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import api from "../../api/axios";
-import { useTranslation } from "react-i18next";
 
 export default function LoginForm() {
   const { login } = useAuth();
@@ -13,7 +12,6 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
-  const {t} = useTranslation();
 
   const {
     register,
@@ -52,10 +50,10 @@ export default function LoginForm() {
           </div>
 
           <h2 className="text-2xl font-bold text-center text-gray-900">
-            {t("auth.welcomeBack")}
+            Welcome back
           </h2>
           <p className="text-xs text-center text-gray-500 mt-1 mb-6">
-            {t("auth.massage")}
+            Sign in to your ShopEase admin account
           </p>
 
           {/* Social login */}
@@ -101,7 +99,7 @@ export default function LoginForm() {
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-px bg-gray-200"></div>
             <span className="text-xs text-gray-400">
-              {t("auth.or")}
+              or continue with email
             </span>
             <div className="flex-1 h-px bg-gray-200"></div>
           </div>
@@ -109,7 +107,7 @@ export default function LoginForm() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                {t("auth.email")}
+                Email address
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -128,7 +126,7 @@ export default function LoginForm() {
 
             <div>
               <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                {t("auth.password")}
+                Password
               </label>
               <div className="relative">
                 <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -165,13 +163,13 @@ export default function LoginForm() {
                   defaultChecked
                   className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500 accent-indigo-600"
                 />
-                <span>{t("auth.rememberMe")}</span>
+                <span>Remember me</span>
               </label>
               <Link
                 to="/forgot-password"
                 className="font-semibold text-primary-600 hover:underline"
               >
-                {t("auth.forgotPassword")}
+                Forgot password?
               </Link>
             </div>
 
@@ -186,7 +184,7 @@ export default function LoginForm() {
               disabled={loading}
               className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-medium text-sm rounded-xl disabled:opacity-50"
             >
-              {loading ? "Signing in..." : t("auth.login")}
+              {loading ? "Signing in..." : "Sign in to your account"}
             </button>
           </form>
         </div>

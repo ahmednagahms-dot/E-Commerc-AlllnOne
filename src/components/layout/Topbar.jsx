@@ -3,8 +3,6 @@ import * as Icons from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { sidebarLinks } from "../../data/sidebarLinks";
 import { useAuth } from "../../context/AuthContext";
-import LanguageSwitcher from "../ui/LanguageSwitch";
-import { useTranslation } from "react-i18next";
 
 const allPages = sidebarLinks.flatMap((group) =>
   group.items.map((item) => ({ ...item, section: group.section })),
@@ -12,12 +10,12 @@ const allPages = sidebarLinks.flatMap((group) =>
 
 export default function Topbar({ onMenuClick }) {
   const { user } = useAuth();
-  const { t } = useTranslation();
   const { pathname } = useLocation();
 
   const currentPage = allPages.find((item) => item.path === pathname);
   const PageIcon = Icons[currentPage?.icon] || Icons.LayoutDashboard;
-  const pageTitle = currentPage?.label || "navigation.dashboard";
+  const pageTitle = currentPage?.label || "Dashboard";
+  const pageSection = currentPage?.section || "MAIN";
 
   return (
     <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20 shadow-sm">
@@ -35,15 +33,13 @@ export default function Topbar({ onMenuClick }) {
           </div>
           <div>
             <h2 className="text-[15px] font-semibold text-gray-900 leading-tight">
-              {t(pageTitle)}
+              {pageTitle}
             </h2>
           </div>
         </div>
       </div>
 
-
       <div className="flex items-center gap-4">
-        <LanguageSwitcher />
         <button className="relative text-gray-500 hover:bg-gray-100 p-2 rounded-lg">
           <Bell size={18} />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500"></span>

@@ -3,14 +3,12 @@ import * as Icons from "lucide-react";
 import { LogOut, X, User } from "lucide-react";
 import { sidebarLinks } from "../../data/sidebarLinks";
 import { useAuth } from "../../context/AuthContext";
-import { useTranslation } from "react-i18next";
 
 const STORE_LOGO_URL =
   "https://res.cloudinary.com/iuc91bdy/image/upload/v1788294261/akybn7rcd5gmyfvdqx1i.png";
 
 export default function Sidebar({ onClose }) {
   const { logout, user } = useAuth();
-  const {t} = useTranslation();
 
   return (
     <aside className="w-64 h-screen bg-slate-900 text-slate-300 flex flex-col">
@@ -44,7 +42,7 @@ export default function Sidebar({ onClose }) {
         {sidebarLinks.map((group) => (
           <div key={group.section} className="mb-4">
             <p className="px-2 text-[11px] text-slate-500 mb-2 font-medium tracking-wide">
-              {t(group.section)}
+              {group.section}
             </p>
             {group.items.map((item) => {
               const Icon = Icons[item.icon];
@@ -63,7 +61,7 @@ export default function Sidebar({ onClose }) {
                   }
                 >
                   {Icon && <Icon size={18} />}
-                  {t(item.label)}
+                  {item.label}
                 </NavLink>
               );
             })}
@@ -101,7 +99,7 @@ export default function Sidebar({ onClose }) {
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition"
         >
           <LogOut size={18} />
-          {t("navigation.logout")}
+          Sign Out
         </button>
       </div>
     </aside>

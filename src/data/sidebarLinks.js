@@ -1,34 +1,34 @@
 export const sidebarLinks = [
   {
-    section: "navigation.sections.main",
+    section: "MAIN",
     items: [
-      { label: "navigation.dashboard", path: "/dashboard", icon: "LayoutDashboard" },
-      { label: "navigation.products", path: "/dashboard/products", icon: "Package" },
-      { label: "navigation.addProduct", path: "/dashboard/products/new", icon: "PackagePlus" },
-      { label: "navigation.orders", path: "/dashboard/orders", icon: "FileText" },
-      { label: "navigation.carts", path: "/dashboard/carts", icon: "ShoppingCart" },
-      { label: "navigation.users", path: "/dashboard/users", icon: "Users" },
-      { label: "navigation.reviews", path: "/dashboard/reviews", icon: "Star" },
-      { label: "navigation.wishlists", path: "/dashboard/wishlists", icon: "Heart" },
+      { label: "Dashboard", path: "/dashboard", icon: "LayoutDashboard" },
+      { label: "Products", path: "/dashboard/products", icon: "Package" },
+      { label: "Add Product", path: "/dashboard/products/new", icon: "PackagePlus" },
+      { label: "Orders", path: "/dashboard/orders", icon: "FileText" },
+      { label: "Carts", path: "/dashboard/carts", icon: "ShoppingCart" },
+      { label: "Users", path: "/dashboard/users", icon: "Users" },
+      { label: "Reviews", path: "/dashboard/reviews", icon: "Star" },
+      { label: "Wishlists", path: "/dashboard/wishlists", icon: "Heart" },
     ],
   },
   {
-    section: "navigation.sections.marketing",
+    section: "MARKETING",
     items: [
-      { label: "navigation.coupons", path: "/dashboard/coupons", icon: "Tag" },
+      { label: "Coupons", path: "/dashboard/coupons", icon: "Tag" },
     ],
   },
   {
-    section: "navigation.sections.communication",
+    section: "COMMUNICATION",
     items: [
-      { label: "navigation.notifications", path: "/dashboard/notifications", icon: "Bell" },
+      { label: "Notifications", path: "/dashboard/notifications", icon: "Bell" },
     ],
   },
   {
-    section: "navigation.sections.settings",
+    section: "SETTINGS",
     items: [
-      { label: "navigation.profile", path: "/dashboard/profile", icon: "User" },
-      { label: "navigation.settings", path: "/dashboard/settings", icon: "Settings" },
+      { label: "Profile", path: "/dashboard/profile", icon: "User" },
+      { label: "Settings", path: "/dashboard/settings", icon: "Settings" },
     ],
   },
 ];
