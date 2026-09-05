@@ -91,7 +91,7 @@ export default function Products() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-[#F5F3EF] -m-6 p-4
+      <div className="min-h-screen bg-[#ffffff] -m-6 p-4
         sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between
           items-start sm:items-center gap-4 mb-7">
@@ -108,7 +108,7 @@ export default function Products() {
         <div className="grid grid-cols-1 sm:grid-cols-2
           lg:grid-cols-4 gap-4 mb-7">
           {stats.map((stat, index) => (
-            <div key={index} className="bg-[#FCFAF7] p-5 rounded-2xl
+            <div key={index} className="bg-[#fffdfd] p-5 rounded-2xl
               border border-[#E3E0DB] shadow-sm">
               <div className="flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-lg flex items-center
@@ -122,7 +122,7 @@ export default function Products() {
           ))}
         </div>
 
-        <div className="bg-[#FCFAF7] p-4 rounded-2xl border
+        <div className="bg-[#fffefc] p-4 rounded-2xl border
           border-[#E3E0DB] shadow-sm mb-7">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">

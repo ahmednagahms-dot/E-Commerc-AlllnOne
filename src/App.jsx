@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import Carts from "./pages/Carts";
 import ProductForm from "./pages/ProductForm";
 import Products from "./pages/Products";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/dashboard/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
       <Route path="/dashboard/products/new" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
       <Route path="/dashboard/products/edit/:id" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
+      <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       
 
       {/* Catch-all route - redirect to dashboard */}
