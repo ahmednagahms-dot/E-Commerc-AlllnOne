@@ -10,6 +10,7 @@ const LanguageSwitcher = () => {
 
   const changeLanguage = (language) => {
     i18n.changeLanguage(language);
+    localStorage.setItem("language", language);
     setIsOpen(false);
   };
 
@@ -43,9 +44,7 @@ const LanguageSwitcher = () => {
 
         <ChevronDown
           size={16}
-          className={`transition-transform ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -60,9 +59,7 @@ const LanguageSwitcher = () => {
           >
             <span>English</span>
 
-            {i18n.language === "en" && (
-              <Check size={16} />
-            )}
+            {i18n.language === "en" && <Check size={16} />}
           </button>
 
           {/* Arabic */}
@@ -73,9 +70,7 @@ const LanguageSwitcher = () => {
           >
             <span>العربية</span>
 
-            {i18n.language === "ar" && (
-              <Check size={16} />
-            )}
+            {i18n.language === "ar" && <Check size={16} />}
           </button>
         </div>
       )}
