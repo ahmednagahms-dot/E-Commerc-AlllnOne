@@ -13,10 +13,8 @@ i18n.use(initReactI18next).init({
       translation: ar,
     },
   },
-
   lng: localStorage.getItem("language") || "en",
   fallbackLng: "en",
-
   interpolation: {
     escapeValue: false,
   },
@@ -24,20 +22,8 @@ i18n.use(initReactI18next).init({
 
 const updateDirection = (language) => {
   const isArabic = language === "ar";
-
   document.documentElement.lang = language;
   document.documentElement.dir = isArabic ? "rtl" : "ltr";
-
-  document.body.dir = isArabic ? "rtl" : "ltr";
-};
-
-updateDirection(i18n.language);
-
-i18n.on("languageChanged", updateDirection);
-
-  document.documentElement.lang = language;
-  document.documentElement.dir = isArabic ? "rtl" : "ltr";
-
   document.body.dir = isArabic ? "rtl" : "ltr";
 };
 
