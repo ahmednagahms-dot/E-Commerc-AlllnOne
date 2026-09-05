@@ -18,7 +18,7 @@ export default function LoginBanner() {
           />
         </div>
         <div>
-          <h1 className="font-semibold text-sm">ShopEase</h1>
+          <h1 className="font-semibold text-sm">AllInOne</h1>
           <p className="text-xs text-white/50">E-commerce Admin</p>
         </div>
       </div>
