@@ -15,6 +15,7 @@ export default function ProductForm() {
   const [imageFiles, setImageFiles] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [deletedImages, setDeletedImages] = useState([]);
+  const [tags, setTags] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(isEditMode);
   const [formError, setFormError] = useState("");
@@ -27,11 +28,9 @@ export default function ProductForm() {
       try {
         const response = await api.get(`/products/${id}`);
         const product = response.data.product;
-        reset({
-          ...product,
-          tags: (product.tags || []).join(", "),
-        });
+        reset(product);
         setExistingImages(product.images || []);
+        setTags(product.tags || []);
       } catch (err) {
         alert("Failed to load product data.");
       } finally {
@@ -49,7 +48,6 @@ export default function ProductForm() {
   const onSubmit = async (formData) => {
     setFormError("");
 
-    // في وضع الإضافة، لازم صورة واحدة على الأقل
     if (!isEditMode && imageFiles.length === 0) {
       setFormError("At least one image is required.");
       return;
@@ -69,16 +67,12 @@ export default function ProductForm() {
     data.append("featured", formData.featured || false);
     data.append("isActive", formData.isActive ?? true);
 
-    // التاجز لازم تتبعت كـ JSON string (زي ما موضح في التوثيق)
-    if (formData.tags) {
-      const tagsArray = formData.tags.split(",").map((t) => t.trim()).filter(Boolean);
-      data.append("tags", JSON.stringify(tagsArray));
+    if (tags.length > 0) {
+      data.append("tags", JSON.stringify(tags));
     }
 
-    // الصور الجديدة
     imageFiles.forEach((file) => data.append("images", file));
 
-    // في وضع التعديل، نبعت الصور المحذوفة (لو فيه)
     if (isEditMode && deletedImages.length > 0) {
       data.append("deletedImages", JSON.stringify(deletedImages));
     }
@@ -86,13 +80,9 @@ export default function ProductForm() {
     try {
       setSubmitting(true);
       if (isEditMode) {
-        await api.patch(`/products/update/${id}`, data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await api.patch(`/products/update/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
       } else {
-        await api.post("/products", data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await api.post("/products", data, { headers: { "Content-Type": "multipart/form-data" } });
       }
       navigate("/dashboard/products");
     } catch (err) {
@@ -108,19 +98,37 @@ export default function ProductForm() {
 
   return (
     <DashboardLayout>
-      <button onClick={() => navigate("/dashboard/products")} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 mb-4">
-        <ArrowLeft size={16} /> Back to products
-      </button>
-
-      <div className="flex items-start gap-3 mb-6">
-        <div className="w-11 h-11 rounded-lg bg-primary-50 text-primary-500 flex items-center justify-center shrink-0">
-          <PackagePlus size={20} />
-        </div>
+      {/* Dark Header Banner */}
+      <div className="bg-sidebar text-white rounded-2xl p-6 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold text-primary-500 tracking-widest uppercase">
-            {isEditMode ? "Edit Product" : "Create Product"}
-          </p>
-          <h1 className="text-2xl font-bold">{isEditMode ? "Update product details" : "Add a new product"}</h1>
+          <button
+            onClick={() => navigate("/dashboard/products")}
+            className="flex items-center gap-2 text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg mb-4"
+          >
+            <ArrowLeft size={14} /> Back to products
+          </button>
+
+          <div className="flex items-start gap-3">
+            <div className="w-11 h-11 rounded-lg bg-primary-500/20 text-primary-300 flex items-center justify-center shrink-0">
+              <PackagePlus size={20} />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-primary-300 tracking-widest uppercase">
+                {isEditMode ? "Edit Product" : "Create Product"}
+              </p>
+              <h1 className="text-2xl font-bold">
+                {isEditMode ? "Update product details" : "Launch a polished product entry"}
+              </h1>
+              <p className="text-sm text-white/50 mt-1">
+                Add products with validation, image previews, multi-upload support, and smooth UX.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white/10 rounded-xl px-4 py-3 shrink-0">
+          <p className="text-xs font-semibold text-primary-300 uppercase">Ready</p>
+          <p className="text-xs text-white/60 mt-0.5">Create, validate, and save with one click.</p>
         </div>
       </div>
 
@@ -136,6 +144,8 @@ export default function ProductForm() {
           setImageFiles={setImageFiles}
           existingImages={existingImages}
           onDeleteExistingImage={onDeleteExistingImage}
+          tags={tags}
+          setTags={setTags}
         />
 
         <div className="flex items-center gap-3 pt-6 mt-6 border-t">

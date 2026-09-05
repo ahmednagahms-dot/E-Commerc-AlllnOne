@@ -22,6 +22,7 @@ function App() {
       <Route path="/dashboard/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
       <Route path="/dashboard/products/new" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
       <Route path="/dashboard/products/edit/:id" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
+      
 
       {/* Catch-all route - redirect to dashboard */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
