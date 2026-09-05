@@ -1,0 +1,66 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading",
+    "submit": "Submit",
+    "close": "Close"
+  },
+
+  "navigation": {
+  "dashboard": "Dashboard",
+  "products": "Products",
+  "addProduct": "Add Product",
+  "orders": "Orders",
+  "carts": "Carts",
+  "users": "Users",
+  "reviews": "Reviews",
+  "wishlists": "Wishlists",
+  "coupons": "Coupons",
+  "notifications": "Notifications",
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Logout",
+  "sections": {
+    "main": "MAIN",
+    "marketing": "MARKETING",
+    "communication": "COMMUNICATION",
+    "settings": "SETTINGS"
+  }
+},
+
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password",
+    "welcomeBack": "Welcome Back",
+    "logOut":"Sign Out",
+    "massage" : "Sign in to your account to access the admin dashboard",
+    "or": "Sign in to your ShopEase admin account",
+    "rememberMe": "Remember Me"
+  },
+
+  "bannar": {
+    "manage": "Manage smarter.",
+    "sell": "Sell more.",
+    "massage" : "Powerful tools and insights to help you run your store, grow your business, and delight your customers.",
+    "sec" : "Secure. Fast. Reliable.",
+    "note" :"Your store. Your data. Always protected."
+  },
+
+  "products": {
+    "products": "Products",
+    "addProduct": "Add Product",
+    "editProduct": "Edit Product",
+    "productName": "Product Name",
+    "price": "Price",
+    "description": "Description",
+    "category": "Category",
+    "stock": "Stock"
+  }
+}
