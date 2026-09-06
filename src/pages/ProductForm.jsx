@@ -20,7 +20,7 @@ export default function ProductForm() {
   const [loadingProduct, setLoadingProduct] = useState(isEditMode);
   const [formError, setFormError] = useState("");
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm();
 
   useEffect(() => {
     if (!isEditMode) return;
@@ -146,6 +146,7 @@ export default function ProductForm() {
           onDeleteExistingImage={onDeleteExistingImage}
           tags={tags}
           setTags={setTags}
+          watch={watch}
         />
 
         <div className="flex items-center gap-3 pt-6 mt-6 border-t">
