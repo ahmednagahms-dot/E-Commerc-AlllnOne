@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/Profile";
+import Orders from './pages/Orders';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/dashboard" element={ <ProtectedRoute> <Dashboard /> </ProtectedRoute>}/>
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/dashboard/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/dashboard/orders" element={<Orders />} />
 
 
 
