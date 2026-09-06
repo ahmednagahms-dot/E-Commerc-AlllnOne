@@ -1,33 +1,34 @@
 export const sidebarLinks = [
   {
-    section: "MAIN",
+    section: "navigation.sections.main",
     items: [
-      { label: "Dashboard", path: "/dashboard", icon: "LayoutDashboard" },
-      { label: "Products", path: "/dashboard/products", icon: "Package" },
-      { label: "Add Product", path: "/dashboard/products/new", icon: "PackagePlus" },
-      { label: "Orders", path: "/dashboard/orders", icon: "ShoppingCart" },
-      { label: "Users", path: "/dashboard/users", icon: "Users" },
-      { label: "Reviews", path: "/dashboard/reviews", icon: "Star" },
-      { label: "Wishlists", path: "/dashboard/wishlists", icon: "Heart" },
+      { label: "navigation.dashboard", path: "/dashboard", icon: "LayoutDashboard" },
+      { label: "navigation.products", path: "/dashboard/products", icon: "Package" },
+      { label: "navigation.addProduct", path: "/dashboard/products/new", icon: "PackagePlus" },
+      { label: "navigation.orders", path: "/dashboard/orders", icon: "FileText" },
+      { label: "navigation.carts", path: "/dashboard/carts", icon: "ShoppingCart" },
+      { label: "navigation.users", path: "/dashboard/users", icon: "Users" },
+      { label: "navigation.reviews", path: "/dashboard/reviews", icon: "Star" },
+      { label: "navigation.wishlists", path: "/dashboard/wishlists", icon: "Heart" },
     ],
   },
   {
-    section: "MARKETING",
+    section: "navigation.sections.marketing",
     items: [
-      { label: "Coupons", path: "/dashboard/coupons", icon: "Tag" },
+      { label: "navigation.coupons", path: "/dashboard/coupons", icon: "Tag" },
     ],
   },
   {
-    section: "COMMUNICATION",
+    section: "navigation.sections.communication",
     items: [
-      { label: "Notifications", path: "/dashboard/notifications", icon: "Bell" },
+      { label: "navigation.notifications", path: "/dashboard/notifications", icon: "Bell" },
     ],
   },
   {
-    section: "SETTINGS",
+    section: "navigation.sections.settings",
     items: [
-      { label: "Profile", path: "/dashboard/profile", icon: "User" },
-      { label: "Settings", path: "/dashboard/settings", icon: "Settings" },
+      { label: "navigation.profile", path: "/dashboard/profile", icon: "User" },
+      { label: "navigation.settings", path: "/dashboard/settings", icon: "Settings" },
     ],
   },
 ];
