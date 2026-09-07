@@ -13,7 +13,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import api from "../api/axios";
+import { forgotPasswordSendOtp, forgotPasswordVerifyOtp } from "../api/auth.api";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -38,9 +38,6 @@ export default function ForgotPassword() {
 
   const password = watch("newPassword", "");
 
-  // -----------------------------
-  // Resend OTP Timer
-  // -----------------------------
   useEffect(() => {
     if (resendTimer <= 0) return;
 
@@ -51,33 +48,21 @@ export default function ForgotPassword() {
     return () => clearInterval(timer);
   }, [resendTimer]);
 
-  // -----------------------------
-  // Helpers
-  // -----------------------------
   const clearMessages = () => {
     setMessage("");
     setError("");
   };
 
-  // -----------------------------
-  // Step 1 - Send OTP
-  // -----------------------------
   const onSendOtp = async (data) => {
     clearMessages();
     setLoading(true);
 
     try {
-      await api.post("/auth/forgot-password/send-otp", {
-        email: data.email,
-      });
+      await forgotPasswordSendOtp({ email: data.email });
 
       setEmail(data.email);
-
       setMessage("A reset code has been sent to your email.");
-
       setStep("otp");
-
-      // Start resend timer
       setResendTimer(60);
     } catch (err) {
       setError(
@@ -89,15 +74,12 @@ export default function ForgotPassword() {
     }
   };
 
-  // -----------------------------
-  // Step 2 - Verify OTP
-  // -----------------------------
   const onVerifyOtp = async (data) => {
     clearMessages();
     setLoading(true);
 
     try {
-      await api.post("/auth/forgot-password/verify-otp", {
+      await forgotPasswordVerifyOtp({
         email,
         otp: data.otp,
         newPassword: data.newPassword,
@@ -120,9 +102,6 @@ export default function ForgotPassword() {
     }
   };
 
-  // -----------------------------
-  // Resend OTP
-  // -----------------------------
   const handleResend = async () => {
     if (resendTimer > 0 || loading) return;
 
@@ -130,12 +109,9 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      await api.post("/auth/forgot-password/send-otp", {
-        email,
-      });
+      await forgotPasswordSendOtp({ email });
 
       setMessage("A new reset code has been sent to your email.");
-
       setResendTimer(60);
     } catch (err) {
       setError(
@@ -147,9 +123,6 @@ export default function ForgotPassword() {
     }
   };
 
-  // -----------------------------
-  // Password Strength
-  // -----------------------------
   const getPasswordStrength = () => {
     if (!password) return 0;
 
@@ -175,11 +148,7 @@ export default function ForgotPassword() {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-[560px]">
-
-        {/* Card */}
         <div className="bg-white border border-slate-200 rounded-[28px] shadow-[0_20px_60px_rgba(15,23,42,0.10)] px-6 py-8 sm:px-10 sm:py-10">
-
-          {/* Back */}
           <Link
             to="/login"
             className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 transition-colors group"
@@ -188,14 +157,10 @@ export default function ForgotPassword() {
               size={17}
               className="transition-transform group-hover:-translate-x-1"
             />
-
             <span>Back to login</span>
           </Link>
 
-          {/* Header */}
           <div className="text-center mt-7">
-
-            {/* Icon */}
             <div className="mx-auto mb-6 w-16 h-16 bg-gradient-to-br from-indigo-100 to-purple-50 text-primary-600 rounded-2xl flex items-center justify-center">
               {step === "email" ? (
                 <Lock className="w-7 h-7 text-indigo-600" />
@@ -217,43 +182,28 @@ export default function ForgotPassword() {
             </p>
           </div>
 
-          {/* Success Message */}
           {message && (
             <div className="mt-7 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3.5">
               <CheckCircle2
                 size={18}
                 className="text-emerald-600 mt-0.5 shrink-0"
               />
-
-              <p className="text-sm text-emerald-700 leading-5">
-                {message}
-              </p>
+              <p className="text-sm text-emerald-700 leading-5">{message}</p>
             </div>
           )}
 
-          {/* Error Message */}
           {error && (
             <div className="mt-7 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5">
               <AlertCircle
                 size={18}
                 className="text-red-600 mt-0.5 shrink-0"
               />
-
-              <p className="text-sm text-red-700 leading-5">
-                {error}
-              </p>
+              <p className="text-sm text-red-700 leading-5">{error}</p>
             </div>
           )}
 
-          {/* =========================
-              STEP 1
-          ========================== */}
           {step === "email" && (
-            <form
-              onSubmit={handleSubmit(onSendOtp)}
-              className="mt-8 space-y-5"
-            >
-              {/* Email */}
+            <form onSubmit={handleSubmit(onSendOtp)} className="mt-8 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-slate-800 mb-2">
                   Email address
@@ -292,7 +242,6 @@ export default function ForgotPassword() {
                 )}
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
@@ -310,15 +259,8 @@ export default function ForgotPassword() {
             </form>
           )}
 
-          {/* =========================
-              STEP 2
-          ========================== */}
           {step === "otp" && (
-            <form
-              onSubmit={handleSubmit(onVerifyOtp)}
-              className="mt-8 space-y-5"
-            >
-              {/* OTP */}
+            <form onSubmit={handleSubmit(onVerifyOtp)} className="mt-8 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-slate-800 mb-2">
                   Reset code (OTP)
@@ -355,7 +297,6 @@ export default function ForgotPassword() {
                 )}
               </div>
 
-              {/* New Password */}
               <div>
                 <label className="block text-sm font-medium text-slate-800 mb-2">
                   New password
@@ -399,7 +340,6 @@ export default function ForgotPassword() {
                   </button>
                 </div>
 
-                {/* Password Strength */}
                 {password && (
                   <div className="mt-2.5">
                     <div className="flex gap-1.5">
@@ -428,7 +368,6 @@ export default function ForgotPassword() {
                 )}
               </div>
 
-              {/* Reset Button */}
               <button
                 type="submit"
                 disabled={loading}
@@ -444,7 +383,6 @@ export default function ForgotPassword() {
                 )}
               </button>
 
-              {/* Resend */}
               <div className="text-center pt-1">
                 <p className="text-sm text-slate-400">
                   Didn't receive a code?
@@ -462,7 +400,6 @@ export default function ForgotPassword() {
                 </button>
               </div>
 
-              {/* Change Email */}
               <button
                 type="button"
                 onClick={() => {
@@ -476,7 +413,6 @@ export default function ForgotPassword() {
             </form>
           )}
 
-          {/* Security Footer */}
           <div className="mt-8 pt-6 border-t border-slate-100">
             <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
               <ShieldCheck size={15} />
@@ -485,7 +421,6 @@ export default function ForgotPassword() {
           </div>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-xs text-slate-400 mt-5">
           © {new Date().getFullYear()} ShopEase. All rights reserved.
         </p>

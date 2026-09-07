@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function getPageNumbers(currentPage, totalPages) {
-  const delta = 1; // كام صفحة نعرض حوالين الصفحة الحالية
+  const delta = 1; 
   const pages = [];
 
   for (let i = 1; i <= totalPages; i++) {
