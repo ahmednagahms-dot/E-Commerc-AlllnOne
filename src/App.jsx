@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/Profile";
+import Orders from './pages/Orders';
 import Carts from "./pages/Carts";
 import Wishlists from "./pages/Wishlists";
 import Coupons from "./pages/Coupons";
@@ -21,6 +22,7 @@ function App() {
       {/* Protected Routes */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/dashboard/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+      <Route path="/dashboard/orders" element={<Orders />} />
       <Route path="/dashboard/carts" element={<ProtectedRoute><Carts /></ProtectedRoute>} />
       <Route path="/dashboard/Wishlists" element={<ProtectedRoute><Wishlists/></ProtectedRoute>} />
       <Route path="/dashboard/Coupons" element={<ProtectedRoute><Coupons/></ProtectedRoute>} />
