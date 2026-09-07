@@ -3,7 +3,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ForgotPassword from "./pages/ForgotPassword";
-import Profile from "./pages/Profile";
+import Profile from "./pages/profile";
 import Orders from './pages/Orders';
 import Carts from "./pages/Carts";
 import Wishlists from "./pages/Wishlists";
