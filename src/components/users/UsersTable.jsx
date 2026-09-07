@@ -1,25 +1,54 @@
-import Cookies from "js-cookie";
+import React, { useState } from "react";
+import { deleteUser, updateUser } from "../../api/user.api";
 
-const UsersTable = ({ users, setUsers }) => {
-  const handleDelete = (id) => {
-    const updatedUsers = users.filter((u) => u.id !== id);
-    setUsers(updatedUsers);
-    Cookies.set("users", JSON.stringify(updatedUsers), { expires: 7 });
+const UsersTable = ({ users, setUsers, onEditClick }) => {
+  const [updatingId, setUpdatingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
+
+  const handleDeleteClick = (id) => {
+    setUserToDelete(id);
   };
 
-  const handleToggleVerify = (id) => {
-    const updatedUsers = users.map((u) =>
-      u.id === id ? { ...u, verified: !u.verified } : u,
-    );
-    setUsers(updatedUsers);
-    Cookies.set("users", JSON.stringify(updatedUsers), { expires: 7 });
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+
+    setDeletingId(userToDelete);
+    try {
+      await deleteUser(userToDelete);
+      const updatedUsers = users.filter((u) => u._id !== userToDelete);
+      setUsers(updatedUsers);
+      setUserToDelete(null);
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("Delete Erorr.!");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleToggleVerify = async (id, currentStatus) => {
+    setUpdatingId(id);
+    try {
+      await updateUser(id, { isVerified: !currentStatus });
+
+      const updatedUsers = users.map((u) =>
+        u._id === id ? { ...u, isVerified: !currentStatus } : u,
+      );
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error("Error updating verification:", error);
+      alert("Edit Erorr.!");
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   return (
     <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="text-gray-500 text-sm bg-gradient-to-r from-slate-800 to-slate-700 text-white">
+          <tr className="text-gray-500 text-sm bg-gray-200 text-gray-500">
             <th className="p-4 font-medium">User</th>
             <th className="p-4 font-medium">Role</th>
             <th className="p-4 font-medium">Verified</th>
@@ -28,34 +57,37 @@ const UsersTable = ({ users, setUsers }) => {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr
-              key={user.id}
-              className="hover:bg-gray-50 transition-colors"
-            >
+            <tr key={user.id} className="hover:bg-gray-50 transition-colors">
               <td className="p-4 flex items-center gap-4">
-                {user?.image ? (
+                {user?.avatar ? (
                   <img
-                    src={user.image}
-                    alt={user.name}
+                    src={user.avatar}
+                    alt={user.username}
                     className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm"
                   />
                 ) : (
                   <div className="w-12 h-12 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
-                    {user?.name?.charAt(0).toUpperCase()}
+                    {user?.username?.charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div>
-                  <p className="font-bold text-gray-800">{user?.name}</p>
+                  <p className="font-bold text-gray-800">{user?.username}</p>
                   <p className="text-sm text-gray-500">{user?.email}</p>
                 </div>
               </td>
               <td className="p-4">
-                <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full text-xs font-semibold uppercase">
+                <span
+                  className={`bg-blue-50 px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                    user?.role?.toLowerCase() === "customer"
+                      ? "text-green-800"
+                      : "text-purple-800"
+                  }`}
+                >
                   {user?.role}
                 </span>
               </td>
               <td className="p-4">
-                {user?.verified ? (
+                {user?.isVerified ? (
                   <span className="text-green-600 font-semibold flex items-center gap-1">
                     Verified
                   </span>
@@ -69,8 +101,10 @@ const UsersTable = ({ users, setUsers }) => {
               <td className="p-4">
                 <div className="flex gap-2">
                   <button
+                    onClick={() => onEditClick(user)}
                     title="Edit User"
-                    className="bg-blue-500 text-white w-9 h-9 rounded-[10px] flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm"
+                    style={{ backgroundColor: "#0284C7" }}
+                    className="text-white w-9 h-9 rounded-[10px] flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -89,32 +123,62 @@ const UsersTable = ({ users, setUsers }) => {
                   </button>
 
                   <button
-                    title={
-                      user.verified ? "Remove Verification" : "Verify User"
+                    onClick={() =>
+                      handleToggleVerify(user._id, user.isVerified)
                     }
-                    onClick={() => handleToggleVerify(user.id)}
-                    className="bg-emerald-500 text-white w-9 h-9 rounded-[10px] flex items-center justify-center hover:bg-emerald-600 transition-colors shadow-sm"
+                    disabled={updatingId === user._id}
+                    title={
+                      user.isVerified ? "Remove Verification" : "Verify User"
+                    }
+                    className={`text-white w-9 h-9 rounded-[10px] flex items-center justify-center transition-colors shadow-sm ${
+                      updatingId === user._id
+                        ? "bg-emerald-400 cursor-wait"
+                        : "bg-emerald-500 hover:bg-emerald-600"
+                    }`}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                      className="w-4 h-4"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
-                      />
-                    </svg>
+                    {updatingId === user._id ? (
+                      <svg
+                        className="animate-spin w-4 h-4 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        className="w-4 h-4"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                        />
+                      </svg>
+                    )}
                   </button>
 
                   <button
+                    onClick={() => handleDeleteClick(user._id)}
                     title="Delete User"
-                    onClick={() => handleDelete(user.id)}
-                    className="bg-red-500 text-white w-9 h-9 rounded-[10px] flex items-center justify-center hover:bg-red-600 transition-colors shadow-sm"
+                    className="text-white w-9 h-9 rounded-[10px] flex items-center justify-center transition-colors shadow-sm bg-red-500 hover:bg-red-600"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -144,6 +208,81 @@ const UsersTable = ({ users, setUsers }) => {
           )}
         </tbody>
       </table>
+
+      {userToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
+          <div className="bg-white rounded-2xl p-6 w-[400px] shadow-2xl transform transition-all scale-100 opacity-100 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                className="w-8 h-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                ></path>
+              </svg>
+            </div>
+
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              Are you sure to delete him/her ?
+            </h3>
+            <p className="text-gray-500 text-sm mb-6">
+              If you delete it, you won't be able to recover its data. This step
+              is final.
+            </p>
+
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => setUserToDelete(null)}
+                disabled={deletingId !== null}
+                className="px-5 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={confirmDelete}
+                disabled={deletingId !== null}
+                className="px-5 py-2.5 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-wait shadow-sm shadow-red-200"
+              >
+                {deletingId !== null ? (
+                  <>
+                    <svg
+                      className="animate-spin w-4 h-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Deleting in progress...
+                  </>
+                ) : (
+                  "Delete"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -2,35 +2,48 @@ import React, { useState, useEffect } from "react";
 import UsersTable from "../components/users/UsersTable";
 import UserFormModal from "../components/users/UserFormModal";
 import DashboardLayout from "../components/layout/DashboardLayout";
-import Cookies from "js-cookie";
+import { fetchUsers } from "../api/user.api";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
 
   useEffect(() => {
-    const savedCookie = Cookies.get("users");
-    const savedUsers = savedCookie ? JSON.parse(savedCookie) : null;
+    const loadUsers = async () => {
+      try {
+        const response = await fetchUsers();
+        console.log("API Response:", response);
 
-    if (savedUsers && savedUsers.length > 0) {
-      setUsers(savedUsers);
-    } else {
-      const initialUsers = [];
-      setUsers(initialUsers);
-      Cookies.set("users", JSON.stringify(initialUsers), { expires: 7 });
-    }
+        const fetchedData =
+          response.data?.users || response.data?.data || response.data;
+
+        setUsers(Array.isArray(fetchedData) ? fetchedData : []);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setUsers([]);
+      }
+    };
+
+    loadUsers();
   }, []);
 
-  const totalUsers = users.length;
-  const adminsCount = users.filter((u) => u.role === "admin").length;
-  const customersCount = users.filter((u) => u.role === "customer").length;
-  const verifiedCount = users.filter((u) => u.verified).length;
+  const safeUsers = Array.isArray(users) ? users : [];
 
-  const filteredUsers = users.filter(
+  const totalUsers = safeUsers.length;
+  const adminsCount = safeUsers.filter(
+    (u) => u?.role === "admin" || u?.role === "ADMIN",
+  ).length;
+  const customersCount = safeUsers.filter(
+    (u) => u?.role === "customer" || u?.role === "CUSTOMER",
+  ).length;
+  const verifiedCount = safeUsers.filter((u) => u?.isVerified).length;
+
+  const filteredUsers = safeUsers.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+      user?.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user?.email?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -38,7 +51,7 @@ const Users = () => {
       <div className="p-6">
         <div className="flex justify-between items-end mb-8">
           <div>
-            <p className="text-blue-800 font-semibold tracking-wider text-sm mb-1">
+            <p style={{ color: "#4F46E5" }} className="font-semibold tracking-wider text-sm mb-1">
               USER MANAGEMENT
             </p>
             <h1 className="text-3xl font-bold text-gray-800">Manage Users</h1>
@@ -47,13 +60,17 @@ const Users = () => {
             <input
               type="text"
               placeholder="Search users..."
-              className="border border-gray-300 rounded-full px-4 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-900 shadow-md"
+              className="border border-gray-300 rounded-full px-4 py-2 w-64 focus:outline-none focus:ring-1 focus:ring-blue-200 shadow-md"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-gradient-to-r from-slate-900 to-slate-700 text-white px-6 py-2 rounded-full font-medium hover:from-slate-800 hover:to-slate-600 transition-all shadow-xl active:scale-95 transition-colors"
+              onClick={() => {
+                setEditingUser(null);
+                setIsModalOpen(true);
+              }}
+              style={{ backgroundColor: "#4F46E5" }}
+              className="text-white px-6 py-2 rounded-full font-medium focus:scale-90 hover:scale-102 transition-all shadow-md hover:shadow-lg"
             >
               + Add User
             </button>
@@ -61,12 +78,15 @@ const Users = () => {
         </div>
 
         <div className="grid grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center">
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center hover:-translate-y-2 transition-all duration-300 ease-in-out">
             <div>
               <p className="text-gray-500 text-sm">Total Users</p>
               <p className="text-2xl font-bold">{totalUsers}</p>
             </div>
-            <div className="bg-gradient-to-br from-blue-900 to-blue-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm">
+            <div
+              style={{ backgroundColor: "#2563EB" }}
+              className="text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -83,12 +103,15 @@ const Users = () => {
               </svg>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center">
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center hover:-translate-y-2 transition-all duration-300 ease-in-out">
             <div>
               <p className="text-gray-500 text-sm">Admins</p>
               <p className="text-2xl font-bold">{adminsCount}</p>
             </div>
-            <div className="bg-gradient-to-br from-blue-900 to-blue-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm">
+            <div
+              style={{ backgroundColor: "#7C3AED" }}
+              className="text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -105,12 +128,15 @@ const Users = () => {
               </svg>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center">
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center hover:-translate-y-2 transition-all duration-300 ease-in-out">
             <div>
               <p className="text-gray-500 text-sm">Customers</p>
               <p className="text-2xl font-bold">{customersCount}</p>
             </div>
-            <div className="bg-gradient-to-br from-blue-900 to-blue-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm">
+            <div
+              style={{ backgroundColor: "#0D9488" }}
+              className="text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -127,12 +153,15 @@ const Users = () => {
               </svg>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center">
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center hover:-translate-y-2 transition-all duration-300 ease-in-out">
             <div>
               <p className="text-gray-500 text-sm">Verified</p>
               <p className="text-2xl font-bold">{verifiedCount}</p>
             </div>
-            <div className="bg-gradient-to-br from-blue-900 to-blue-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm">
+            <div
+              style={{ backgroundColor: "#D97706" }}
+              className="text-white w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -150,13 +179,23 @@ const Users = () => {
             </div>
           </div>
         </div>
-
-        <UsersTable users={filteredUsers} setUsers={setUsers} />
+        <UsersTable
+          users={filteredUsers}
+          setUsers={setUsers}
+          onEditClick={(user) => {
+            setEditingUser(user);
+            setIsModalOpen(true);
+          }}
+        />
 
         {isModalOpen && (
           <UserFormModal
-            closeModal={() => setIsModalOpen(false)}
+            closeModal={() => {
+              setIsModalOpen(false);
+              setEditingUser(null);
+            }}
             setUsers={setUsers}
+            editingUser={editingUser}
           />
         )}
       </div>
