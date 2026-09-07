@@ -22,7 +22,7 @@ function App() {
       {/* Protected Routes */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/dashboard/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/dashboard/orders" element={<Orders />} />
+      <Route path="/dashboard/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
       <Route path="/dashboard/carts" element={<ProtectedRoute><Carts /></ProtectedRoute>} />
       <Route path="/dashboard/Wishlists" element={<ProtectedRoute><Wishlists/></ProtectedRoute>} />
       <Route path="/dashboard/Coupons" element={<ProtectedRoute><Coupons/></ProtectedRoute>} />
