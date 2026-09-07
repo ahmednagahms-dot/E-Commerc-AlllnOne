@@ -10,6 +10,7 @@ import Coupons from "./pages/Coupons";
 import ProductForm from "./pages/ProductForm";
 import Products from "./pages/Products";
 import Settings from "./pages/Settings";
+import Users from "./pages/Users";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
       <Route path="/dashboard/products/new" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
       <Route path="/dashboard/products/edit/:id" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
       <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/dashboard/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
       
 
       {/* Catch-all route - redirect to dashboard */}
