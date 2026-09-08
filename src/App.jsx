@@ -12,6 +12,8 @@ import ProductForm from "./pages/ProductForm";
 import Products from "./pages/Products";
 import Settings from "./pages/Settings";
 import Users from "./pages/Users";
+import Categories from "./pages/Categories";
+import Reviews from "./pages/Reviews";
 
 function App() {
   return (
@@ -27,12 +29,13 @@ function App() {
       <Route path="/dashboard/carts" element={<ProtectedRoute><Carts /></ProtectedRoute>} />
       <Route path="/dashboard/Wishlists" element={<ProtectedRoute><Wishlists/></ProtectedRoute>} />
       <Route path="/dashboard/Coupons" element={<ProtectedRoute><Coupons/></ProtectedRoute>} />
-
+      <Route path="/dashboard/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
       <Route path="/dashboard/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
       <Route path="/dashboard/products/new" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
       <Route path="/dashboard/products/edit/:id" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
       <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/dashboard/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+      <Route path="/dashboard/reviews" element={<ProtectedRoute><Reviews /></ProtectedRoute>} />
       
 
       {/* Catch-all route - redirect to dashboard */}

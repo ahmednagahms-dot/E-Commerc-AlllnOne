@@ -6,7 +6,7 @@ import Pagination from "../components/ui/Pagination"
 import api from "../api/axios"
 
 const LIMIT = 9
-const CATEGORIES = ["electronics", "phones", "fashion", "home", "beauty", "sports"]
+// const CATEGORIES = ["electronics", "phones", "fashion", "home", "beauty", "sports"]
 
 export default function Products() {
   const navigate = useNavigate()
@@ -308,6 +308,7 @@ export default function Products() {
               onPageChange={setCurrentPage} totalItems={totalProducts} itemsPerPage={LIMIT} />
           </>
         )}
+        
       </div>
     </DashboardLayout>
   )

@@ -1,8 +1,7 @@
 import { ImagePlus, X, Sparkles, Tag, DollarSign, Layers, Boxes } from "lucide-react";
 import Input from "../ui/Input";
 import TagsInput from "./TagsInput";
-
-const categories = ["electronics", "phones", "fashion", "home", "beauty", "sports"];
+import { getAllCategories } from "../../data/customCategories";
 
 function SectionHeader({ icon: Icon, title, subtitle }) {
   return (
@@ -117,7 +116,7 @@ export default function ProductFormFields({
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                   {...register("category")}
                 >
-                  {categories.map((c) => (
+                  {getAllCategories().map((c) => (
                     <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
                   ))}
                 </select>
