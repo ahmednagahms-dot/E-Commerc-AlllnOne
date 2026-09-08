@@ -10,10 +10,6 @@ import {
   Trash2,
 } from "lucide-react";
 
-<<<<<<< HEAD
-const LIMIT = 9
-// const CATEGORIES = ["electronics", "phones", "fashion", "home", "beauty", "sports"]
-=======
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Pagination from "../components/ui/Pagination";
 import DeleteConfirmModal from "../components/products/DeleteConfirmModal";
@@ -30,7 +26,6 @@ const CATEGORIES = [
   "beauty",
   "sports",
 ];
->>>>>>> 68aa3543cbe0216df74665538c7071d5d29b73d2
 
 export default function Products() {
   const navigate = useNavigate();
@@ -596,9 +591,6 @@ export default function Products() {
             />
           </>
         )}
-<<<<<<< HEAD
-        
-=======
 
         {/* Delete Confirmation Modal */}
         <DeleteConfirmModal
@@ -616,7 +608,6 @@ export default function Products() {
           onClose={handleCloseQuickEdit}
           onUpdated={handleProductUpdated}
         />
->>>>>>> 68aa3543cbe0216df74665538c7071d5d29b73d2
       </div>
     </DashboardLayout>
   );
