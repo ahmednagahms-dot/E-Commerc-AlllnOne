@@ -83,15 +83,11 @@ export default function Products() {
     }, 0);
 
     return () => clearTimeout(timeoutId);
-  }, [currentPage, category, sortBy]);
+  }, [currentPage, category, sortBy, search]);
 
   const handleSearch = () => {
     setSearch(searchText.trim());
     setCurrentPage(1);
-
-    if (currentPage === 1) {
-      fetchProducts();
-    }
   };
 
   const changeFeatured = async (item) => {
@@ -99,15 +95,12 @@ export default function Products() {
 
     setItems((prev) =>
       prev.map((x) =>
-        x._id === item._id
-          ? { ...x, featured: newValue }
-          : x
+        x._id === item._id ? { ...x, featured: newValue } : x
       )
     );
 
     try {
       const formData = new FormData();
-
       formData.append("featured", newValue);
 
       await api.patch(
@@ -122,9 +115,7 @@ export default function Products() {
     } catch (err) {
       setItems((prev) =>
         prev.map((x) =>
-          x._id === item._id
-            ? { ...x, featured: !newValue }
-            : x
+          x._id === item._id ? { ...x, featured: !newValue } : x
         )
       );
 
@@ -222,7 +213,6 @@ export default function Products() {
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-[#F5F3EF] -m-6 p-4 sm:p-6">
-
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-7">
           <div>
@@ -276,9 +266,7 @@ export default function Products() {
 
         {/* Search & Filters */}
         <div className="bg-[#FCFAF7] p-4 rounded-2xl border border-[#E3E0DB] shadow-sm mb-7">
-
           <div className="flex flex-col sm:flex-row gap-3">
-
             <div className="relative flex-1">
               <Search
                 size={18}
@@ -320,13 +308,11 @@ export default function Products() {
               <SlidersHorizontal size={20} />
               Filter
             </button>
-
           </div>
 
           {/* Filters */}
           {showFilters && (
             <div className="mt-4 pt-4 border-t border-[#E3E0DB] grid grid-cols-1 sm:grid-cols-2 gap-4">
-
               <div>
                 <p className="text-sm font-semibold text-[#405066] mb-2">
                   Categories
@@ -394,7 +380,6 @@ export default function Products() {
               >
                 Clear Filters
               </button>
-
             </div>
           )}
         </div>
@@ -415,9 +400,7 @@ export default function Products() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-
               {items.map((item) => {
-
                 const hasDiscount =
                   item.discountPrice &&
                   item.discountPrice < item.price;
@@ -444,10 +427,8 @@ export default function Products() {
                     key={item._id}
                     className="bg-[#FCFAF7] rounded-2xl overflow-hidden border border-[#E3E0DB] shadow-sm hover:shadow-md transition flex flex-col"
                   >
-
                     {/* Image */}
                     <div className="relative bg-[#F3F1ED]">
-
                       <div className="h-52 sm:h-56 overflow-hidden">
                         {item.images?.length > 0 ? (
                           <img
@@ -494,69 +475,75 @@ export default function Products() {
                           ? `${item.stock} in stock`
                           : "Out of stock"}
                       </span>
-
                     </div>
 
                     {/* Product Info */}
                     <div className="p-5 flex flex-col flex-1">
-
                       <h2 className="font-bold text-lg text-[#172033]">
                         {item.name}
                       </h2>
 
-                      <p className="text-[#697386] text-sm mt-1 capitalize">
-                        {item.category}
-                        {item.subcategory &&
-                          ` / ${item.subcategory}`}
-                      </p>
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-sm font-medium text-[#8A94A6]">
+                        {item.category && (
+                          <span className="capitalize">{item.category}</span>
+                        )}
+                        {item.subcategory && (
+                          <>
+                            <span className="text-[#C2C0BB]">•</span>
+                            <span className="capitalize">{item.subcategory}</span>
+                          </>
+                        )}
+                        {item.brand && (
+                          <>
+                            <span className="text-[#C2C0BB]">•</span>
+                            <span>{item.brand}</span>
+                          </>
+                        )}
+                      </div>
 
-                      <div className="flex items-center gap-3 mt-4">
-                        <span className="font-bold text-2xl text-[#18243A]">
+                      {item.shortDescription && (
+                        <p className="text-[#344054] text-sm mt-3 leading-6 font-medium line-clamp-2">
+                          {item.shortDescription}
+                        </p>
+                      )}
+
+                      <div className="flex items-end gap-3 mt-7">
+                        <span className="font-extrabold text-[30px] leading-none tracking-tight text-[#263653]">
                           ${displayPrice}
                         </span>
-
                         {hasDiscount && (
-                          <span className="text-[#20A464] text-sm font-medium">
+                          <span className="mb-0.5 text-sm font-semibold text-[#20A464]">
                             -${discountAmount} off
                           </span>
                         )}
                       </div>
 
-                      <div className="min-h-[32px] mt-3">
-                        {tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
-                            {tags.map((tag, index) => (
-                              <span
-                                key={`${item._id}-tag-${index}`}
-                                className="px-3 py-1 bg-[#F8F6F3] border border-[#D4CEC5] text-[#596273] text-xs rounded-md"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      {/* Tags */}
+                      {tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {tags.map((tag, index) => (
+                            <span
+                              key={`${item._id}-tag-${index}`}
+                              className="px-3 py-1 bg-[#F8F6F3] border border-[#D4CEC5] text-[#596273] text-xs rounded-md"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
                       {/* Actions */}
-                      <div className="flex items-center justify-between gap-3 mt-auto pt-5">
-
-                        <div className="flex items-center gap-1.5 shrink-0">
-
+                      <div className="mt-6 pt-4 border-t border-[#E5E1DB]">
+                        <div className="flex items-center gap-2">
                           <button
-                            onClick={() =>{
-                              // alert("item._id");
+                            onClick={() =>
                               navigate(
                                 `/dashboard/products/${item._id}/view`
                               )
                             }
-                            }
-                            className="h-9 px-2.5 bg-[#F3F1ED] border border-[#D9D5CF] rounded-lg text-[#405066] hover:bg-[#EAE7E1] flex items-center gap-1 text-xs whitespace-nowrap"
+                            className="group h-10 px-3 rounded-xl border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066] flex items-center gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#263653] hover:border-[#263653] hover:text-white hover:shadow-md active:translate-y-0 active:scale-[0.97]"
                           >
-                            <Eye
-                              size={14}
-                              className="text-[#1D2A43]"
-                            />
-                            View
+                            <Eye size={15} /> View
                           </button>
 
                           <button
@@ -565,50 +552,34 @@ export default function Products() {
                                 `/dashboard/products/${item._id}/edit`
                               )
                             }
-                            className="h-9 px-2.5 bg-[#F3F1ED] border border-[#D9D5CF] rounded-lg text-[#405066] hover:bg-[#EAE7E1] flex items-center gap-1 text-xs whitespace-nowrap"
+                            className="group h-10 px-3 rounded-xl border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066] flex items-center gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#EEF1F7] hover:border-[#3157D5] hover:text-[#3157D5] hover:shadow-md active:translate-y-0 active:scale-[0.97]"
                           >
-                            <Pencil
-                              size={14}
-                              className="text-[#1D2A43]"
-                            />
-                            Edit
+                            <Pencil size={15} /> Edit
                           </button>
 
                           <button
                             type="button"
-                            onClick={(e) =>{
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleQuickEdit(item)} }
-                            className="h-9 px-2.5 bg-[#F3F1ED] border border-[#D9D5CF] rounded-lg text-[#405066] hover:bg-[#EAE7E1] flex items-center gap-1 text-xs whitespace-nowrap"
+                            onClick={() => handleQuickEdit(item)}
+                            className="group h-10 px-3 rounded-xl border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066] flex items-center gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#FFF8E8] hover:border-[#D99A16] hover:text-[#D99A16] hover:shadow-md active:translate-y-0 active:scale-[0.97]"
                           >
-                            <SlidersHorizontal
-                              size={14}
-                              className="text-[#1D2A43]"
-                            />
-                            Quick Edit
+                            <SlidersHorizontal size={15} /> Quick Edit
                           </button>
-
                         </div>
 
-                        {/* Delete */}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleDelete(item)
-                          }
-                          className="h-9 px-2.5 bg-[#FBEFEE] border border-[#E9C9C6] rounded-lg text-[#C94A4A] hover:bg-[#F8E3E1] flex items-center gap-1 text-xs whitespace-nowrap shrink-0"
-                        >
-                          <Trash2 size={14} />
-                          Delete
-                        </button>
-
+                        <div className="flex justify-end mt-3">
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(item)}
+                            className="h-10 px-3 rounded-xl border border-[#E9C9C6] bg-[#FDF4F3] text-[#C94A4A] flex items-center justify-center gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#C94A4A] hover:border-[#C94A4A] hover:text-white hover:shadow-md active:translate-y-0 active:scale-[0.97]"
+                          >
+                            <Trash2 size={15} /> Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 );
               })}
-
             </div>
 
             <Pagination
@@ -637,7 +608,6 @@ export default function Products() {
           onClose={handleCloseQuickEdit}
           onUpdated={handleProductUpdated}
         />
-
       </div>
     </DashboardLayout>
   );

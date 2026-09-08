@@ -1,12 +1,14 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials : true,
 });
 
 api.interceptors.request.use((config) => {
-  const token = Cookies.get("shopease_token");
+  const token = Cookies.get("allinone_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -16,11 +18,13 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      Cookies.remove("shopease_token");
-      Cookies.remove("shopease_user");
+    if (error.message.status === 401) {
+      Cookies.remove("allinone_token");
+      Cookies.remove("allinone_user");
       if (!window.location.pathname.startsWith("/login")) {
-        window.location.href = "/login";
+        window.history.replaceState(null,"","/login") 
+
+
       }
     }
     return Promise.reject(error);

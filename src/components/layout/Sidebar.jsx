@@ -9,7 +9,7 @@ const STORE_LOGO_URL =
   "https://res.cloudinary.com/iuc91bdy/image/upload/v1788294261/akybn7rcd5gmyfvdqx1i.png";
 
 export default function Sidebar({ onClose }) {
-  const { logout, user } = useAuth();
+  const { logoutUser, user } = useAuth();
   const {t} = useTranslation();
 
   return (
@@ -97,7 +97,10 @@ export default function Sidebar({ onClose }) {
           </div>
         </div>
         <button
-          onClick={logout}
+          onClick={async () => {
+            await logoutUser();
+            window.location.href = "/login";
+          }}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition"
         >
           <LogOut size={18} />
