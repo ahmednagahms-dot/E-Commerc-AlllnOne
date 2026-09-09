@@ -1,3 +1,11 @@
+
+import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { Search, SlidersHorizontal, Star, Plus, Eye, Pencil, Trash2 } from "lucide-react"
+import DashboardLayout from "../components/layout/DashboardLayout"
+import Pagination from "../components/ui/Pagination"
+import api from "../api/axios"
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -9,6 +17,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Pagination from "../components/ui/Pagination";
@@ -28,7 +37,51 @@ const CATEGORIES = [
 ];
 
 export default function Products() {
+
+  const navigate = useNavigate()
+  const [items, setItems] = useState([])
+  const [totalProducts, setTotalProducts] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [search, setSearch] = useState("")
+  const [searchText, setSearchText] = useState("")
+  const [category, setCategory] = useState("")
+  const [sortBy, setSortBy] = useState("")
+  const [showFilters, setShowFilters] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { getAllCategories } from "../data/customCategories";
+import {
+  Search,
+  SlidersHorizontal,
+  Star,
+  Plus,
+  Eye,
+  Pencil,
+  Trash2,
+} from "lucide-react";
+
+import DashboardLayout from "../components/layout/DashboardLayout";
+import Pagination from "../components/ui/Pagination";
+import DeleteConfirmModal from "../components/products/DeleteConfirmModal";
+import QuickEditModel from "../components/products/QuickEditModel";
+import api from "../api/axios";
+
+const LIMIT = 9;
+
+
+
+export default function Products() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const CATEGORIES = getAllCategories();
+
+  const navigate = useNavigate();
+
 
   const [items, setItems] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -40,9 +93,15 @@ export default function Products() {
 
   const [search, setSearch] = useState("");
   const [searchText, setSearchText] = useState("");
+
+  const [category, setCategory] = useState(searchParams.get("category") || "");
+  const [showFilters, setShowFilters] = useState(!!searchParams.get("category"));
+  const [sortBy, setSortBy] = useState("");
+
   const [category, setCategory] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+
 
   // Delete Modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -51,6 +110,7 @@ export default function Products() {
   // Quick Edit Modal state
   const [quickEditOpen, setQuickEditOpen] = useState(false);
   const [quickEditProduct, setQuickEditProduct] = useState(null);
+
 
   const fetchProducts = async () => {
     try {
@@ -546,14 +606,28 @@ export default function Products() {
                             <Eye size={15} /> View
                           </button>
 
+                          <button onClick={() => navigate(`/dashboard/products/${item._id}/edit`)} className="group h-10 px-3 rounded-xl
+                            border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066]
+                            flex items-center gap-1.5 text-xs font-semibold shadow-sm
+                            transition-all duration-200 hover:-translate-y-0.5
+                            hover:bg-[#EEF1F7] hover:border-[#3157D5] hover:text-[#3157D5]
+                            hover:shadow-md active:translate-y-0 active:scale-[0.97]">
+
+
+
                           <button
                             onClick={() =>
                               navigate(
+
+                               `/dashboard/products/edit/${item._id}`
+
                                 `/dashboard/products/${item._id}/edit`
+
                               )
                             }
                             className="group h-10 px-3 rounded-xl border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066] flex items-center gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#EEF1F7] hover:border-[#3157D5] hover:text-[#3157D5] hover:shadow-md active:translate-y-0 active:scale-[0.97]"
                           >
+
                             <Pencil size={15} /> Edit
                           </button>
 
