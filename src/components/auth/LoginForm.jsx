@@ -4,11 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
-import api from "../../api/axios";
 import { useTranslation } from "react-i18next";
 
 export default function LoginForm() {
-  const { login } = useAuth();
+  const { loginUser } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -26,15 +25,13 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const response = await api.post("/auth/login", { email, password });
-      const { token, user } = response.data;
+      const data = await loginUser({ email, password });
 
-      if (user.role !== "admin") {
+      if (data.user.role !== "admin") {
         setLoginError("This account doesn't have admin access.");
         return;
       }
 
-      login(user, token);
       navigate("/dashboard");
     } catch (err) {
       setLoginError(err.response?.data?.message || "Invalid email or password");

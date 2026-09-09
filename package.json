@@ -13,7 +13,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "axios": "^1.6.8",
     "i18next": "^23.10.1",
-    "js-cookie": "^3.0.5",
+    "js-cookie": "^3.0.8",
     "lucide-react": "^0.365.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
