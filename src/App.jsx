@@ -8,6 +8,7 @@ import Orders from './pages/Orders';
 import Carts from "./pages/Carts";
 import Wishlists from "./pages/Wishlists";
 import Coupons from "./pages/Coupons";
+import Notifications from "./pages/Notifications";
 import ProductForm from "./pages/ProductForm";
 import Products from "./pages/Products";
 import ProductView from "./pages/ProductView";
@@ -30,6 +31,8 @@ function App() {
 
       <Route path="/dashboard/Wishlists" element={<ProtectedRoute><Wishlists/></ProtectedRoute>} />
       <Route path="/dashboard/Coupons" element={<ProtectedRoute><Coupons/></ProtectedRoute>} />
+      <Route path="/dashboard/Notifications" element={<ProtectedRoute><Notifications/></ProtectedRoute>} />
+
 
       <Route path="/dashboard/wishlists" element={<ProtectedRoute><Wishlists /></ProtectedRoute>} />
       <Route path="/dashboard/coupons" element={<ProtectedRoute><Coupons /></ProtectedRoute>} />
