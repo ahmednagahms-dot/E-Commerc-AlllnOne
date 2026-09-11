@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "../api/axios";
+import DashboardLayout from "../components/layout/DashboardLayout"
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -136,6 +137,7 @@ const Orders = () => {
   };
 
   return (
+     <DashboardLayout>
     <div className="p-8 bg-gray-100 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -547,6 +549,7 @@ const Orders = () => {
         </div>
       </div>
     </div>
+    </DashboardLayout>
   );
 };
 
