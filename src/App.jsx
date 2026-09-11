@@ -11,6 +11,7 @@ import Coupons from "./pages/Coupons";
 import ProductForm from "./pages/ProductForm";
 import Products from "./pages/Products";
 import Settings from "./pages/Settings";
+import Reviews from "./pages/Reviews";
 
 function App() {
   return (
@@ -35,7 +36,16 @@ function App() {
 
       {/* Catch-all route - redirect to dashboard */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
+  <Route 
+  path="/dashboard/reviews" 
+  element={
+    <ProtectedRoute>
+      <Reviews />
+    </ProtectedRoute>
+  } 
+/>
     </Routes>
+    
   );
 }
 
