@@ -13,8 +13,11 @@ import ProductForm from "./pages/ProductForm";
 import Products from "./pages/Products";
 import ProductView from "./pages/ProductView";
 import Settings from "./pages/Settings";
+import Reviews from "./pages/Reviews";
+
 import Users from "./pages/Users";
 import Categories from "./pages/Categories";
+
 
 function App() {
   return (
@@ -54,7 +57,16 @@ function App() {
 
       {/* Catch-all route - redirect to dashboard */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
+  <Route 
+  path="/dashboard/reviews" 
+  element={
+    <ProtectedRoute>
+      <Reviews />
+    </ProtectedRoute>
+  } 
+/>
     </Routes>
+    
   );
 }
 
