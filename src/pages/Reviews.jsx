@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { FiSearch, FiTrash2, FiPlus, FiMessageSquare } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
@@ -71,12 +72,14 @@ const AddReviewModal = ({ isOpen, onClose, products, onReviewAdded }) => {
         setRating(5);
         onReviewAdded();
         onClose();
+        toast.success("Review added successfully!");
       } else {
         const errorData = await response.json();
-        alert(errorData.message || 'Failed to add review');
+        toast.error(errorData.message || 'Failed to add review');
       }
     } catch (error) {
       console.error('Failed to add review:', error);
+      toast.error("Failed to add review. Please try again.");
     }
   };
 
@@ -289,6 +292,7 @@ const Reviews = () => {
       fetchData(); // ده هيشغل اللودينج الشبح تاني وهو بيجيب الداتا الجديدة، شكلها هيبقى احترافي!
     } catch (error) {
       console.error('Error deleting review:', error);
+       toast.error("Failed to load reviews.");
     }
   };
 

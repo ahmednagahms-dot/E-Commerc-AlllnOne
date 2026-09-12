@@ -1,4 +1,5 @@
     import { useEffect, useState } from "react";
+    import { toast } from "react-toastify";
     import { useNavigate, useParams } from "react-router-dom";
     import {
     ArrowLeft,
@@ -56,6 +57,9 @@
         } catch (err) {
             setError(
             err.response?.data?.message ||
+                "Failed to load product details."
+            );
+            toast.error(err.response?.data?.message ||
                 "Failed to load product details."
             );
         } finally {

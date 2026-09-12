@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -107,14 +108,14 @@ export default function Products() {
           "Content-Type": "multipart/form-data",
         },
       });
+      toast.success("Featured status updated successfully!");
     } catch (err) {
       setItems((prev) =>
         prev.map((x) =>
           x._id === item._id ? { ...x, featured: !newValue } : x,
         ),
       );
-
-      alert("Failed to update featured status.");
+      toast.error("Failed to update featured status.");
     }
   };
 
@@ -137,6 +138,7 @@ export default function Products() {
     setItems((prev) => prev.filter((item) => item._id !== selectedProduct._id));
 
     setTotalProducts((prev) => Math.max(prev - 1, 0));
+    toast.success("Product deleted successfully!");
   };
 
   const clearFilters = () => {
@@ -552,6 +554,15 @@ export default function Products() {
                 />
               </>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <DeleteConfirmModal
+              isOpen={deleteModalOpen}
+              productId={selectedProduct?._id}
+              productName={selectedProduct?.name}
+              onClose={handleCloseDeleteModal}
+              onDeleted={handleProductDeleted}
+            />
 
             {/* Delete Confirmation Modal */}
             <DeleteConfirmModal

@@ -1,4 +1,6 @@
 import React from 'react';
+const STORE_LOGO_URL =
+  "https://res.cloudinary.com/iuc91bdy/image/upload/v1788294261/akybn7rcd5gmyfvdqx1i.png";
 
 const SessionLoader = () => {
   return (
@@ -14,8 +16,12 @@ const SessionLoader = () => {
         
         <div className="absolute inset-8 rounded-full border border-slate-100 bg-white shadow-sm"></div>
 
-        <div className="relative flex items-center justify-center w-14 h-14 bg-gradient-to-tr from-slate-900 to-slate-700 rounded-full shadow-lg">
-          <span className="text-white font-black text-xl tracking-tighter">AlO</span>
+        <div className="relative flex items-center justify-center w-14 h-14 rounded-full shadow-lg">
+          <img 
+          src={STORE_LOGO_URL} 
+          alt="AllInOne Logo" 
+          className="w-14 h-14 object-contain" 
+        />
         </div>
       </div>
 

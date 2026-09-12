@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import api from "../api/axios";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
@@ -17,9 +18,11 @@ export default function Notifications() {
             ? response.data
             : response.data?.Notifications || response.data?.data || [],
         );
+        toast.success("Notifications loaded successfully!");
       } catch (error) {
         console.error("Error fetching Notifications:", error);
         setNotifications([]);
+        toast.error("Failed to load notifications.");
       } finally {
         setLoading(false);
       }

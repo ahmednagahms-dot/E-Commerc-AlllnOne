@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "../api/axios";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
+import { toast } from "react-toastify";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -60,6 +61,7 @@ const Orders = () => {
         setTotalOrders(
           data.results || data.totalOrders || data.total || list.length || 0,
         );
+
       } catch (err) {
         console.error("API Error:", err);
         if (err.response?.status === 401) {
@@ -74,6 +76,7 @@ const Orders = () => {
           );
         }
         setOrders([]);
+        toast.error("Failed to load orders.");
       } finally {
         setLoading(false);
       }
@@ -101,11 +104,11 @@ const Orders = () => {
         ),
       );
 
-      setSelectedOrder((prev) => ({ ...prev, status: newStatus }));
-      alert("Order status updated successfully!");
+      setSelectedOrder(prev => ({ ...prev, status: newStatus }));
+      toast.success("Order status updated successfully!");
     } catch (err) {
       console.error("Failed to update status:", err);
-      alert(err.response?.data?.message || "Failed to update order status.");
+      toast.error(err.response?.data?.message || "Failed to update order status.");
     } finally {
       setUpdating(false);
     }

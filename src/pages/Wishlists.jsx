@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import api from "../api/axios";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
@@ -20,6 +21,7 @@ export default function Wishlists() {
       } catch (error) {
         console.error("Error fetching Wishlists:", error);
         setWishlists([]);
+        toast.error("Failed Loading Wishlists:", error);
       } finally {
         setLoading(false);
       }

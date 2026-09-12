@@ -10,6 +10,7 @@ import {
 } from "../data/customCategories";
 import api from "../api/axios";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
+import { toast } from "react-toastify";
 
 export default function Categories() {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export default function Categories() {
         setError(null);
       } catch (err) {
         setError("Failed to load categories.");
+         toast.error("Failed to load categories.");
       } finally {
         setLoading(false);
       }

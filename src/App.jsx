@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -21,6 +23,7 @@ import Categories from "./pages/Categories";
 
 function App() {
   return (
+    <>
     <Routes>
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
@@ -67,6 +70,18 @@ function App() {
 />
     </Routes>
     
+     <ToastContainer
+  position="top-right"
+  autoClose={3000}
+  hideProgressBar={false}
+  newestOnTop
+  closeOnClick
+  pauseOnHover
+  draggable
+  toastClassName="!bg-[#FCFAF7] !text-[#263653] !rounded-2xl !border !border-[#E3E0DB] !shadow-lg !w-[calc(100vw-2rem)] sm:!w-[380px] !min-h-[60px] !font-medium"
+  progressClassName="!bg-[#20A464]"
+/>
+    </>
   );
 }
 
