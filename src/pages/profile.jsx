@@ -7,6 +7,7 @@ import Button from "../components/ui/Button";
 import { useAuth } from "../context/AuthContext";
 import { uploadToCloudinary } from "../api/cloudinary";
 import api from "../api/axios";
+import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 export default function Profile() {
   const { user, updateUser } = useAuth();

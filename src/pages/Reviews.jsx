@@ -4,6 +4,8 @@ import { FiSearch, FiTrash2, FiPlus, FiMessageSquare } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import DashboardLayout from '../components/layout/DashboardLayout';
+// 1. المسار اتصلح هنا
+import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 const BASE_URL = 'https://e-commerce-api-3wara.vercel.app';
 
@@ -191,6 +193,9 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm }) => {
 };
 
 const Reviews = () => {
+  // 2. ضفنا حالة التحميل هنا
+  const [loading, setLoading] = useState(true);
+  
   const [products, setProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -199,6 +204,8 @@ const Reviews = () => {
   const [selectedReview, setSelectedReview] = useState(null);
 
   const fetchData = async () => {
+    // 3. بنشغل التحميل أول ما يبدأ يكلم الـ API
+    setLoading(true);
     try {
       const response = await fetch(`${BASE_URL}/products`, {
         headers: getAuthHeaders(),
@@ -255,6 +262,9 @@ const Reviews = () => {
       setReviews(extractedReviews);
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      // 4. بنقفل التحميل أول ما يخلص خالص سواء جاب الداتا أو ضرب إيرور
+      setLoading(false);
     }
   };
 
@@ -276,7 +286,7 @@ const Reviews = () => {
       );
       setIsDeleteModalOpen(false);
       setSelectedReview(null);
-      fetchData();
+      fetchData(); // ده هيشغل اللودينج الشبح تاني وهو بيجيب الداتا الجديدة، شكلها هيبقى احترافي!
     } catch (error) {
       console.error('Error deleting review:', error);
     }
@@ -299,137 +309,142 @@ const Reviews = () => {
 
   return (
     <DashboardLayout>
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <span className="text-xs font-semibold text-indigo-600 tracking-wider uppercase">
-              CATALOG
-            </span>
-            <h1 className="text-2xl font-bold text-gray-900 mt-1">Reviews</h1>
-            <p className="text-sm text-gray-500">
-              Customer reviews across all products. {reviews.length} reviews total.
-            </p>
-          </div>
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md hover:shadow-lg transition"
-          >
-            <FiPlus size={16} />
-            <span>Add Review</span>
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white p-5 rounded-xl shadow-sm flex items-center space-x-4">
-            <div className="p-3 bg-yellow-50 text-yellow-500 rounded-lg">
-              <FaStar size={24} />
-            </div>
+      {/* 5. الشرط بتاعنا اهوه */}
+      {loading ? (
+        <PageLoader text="Loading reviews..." />
+      ) : (
+        <div className="animate-fade-in p-6 max-w-7xl mx-auto space-y-6 w-full">
+          <div className="flex justify-between items-start">
             <div>
-              <div className="text-2xl font-bold text-gray-900">{avgRating}</div>
-              <div className="text-xs text-gray-500">Average Rating</div>
+              <span className="text-xs font-semibold text-indigo-600 tracking-wider uppercase">
+                CATALOG
+              </span>
+              <h1 className="text-2xl font-bold text-gray-900 mt-1">Reviews</h1>
+              <p className="text-sm text-gray-500">
+                Customer reviews across all products. {reviews.length} reviews total.
+              </p>
             </div>
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md hover:shadow-lg transition"
+            >
+              <FiPlus size={16} />
+              <span>Add Review</span>
+            </button>
           </div>
 
-          <div className="bg-white p-5 rounded-xl shadow-sm flex items-center space-x-4">
-            <div className="p-3 bg-blue-50 text-blue-500 rounded-lg">
-              <FiMessageSquare size={24} />
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-gray-900">
-                {reviews.length}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white p-5 rounded-xl shadow-sm flex items-center space-x-4">
+              <div className="p-3 bg-yellow-50 text-yellow-500 rounded-lg">
+                <FaStar size={24} />
               </div>
-              <div className="text-xs text-gray-500">Total Reviews</div>
+              <div>
+                <div className="text-2xl font-bold text-gray-900">{avgRating}</div>
+                <div className="text-xs text-gray-500">Average Rating</div>
+              </div>
+            </div>
+
+            <div className="bg-white p-5 rounded-xl shadow-sm flex items-center space-x-4">
+              <div className="p-3 bg-blue-50 text-blue-500 rounded-lg">
+                <FiMessageSquare size={24} />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {reviews.length}
+                </div>
+                <div className="text-xs text-gray-500">Total Reviews</div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="relative">
-          <FiSearch
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            size={18}
-          />
-          <input
-            type="text"
-            placeholder="Search by customer or product..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white shadow-sm rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
-          />
-        </div>
+          <div className="relative">
+            <FiSearch
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={18}
+            />
+            <input
+              type="text"
+              placeholder="Search by customer or product..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-white shadow-sm rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+            />
+          </div>
 
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                <th className="py-3.5 px-4">Customer</th>
-                <th className="py-3.5 px-4">Product</th>
-                <th className="py-3.5 px-4">Rating</th>
-                <th className="py-3.5 px-4">Comment</th>
-                <th className="py-3.5 px-4">Date</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 text-sm">
-              {filteredReviews.length > 0 ? (
-                filteredReviews.map((review) => (
-                  <tr
-                    key={review._id || review.id}
-                    className="hover:bg-gray-50/50 transition"
-                  >
-                    <td className="py-3.5 px-4 font-medium text-gray-900">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800">
-                        {review.user?.name || review.customerName || 'ADMIN'} ✓
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-gray-600">
-                      {review.productName}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <StarRating rating={review.rating} />
-                    </td>
-                    <td className="py-3.5 px-4 text-gray-500 max-w-xs truncate">
-                      {review.comment}
-                    </td>
-                    <td className="py-3.5 px-4 text-gray-500">
-                      {formatDate(review.createdAt || review.date)}
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <button
-                        onClick={() => {
-                          setSelectedReview(review);
-                          setIsDeleteModalOpen(true);
-                        }}
-                        className="text-red-400 hover:text-red-600 transition"
-                      >
-                        <FiTrash2 size={16} />
-                      </button>
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="py-3.5 px-4">Customer</th>
+                  <th className="py-3.5 px-4">Product</th>
+                  <th className="py-3.5 px-4">Rating</th>
+                  <th className="py-3.5 px-4">Comment</th>
+                  <th className="py-3.5 px-4">Date</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 text-sm">
+                {filteredReviews.length > 0 ? (
+                  filteredReviews.map((review) => (
+                    <tr
+                      key={review._id || review.id}
+                      className="hover:bg-gray-50/50 transition"
+                    >
+                      <td className="py-3.5 px-4 font-medium text-gray-900">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800">
+                          {review.user?.name || review.customerName || 'ADMIN'} ✓
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-gray-600">
+                        {review.productName}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <StarRating rating={review.rating} />
+                      </td>
+                      <td className="py-3.5 px-4 text-gray-500 max-w-xs truncate">
+                        {review.comment}
+                      </td>
+                      <td className="py-3.5 px-4 text-gray-500">
+                        {formatDate(review.createdAt || review.date)}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <button
+                          onClick={() => {
+                            setSelectedReview(review);
+                            setIsDeleteModalOpen(true);
+                          }}
+                          className="text-red-400 hover:text-red-600 transition"
+                        >
+                          <FiTrash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center py-6 text-gray-400">
+                      No reviews found
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center py-6 text-gray-400">
-                    No reviews found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <AddReviewModal
+            isOpen={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
+            products={products}
+            onReviewAdded={fetchData}
+          />
+
+          <DeleteConfirmModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={handleDelete}
+          />
         </div>
-
-        <AddReviewModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          products={products}
-          onReviewAdded={fetchData}
-        />
-
-        <DeleteConfirmModal
-          isOpen={isDeleteModalOpen}
-          onClose={() => setIsDeleteModalOpen(false)}
-          onConfirm={handleDelete}
-        />
-      </div>
+      )}
     </DashboardLayout>
   );
 };

@@ -13,6 +13,7 @@
     import DashboardLayout from "../components/layout/DashboardLayout";
     import Button from "../components/ui/Button";
     import api from "../api/axios";
+    import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
     export default function ProductView() {
     const { id } = useParams();
@@ -81,17 +82,7 @@
     if (loading) {
         return (
         <DashboardLayout>
-            <div className="min-h-screen bg-[#F5F3EF] -m-6 p-6">
-            <div className="flex items-center justify-center min-h-[500px]">
-                <div className="text-center">
-                <div className="w-10 h-10 border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-4" />
-
-                <p className="text-gray-500 text-sm">
-                    Loading product...
-                </p>
-                </div>
-            </div>
-            </div>
+            <PageLoader text="Loading product..." />
         </DashboardLayout>
         );
     }

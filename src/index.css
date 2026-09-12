@@ -26,3 +26,13 @@
   animation: fadeIn 0.3s ease-out forwards;
 }
 /* /////////////////////////////////////////// */
+
+/* حركة شريط التحميل المستمرة (من الشمال لليمين وبيتعاد) */
+@keyframes progress-sweep {
+  0% { left: -50%; width: 40%; }
+  100% { left: 110%; width: 40%; }
+}
+
+.animate-progress-sweep {
+  animation: progress-sweep 1.2s infinite ease-in-out;
+}
