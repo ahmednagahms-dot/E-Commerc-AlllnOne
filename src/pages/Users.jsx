@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import UsersTable from "../components/users/UsersTable";
 import UserFormModal from "../components/users/UserFormModal";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -23,6 +24,7 @@ const Users = () => {
       } catch (error) {
         console.error("Error fetching users:", error);
         setUsers([]);
+         toast.error("Failed to load users.");
       }
     };
 

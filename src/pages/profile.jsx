@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import { useForm } from "react-hook-form";
 import { Camera, Loader2 } from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -28,7 +29,7 @@ export default function Profile() {
       const url = await uploadToCloudinary(file);
       setAvatar(url);
     } catch (err) {
-      alert("Failed to upload image. Please try again.");
+      toast.error("Failed to upload image. Please try again.");
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -46,8 +47,11 @@ export default function Profile() {
       updateUser(response.data.user);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
+      toast.success("Profile updated successfully!");
     } catch (err) {
-      alert("Failed to update profile.");
+       toast.error(
+      err.response?.data?.message || "Failed to update profile."
+    );
     } finally {
       setSaving(false);
     }
@@ -98,12 +102,6 @@ export default function Profile() {
             />
             <Input label="Email address" value={user.email} disabled className="bg-gray-50" />
             <Input label="Phone number" {...register("phone")} />
-
-            {saved && (
-              <p className="text-success text-sm bg-green-50 border border-green-100 rounded-lg px-3 py-2">
-                Profile updated successfully!
-              </p>
-            )}
 
             <div>
               <Button type="submit" disabled={saving || uploading}>

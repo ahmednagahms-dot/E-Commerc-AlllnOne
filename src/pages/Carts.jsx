@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { toast } from "react-toastify";
 import { ShoppingCart, DollarSign, Users, Package, Search, RefreshCw } from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Pagination from "../components/ui/Pagination";
@@ -97,9 +98,14 @@ export default function Carts() {
     },
   ];
 
-  const handleRefresh = () => {
-    fetchCarts();
-  };
+ const handleRefresh = async () => {
+  try {
+    await fetchCarts();
+    toast.success("Carts updated successfully!");
+  } catch (error) {
+    toast.error("Failed to update carts.");
+  }
+};
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
