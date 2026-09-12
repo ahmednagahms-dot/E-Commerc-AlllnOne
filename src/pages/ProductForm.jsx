@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -32,7 +33,7 @@ export default function ProductForm() {
         setExistingImages(product.images || []);
         setTags(product.tags || []);
       } catch (err) {
-        alert("Failed to load product data.");
+        toast.error("Failed to load product data.");
       } finally {
         setLoadingProduct(false);
       }
@@ -78,15 +79,27 @@ export default function ProductForm() {
     }
 
     try {
-      setSubmitting(true);
-      if (isEditMode) {
-        await api.patch(`/products/update/${id}`, data, { headers: { "Content-Type": "multipart/form-data" } });
-      } else {
-        await api.post("/products", data, { headers: { "Content-Type": "multipart/form-data" } });
-      }
+  setSubmitting(true);
+
+  if (isEditMode) {
+    await api.patch(`/products/update/${id}`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  } else {
+    await api.post("/products", data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  }
+
+  toast.success(
+    isEditMode
+      ? "Product updated successfully!"
+      : "Product added successfully!"
+  );
       navigate("/dashboard/products");
     } catch (err) {
       setFormError(err.response?.data?.message || "Something went wrong while saving the product.");
+      toast.error(err.response?.data?.message || "Something went wrong while saving the product.");
     } finally {
       setSubmitting(false);
     }

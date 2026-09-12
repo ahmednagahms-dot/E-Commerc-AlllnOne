@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import {
   Search,
@@ -112,14 +113,14 @@ export default function Products() {
           },
         }
       );
+      toast.success("Featured status updated successfully!");
     } catch (err) {
       setItems((prev) =>
         prev.map((x) =>
           x._id === item._id ? { ...x, featured: !newValue } : x
         )
       );
-
-      alert("Failed to update featured status.");
+      toast.error("Failed to update featured status.");
     }
   };
 
@@ -146,6 +147,7 @@ export default function Products() {
     );
 
     setTotalProducts((prev) => Math.max(prev - 1, 0));
+    toast.success("Product deleted successfully!");
   };
 
   const clearFilters = () => {
@@ -607,6 +609,7 @@ export default function Products() {
           productId={quickEditProduct?._id}
           onClose={handleCloseQuickEdit}
           onUpdated={handleProductUpdated}
+          
         />
       </div>
     </DashboardLayout>

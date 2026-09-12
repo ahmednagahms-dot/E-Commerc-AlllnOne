@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -69,6 +70,7 @@ export default function ForgotPassword() {
         err.response?.data?.message ||
           "We couldn't send the reset code. Please try again."
       );
+       toast.error("Failed to send reset code.");
     } finally {
       setLoading(false);
     }
@@ -84,7 +86,6 @@ export default function ForgotPassword() {
         otp: data.otp,
         newPassword: data.newPassword,
       });
-
       setMessage(
         "Your password has been updated successfully. Redirecting to login..."
       );
@@ -92,11 +93,13 @@ export default function ForgotPassword() {
       setTimeout(() => {
         navigate("/login");
       }, 2000);
+      toast.success("Password has been updated successfully")
     } catch (err) {
       setError(
         err.response?.data?.message ||
           "Invalid or expired code. Please try again."
       );
+       toast.error("Invalid Or Expired code.");
     } finally {
       setLoading(false);
     }
@@ -118,6 +121,7 @@ export default function ForgotPassword() {
         err.response?.data?.message ||
           "Unable to resend the code. Please try again."
       );
+      toast.error("Failed to resend code.")
     } finally {
       setLoading(false);
     }

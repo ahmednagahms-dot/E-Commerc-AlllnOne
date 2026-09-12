@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import api from "../api/axios";
 
@@ -18,6 +19,7 @@ export default function Coupons() {
         );
       } catch (error) {
         console.error("Error fetching Coupons:", error);
+        toast.error("Failed to load Coupons.");
         setCoupons([]);
       } finally {
         setLoading(false);
