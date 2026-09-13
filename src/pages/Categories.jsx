@@ -9,7 +9,9 @@ import {
   removeCustomCategory,
 } from "../data/customCategories";
 import api from "../api/axios";
+
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
+
 import { toast } from "react-toastify";
 
 export default function Categories() {

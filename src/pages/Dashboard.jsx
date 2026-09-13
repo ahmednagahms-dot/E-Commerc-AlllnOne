@@ -2,7 +2,10 @@ import { useState, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
+
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
+
+
 
 import StatCard from "../components/dashboard/StatCard";
 import SalesOverviewChart from "../components/dashboard/SalesOverviewChart";
@@ -50,7 +53,11 @@ export default function Dashboard() {
       setProducts(productsRes.data.products || []);
 
       setCustomers(
+
         (usersRes.data.users || []).filter((user) => user.role === "customer"),
+
+        (usersRes.data.users || []).filter((user) => user.role === "customer")
+
       );
 
       if (showSuccessToast) {
@@ -89,6 +96,7 @@ export default function Dashboard() {
       "createdAt",
       prev.year,
       prev.month,
+      prev.month
     );
 
     const periodCustomers = filterByPeriod(customers, "createdAt", year, month);
@@ -98,6 +106,8 @@ export default function Dashboard() {
       "createdAt",
       prev.year,
       prev.month,
+      prev.month
+
     );
 
     const periodProducts = filterByPeriod(products, "createdAt", year, month);
@@ -107,6 +117,8 @@ export default function Dashboard() {
       "createdAt",
       prev.year,
       prev.month,
+      prev.month
+
     );
 
     // Exclude cancelled orders from revenue
@@ -116,16 +128,23 @@ export default function Dashboard() {
 
     const prevValidOrders = prevOrders.filter(
       (order) => order.status !== "cancelled",
+      (order) => order.status !== "cancelled"
+    );
+
+    const prevValidOrders = prevOrders.filter(
+      (order) => order.status !== "cancelled"
     );
 
     const revenue = validOrders.reduce(
       (sum, order) => sum + Number(order.totalPrice || 0),
       0,
+      0
     );
 
     const prevRevenue = prevValidOrders.reduce(
       (sum, order) => sum + Number(order.totalPrice || 0),
       0,
+      0
     );
 
     const revenueSeries = buildSeries(
@@ -134,6 +153,7 @@ export default function Dashboard() {
       (order) => Number(order.totalPrice || 0),
       year,
       month,
+      month
     );
 
     const ordersSeries = buildSeries(orders, "createdAt", () => 1, year, month);
@@ -144,6 +164,7 @@ export default function Dashboard() {
       () => 1,
       year,
       month,
+      month
     );
 
     const productsSeries = buildSeries(
@@ -152,6 +173,7 @@ export default function Dashboard() {
       () => 1,
       year,
       month,
+      month
     );
 
     return {
@@ -207,6 +229,7 @@ export default function Dashboard() {
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 5),
     [orders],
+    [orders]
   );
 
   const recentActivity = useMemo(() => {
@@ -324,6 +347,83 @@ export default function Dashboard() {
             </>
           )}
         </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+
+          <p className="text-sm text-gray-500">
+            Real-time overview of your store's performance.
+          </p>
+        </div>
+
+        <div className="flex gap-2">
+          <select
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            {months.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            {availableYears.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => fetchAll(true)}
+            disabled={loading}
+            className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Refreshing..." : "Refresh"}
+          </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16 text-gray-400">
+          Loading dashboard...
+        </div>
+      ) : error ? (
+        <div className="text-center py-16 text-danger">{error}</div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {data.stats.map((stat) => (
+              <StatCard key={stat.title} {...stat} />
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+            <SalesOverviewChart data={data.salesData} />
+
+            <TopProductsList products={data.topProducts} />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <RecentOrdersTable orders={recentOrders} />
+
+            <div className="flex flex-col gap-4">
+              <OrderStatusDonut data={data.statusBreakdown} />
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <RecentActivityFeed activities={recentActivity} />
+          </div>
+        </>
       )}
     </DashboardLayout>
   );

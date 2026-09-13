@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "../api/axios";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
+import DashboardLayout from "../components/layout/DashboardLayout"
 import { toast } from "react-toastify";
 
 const Orders = () => {

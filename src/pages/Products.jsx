@@ -103,11 +103,23 @@ export default function Products() {
       const formData = new FormData();
       formData.append("featured", newValue);
 
+
       await api.patch(`/products/update/${item._id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      await api.patch(
+        `/products/update/${item._id}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
       toast.success("Featured status updated successfully!");
     } catch (err) {
       setItems((prev) =>
@@ -583,6 +595,27 @@ export default function Products() {
           </div>
         </div>
       )}
+          </>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmModal
+          isOpen={deleteModalOpen}
+          productId={selectedProduct?._id}
+          productName={selectedProduct?.name}
+          onClose={handleCloseDeleteModal}
+          onDeleted={handleProductDeleted}
+        />
+
+        {/* Quick Edit Modal */}
+        <QuickEditModel
+          isOpen={quickEditOpen}
+          productId={quickEditProduct?._id}
+          onClose={handleCloseQuickEdit}
+          onUpdated={handleProductUpdated}
+          
+        />
+      </div>
     </DashboardLayout>
   );
 }
