@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import { ImagePlus, X, Sparkles, Tag, DollarSign, Layers, Boxes } from "lucide-react";
 import Input from "../ui/Input";
 import TagsInput from "./TagsInput";
@@ -22,15 +23,33 @@ export default function ProductFormFields({
   errors,
   imageFiles,
   setImageFiles,
-  existingImages,
+  existingImages = [],
   onDeleteExistingImage,
   tags,
   setTags,
   watch,
 }) {
+  const existingCount = existingImages?.length || 0;
+  const maxNewAllowed = Math.max(0, 5 - existingCount);
+  const totalImages = existingCount + imageFiles.length;
+
+  // إدارة روابط المعاينة وتنظيف الذاكرة بشكل آمن
+  const newImagePreviews = useMemo(() => {
+    return imageFiles.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+  }, [imageFiles]);
+
+  useEffect(() => {
+    return () => {
+      newImagePreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+    };
+  }, [newImagePreviews]);
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const combined = [...imageFiles, ...files].slice(0, 5);
+    const combined = [...imageFiles, ...files].slice(0, maxNewAllowed);
     setImageFiles(combined);
     e.target.value = "";
   };
@@ -39,7 +58,7 @@ export default function ProductFormFields({
     setImageFiles(imageFiles.filter((_, i) => i !== index));
   };
 
-  const totalImages = (existingImages?.length || 0) + imageFiles.length;
+  const categories = useMemo(() => getAllCategories(), []);
   const shortDescValue = watch ? watch("shortDescription") || "" : "";
   const descValue = watch ? watch("description") || "" : "";
 
@@ -58,9 +77,9 @@ export default function ProductFormFields({
 
           {totalImages > 0 && (
             <div className="grid grid-cols-3 gap-3 mb-4">
-              {existingImages?.map((img, i) => (
-                <div key={img.public_id} className="relative rounded-xl overflow-hidden border border-gray-100 aspect-square">
-                  <img src={img.url} alt="Existing" className="w-full h-full object-cover" />
+              {existingImages.map((img, i) => (
+                <div key={img.public_id || i} className="relative rounded-xl overflow-hidden border border-gray-100 aspect-square">
+                  <img src={img.url} alt="Existing product" className="w-full h-full object-cover" />
                   {i === 0 && (
                     <span className="absolute top-1 left-1 bg-primary-500 text-white text-[9px] font-semibold px-1.5 py-0.5 rounded">
                       COVER
@@ -68,21 +87,23 @@ export default function ProductFormFields({
                   )}
                   <button
                     type="button"
+                    aria-label="Remove image"
                     onClick={() => onDeleteExistingImage(img.public_id)}
-                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80"
+                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80 transition"
                   >
                     <X size={12} />
                   </button>
                 </div>
               ))}
 
-              {imageFiles.map((file, index) => (
-                <div key={index} className="relative rounded-xl overflow-hidden border border-primary-100 aspect-square">
-                  <img src={URL.createObjectURL(file)} alt={`New ${index + 1}`} className="w-full h-full object-cover" />
+              {newImagePreviews.map((preview, index) => (
+                <div key={preview.url} className="relative rounded-xl overflow-hidden border border-primary-100 aspect-square">
+                  <img src={preview.url} alt={`New upload ${index + 1}`} className="w-full h-full object-cover" />
                   <button
                     type="button"
+                    aria-label="Remove image"
                     onClick={() => removeNewImage(index)}
-                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80"
+                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80 transition"
                   >
                     <X size={12} />
                   </button>
@@ -95,7 +116,7 @@ export default function ProductFormFields({
           )}
 
           {totalImages < 5 && (
-            <label className="block border-2 border-dashed border-gray-200 rounded-xl py-7 flex flex-col items-center justify-center text-gray-400 text-sm cursor-pointer hover:border-primary-300 hover:bg-primary-50/30 transition">
+            <label className="border-2 border-dashed border-gray-200 rounded-xl py-7 flex flex-col items-center justify-center text-gray-400 text-sm cursor-pointer hover:border-primary-300 hover:bg-primary-50/30 transition">
               <ImagePlus size={20} className="text-gray-300 mb-1.5" />
               <span className="font-medium text-gray-500">Click or drag images here</span>
               <span className="text-xs text-gray-400 mt-0.5">PNG, JPG, WEBP</span>
@@ -116,8 +137,10 @@ export default function ProductFormFields({
                   className="px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                   {...register("category")}
                 >
-                  {getAllCategories().map((c) => (
-                    <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+                  {categories.map((c) => (
+                    <option key={c} value={c}>
+                      {c.charAt(0).toUpperCase() + c.slice(1)}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -184,13 +207,17 @@ export default function ProductFormFields({
               <textarea
                 rows={4}
                 placeholder="Full product details, specs, and features..."
-                className={`px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500 ${errors.description ? "border-danger" : "border-gray-300"}`}
+                className={`px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary-500 ${
+                  errors.description ? "border-danger" : "border-gray-300"
+                }`}
                 {...register("description", { required: "Required", minLength: { value: 20, message: "Minimum 20 characters" } })}
               />
               <div className="flex items-center justify-between mt-1">
                 {errors.description ? (
                   <span className="text-xs text-danger">{errors.description.message}</span>
-                ) : <span />}
+                ) : (
+                  <span />
+                )}
                 <p className="text-xs text-gray-400">{descValue.length} characters</p>
               </div>
             </div>
@@ -203,12 +230,31 @@ export default function ProductFormFields({
 
           <div className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Price" type="number" step="0.01" placeholder="0.00" error={errors.price?.message} {...register("price", { required: "Required", min: 0 })} />
-              <Input label="Discount Price" type="number" step="0.01" placeholder="Optional" {...register("discountPrice")} />
+              <Input
+                label="Price"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                error={errors.price?.message}
+                {...register("price", { required: "Required", min: 0, valueAsNumber: true })}
+              />
+              <Input
+                label="Discount Price"
+                type="number"
+                step="0.01"
+                placeholder="Optional"
+                {...register("discountPrice", { valueAsNumber: true })}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Stock" type="number" placeholder="0" error={errors.stock?.message} {...register("stock", { required: "Required", min: 0 })} />
+              <Input
+                label="Stock"
+                type="number"
+                placeholder="0"
+                error={errors.stock?.message}
+                {...register("stock", { required: "Required", min: 0, valueAsNumber: true })}
+              />
               <Input label="SKU" placeholder="Optional" {...register("sku")} />
             </div>
           </div>

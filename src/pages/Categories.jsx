@@ -2,16 +2,13 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layers, Package, Search, Plus, Trash2 } from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
-import Button from "../components/ui/Button";
 import CategoryFormModal from "../components/categories/CategoryFormModal";
 import {
   getCustomCategories,
   removeCustomCategory,
 } from "../data/customCategories";
 import api from "../api/axios";
-
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
-
 import { toast } from "react-toastify";
 
 export default function Categories() {
@@ -32,7 +29,7 @@ export default function Categories() {
         setError(null);
       } catch (err) {
         setError("Failed to load categories.");
-         toast.error("Failed to load categories.");
+        toast.error("Failed to load categories.");
       } finally {
         setLoading(false);
       }
@@ -75,7 +72,7 @@ export default function Categories() {
 
   const filteredCategories = useMemo(() => {
     return categoriesData.filter((c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()),
+      c.name.toLowerCase().includes(search.toLowerCase())
     );
   }, [categoriesData, search]);
 
@@ -84,61 +81,70 @@ export default function Categories() {
       {loading ? (
         <PageLoader text="Loading categories..." />
       ) : (
-        <div className="animate-fade-in w-full">
-          <div className="flex items-center justify-between mb-6">
+        <div className="p-4 sm:p-6 w-full animate-fade-in">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <p className="text-xs font-semibold text-primary-500 tracking-widest uppercase">
+              <span className="text-xs font-semibold text-indigo-600 tracking-wider uppercase">
                 Catalog
-              </p>
-              <h1 className="text-2xl font-bold">Categories</h1>
-              <p className="text-sm text-gray-500">
-                Categories are derived from your live products — there's no
-                separate categories endpoint yet.
+              </span>
+              <h1 className="text-2xl font-bold text-gray-900 mt-0.5">
+                Categories
+              </h1>
+              <p className="text-sm text-gray-500 mt-0.5">
+                Categories are derived from your live products.
               </p>
             </div>
-            <Button
-              className="flex items-center gap-2"
+
+            <button
               onClick={() => setShowFormModal(true)}
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-sm"
             >
-              <Plus size={16} /> Add Category
-            </Button>
+              <Plus size={18} /> Add Category
+            </button>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-6">
-            <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg max-w-sm">
-              <Search size={16} className="text-gray-400" />
+          {/* Search Bar */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-6">
+            <div className="relative max-w-md">
+              <Search
+                size={18}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+              />
               <input
+                type="text"
                 placeholder="Search categories..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="bg-transparent outline-none text-sm w-full"
+                className="w-full h-11 bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
               />
             </div>
           </div>
 
-          {loading ? (
-            <div className="text-center py-16 text-gray-400">
-              Loading categories...
+          {/* Categories Grid */}
+          {error ? (
+            <div className="bg-white rounded-2xl p-12 text-center text-red-500 border border-gray-100 shadow-sm">
+              {error}
             </div>
-          ) : error ? (
-            <div className="text-center py-16 text-danger">{error}</div>
           ) : filteredCategories.length === 0 ? (
-            <div className="text-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
-              No categories found.
+            <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100 shadow-sm">
+              No categories found
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredCategories.map((cat) => (
-                <div key={cat.name} className="relative">
+                <div key={cat.name} className="relative group">
                   <button
                     onClick={() =>
                       navigate(
-                        `/dashboard/products?category=${encodeURIComponent(cat.name)}`,
+                        `/dashboard/products?category=${encodeURIComponent(
+                          cat.name
+                        )}`
                       )
                     }
-                    className="w-full bg-white rounded-xl border border-gray-100 shadow-sm p-5 text-left hover:shadow-md transition flex items-center gap-4"
+                    className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-indigo-100 p-5 text-left transition flex items-center gap-4"
                   >
-                    <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex items-center justify-center shrink-0">
+                    <div className="w-14 h-14 rounded-xl bg-gray-50 border border-gray-100 overflow-hidden flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                       {cat.image ? (
                         <img
                           src={cat.image}
@@ -146,16 +152,23 @@ export default function Categories() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <Layers size={22} className="text-gray-400" />
+                        <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                          <Layers size={20} />
+                        </div>
                       )}
                     </div>
-                    <div>
-                      <h3 className="font-semibold capitalize">{cat.name}</h3>
+
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 capitalize truncate">
+                        {cat.name}
+                      </h3>
                       <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                        <Package size={12} /> {cat.count} product
-                        {cat.count !== 1 ? "s" : ""}
+                        <Package size={12} className="text-gray-400" />
+                        <span>
+                          {cat.count} product{cat.count !== 1 ? "s" : ""}
+                        </span>
                       </p>
-                      <p className="text-xs text-success mt-0.5">
+                      <p className="text-xs font-medium text-emerald-600 mt-1">
                         {cat.inStock} in stock
                       </p>
                     </div>
@@ -163,10 +176,13 @@ export default function Categories() {
 
                   {cat.isCustom && cat.count === 0 && (
                     <button
-                      onClick={() =>
-                        setCustomCats(removeCustomCategory(cat.name))
-                      }
-                      className="absolute top-3 right-3 text-gray-300 hover:text-danger"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCustomCats(removeCustomCategory(cat.name));
+                      }}
+                      className="absolute top-3 right-3 w-8 h-8 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition"
+                      title="Delete Category"
                     >
                       <Trash2 size={16} />
                     </button>

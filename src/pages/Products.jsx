@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Search,
   SlidersHorizontal,
@@ -9,12 +9,13 @@ import {
   Eye,
   Pencil,
   Trash2,
+  Package,
 } from "lucide-react";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Pagination from "../components/ui/Pagination";
 import DeleteConfirmModal from "../components/products/DeleteConfirmModal";
-import QuickEditModel from "../components/products/QuickEditModel";
+import QuickEditModal from "../components/products/QuickEditModel";
 import api from "../api/axios";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
@@ -31,6 +32,10 @@ const CATEGORIES = [
 
 export default function Products() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // قراءة الفئة من الرابط إن وجدت (مثل: /dashboard/products?category=electronics)
+  const categoryParam = searchParams.get("category") || "";
 
   const [items, setItems] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -42,21 +47,29 @@ export default function Products() {
 
   const [search, setSearch] = useState("");
   const [searchText, setSearchText] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(categoryParam);
   const [sortBy, setSortBy] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(!!categoryParam);
 
-  // Delete Modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Quick Edit Modal state
   const [quickEditOpen, setQuickEditOpen] = useState(false);
   const [quickEditProduct, setQuickEditProduct] = useState(null);
+
+  // تحديث الفئة عند تغيير الرابط
+  useEffect(() => {
+    const currentCatParam = searchParams.get("category") || "";
+    setCategory(currentCatParam);
+    if (currentCatParam) {
+      setShowFilters(true);
+    }
+  }, [searchParams]);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
+      setError(null);
 
       const res = await api.get("/products/search", {
         params: {
@@ -71,20 +84,16 @@ export default function Products() {
       setItems(res.data.products || []);
       setTotalProducts(res.data.totalProducts || 0);
       setTotalPages(res.data.totalPages || 1);
-      setError(null);
     } catch (err) {
       setError("Failed to load products.");
+      toast.error("Failed to load products");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchProducts();
-    }, 0);
-
-    return () => clearTimeout(timeoutId);
+    fetchProducts();
   }, [currentPage, category, sortBy, search]);
 
   const handleSearch = () => {
@@ -92,54 +101,53 @@ export default function Products() {
     setCurrentPage(1);
   };
 
+  const handleCategoryChange = (newCat) => {
+    setCategory(newCat);
+    setCurrentPage(1);
+    if (newCat) {
+      setSearchParams({ category: newCat });
+    } else {
+      setSearchParams({});
+    }
+  };
+
   const changeFeatured = async (item) => {
     const newValue = !item.featured;
 
     setItems((prev) =>
-      prev.map((x) => (x._id === item._id ? { ...x, featured: newValue } : x)),
+      prev.map((x) => (x._id === item._id ? { ...x, featured: newValue } : x))
     );
 
     try {
-      const formData = new FormData();
-      formData.append("featured", newValue);
-
-      await api.patch(`/products/update/${item._id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      toast.success("Featured status updated successfully!");
+      await api.patch(`/products/update/${item._id}`, { featured: newValue });
+      toast.success("Featured status updated");
     } catch (err) {
       setItems((prev) =>
         prev.map((x) =>
-          x._id === item._id ? { ...x, featured: !newValue } : x,
-        ),
+          x._id === item._id ? { ...x, featured: !newValue } : x
+        )
       );
-      toast.error("Failed to update featured status.");
+      toast.error("Failed to update featured status");
     }
   };
 
-  // Open Delete Modal
   const handleDelete = (item) => {
     setSelectedProduct(item);
     setDeleteModalOpen(true);
   };
 
-  // Close Delete Modal
   const handleCloseDeleteModal = () => {
     setDeleteModalOpen(false);
     setSelectedProduct(null);
   };
 
-  // Called after successful deletion
   const handleProductDeleted = () => {
-    if (!selectedProduct) return;
-
-    setItems((prev) => prev.filter((item) => item._id !== selectedProduct._id));
-
-    setTotalProducts((prev) => Math.max(prev - 1, 0));
-    toast.success("Product deleted successfully!");
+    toast.success("Product deleted successfully");
+    if (items.length === 1 && currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    } else {
+      fetchProducts();
+    }
   };
 
   const clearFilters = () => {
@@ -148,9 +156,9 @@ export default function Products() {
     setCategory("");
     setSortBy("");
     setCurrentPage(1);
+    setSearchParams({});
   };
 
-  // Quick Edit
   const handleQuickEdit = (item) => {
     setQuickEditProduct(item);
     setQuickEditOpen(true);
@@ -166,35 +174,33 @@ export default function Products() {
   };
 
   const featuredCount = items.filter((i) => i.featured).length;
-
   const inStockCount = items.filter((i) => i.stock > 0).length;
-
   const outStockCount = items.filter((i) => i.stock <= 0).length;
 
   const stats = [
     {
-      icon: "▣",
       title: "Total Products",
       count: totalProducts,
-      style: "text-[#3157D5] bg-[#EEF1F7]",
+      icon: Package,
+      color: "bg-indigo-50 text-indigo-600",
     },
     {
-      icon: <Star size={19} />,
-      title: "Featured (this page)",
+      title: "Featured (page)",
       count: featuredCount,
-      style: "text-[#D99A16] bg-[#FFF8E8]",
+      icon: Star,
+      color: "bg-amber-50 text-amber-600",
     },
     {
-      icon: "✓",
-      title: "In Stock (this page)",
+      title: "In Stock (page)",
       count: inStockCount,
-      style: "text-[#20A464] bg-[#EAF8F0]",
+      icon: Package,
+      color: "bg-emerald-50 text-emerald-600",
     },
     {
-      icon: "⊘",
-      title: "Out of Stock (this page)",
+      title: "Out of Stock (page)",
       count: outStockCount,
-      style: "text-[#D95353] bg-[#FDEEEE]",
+      icon: Package,
+      color: "bg-red-50 text-red-600",
     },
   ];
 
@@ -203,372 +209,327 @@ export default function Products() {
       {loading ? (
         <PageLoader text="Loading products..." />
       ) : (
-        <div className="animate-fade-in w-full">
-          <div className="min-h-screen bg-[#F5F3EF] -m-6 p-4 sm:p-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-7">
-              <div>
-                <h1 className="text-3xl font-bold text-[#172033]">Products</h1>
-
-                <p className="text-[#697386] mt-1">
-                  {totalProducts} products total
-                </p>
-              </div>
-
-              <button
-                onClick={() => navigate("/dashboard/products/new")}
-                className="flex items-center gap-2 bg-[#263653] hover:bg-[#1D2A43] text-white px-5 py-3 rounded-xl transition"
-              >
-                <Plus size={18} />
-                Add Product
-              </button>
+        <div className="p-4 sm:p-6 w-full animate-fade-in">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {totalProducts} products total
+              </p>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
-              {stats.map((stat, index) => (
+            <button
+              onClick={() => navigate("/dashboard/products/new")}
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-sm"
+            >
+              <Plus size={18} />
+              Add Product
+            </button>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {stats.map((stat) => {
+              const Icon = stat.icon;
+              return (
                 <div
-                  key={index}
-                  className="bg-[#FCFAF7] p-5 rounded-2xl border border-[#E3E0DB] shadow-sm"
+                  key={stat.title}
+                  className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.style}`}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${stat.color}`}
                     >
-                      {stat.icon}
+                      <Icon size={18} />
                     </div>
-
                     <div>
-                      <p className="text-[#697386] text-sm">{stat.title}</p>
-
-                      <h2 className="text-2xl font-bold text-[#172033]">
+                      <p className="text-sm text-gray-500">{stat.title}</p>
+                      <p className="text-2xl font-bold text-gray-900">
                         {stat.count}
-                      </h2>
+                      </p>
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
+          </div>
 
-            {/* Search & Filters */}
-            <div className="bg-[#FCFAF7] p-4 rounded-2xl border border-[#E3E0DB] shadow-sm mb-7">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
-                  <Search
-                    size={18}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-[#263653]"
-                  />
-
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                    className="w-full h-12 bg-[#F3F1ED] border border-[#DEDAD3] rounded-xl pl-11 pr-4 outline-none text-[#172033] placeholder-[#8A94A6]"
-                  />
-                </div>
-
-                <button
-                  onClick={handleSearch}
-                  className="w-full sm:w-32 h-12 bg-[#1D3CA5] hover:bg-[#172F8F] text-white rounded-xl flex items-center justify-center gap-2"
-                >
-                  <Search size={17} />
-                  Search
-                </button>
-
-                <button
-                  onClick={() => setShowFilters((prev) => !prev)}
-                  className={`w-full sm:w-36 h-12 rounded-xl border flex items-center justify-center gap-2 font-medium ${
-                    showFilters
-                      ? "bg-[#263653] text-white border-[#263653]"
-                      : "bg-[#F3F1ED] text-[#263653] border-[#D9D5CF]"
-                  }`}
-                >
-                  <SlidersHorizontal size={20} />
-                  Filter
-                </button>
+          {/* Search & Filters */}
+          <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm mb-6">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search
+                  size={18}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  className="w-full h-11 bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 outline-none text-sm text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                />
               </div>
 
-              {/* Filters */}
-              {showFilters && (
-                <div className="mt-4 pt-4 border-t border-[#E3E0DB] grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-semibold text-[#405066] mb-2">
-                      Categories
-                    </p>
+              <button
+                onClick={handleSearch}
+                className="h-11 px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition shadow-sm"
+              >
+                <Search size={16} />
+                Search
+              </button>
 
-                    <select
-                      value={category}
-                      onChange={(e) => {
-                        setCategory(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="w-full h-11 border border-[#D9D5CF] rounded-xl px-4 bg-[#F3F1ED] text-[#405066] outline-none"
-                    >
-                      <option value="">All Categories</option>
+              <button
+                onClick={() => setShowFilters((prev) => !prev)}
+                className={`h-11 px-4 rounded-xl border text-sm font-medium flex items-center justify-center gap-2 transition ${
+                  showFilters
+                    ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                    : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                }`}
+              >
+                <SlidersHorizontal size={16} />
+                Filters
+              </button>
+            </div>
 
-                      {CATEGORIES.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-semibold text-[#405066] mb-2">
-                      Sort By
-                    </p>
-
-                    <select
-                      value={sortBy}
-                      onChange={(e) => {
-                        setSortBy(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="w-full h-11 border border-[#D9D5CF] rounded-xl px-4 bg-[#F3F1ED] text-[#405066] outline-none"
-                    >
-                      <option value="">Newest</option>
-
-                      <option value="oldest">Oldest</option>
-
-                      <option value="price_asc">Price: Low to High</option>
-
-                      <option value="price_desc">Price: High to Low</option>
-
-                      <option value="rating">Highest Rated</option>
-                    </select>
-                  </div>
-
-                  <button
-                    onClick={clearFilters}
-                    className="sm:col-span-2 text-sm text-[#263653] font-medium text-left hover:underline"
+            {showFilters && (
+              <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+                    Category
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => handleCategoryChange(e.target.value)}
+                    className="w-full h-10 border border-gray-200 rounded-xl px-3 bg-gray-50 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500"
                   >
-                    Clear Filters
-                  </button>
+                    <option value="">All Categories</option>
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              )}
+
+                <div>
+                  <label className="text-xs font-medium text-gray-500 mb-1.5 block">
+                    Sort By
+                  </label>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => {
+                      setSortBy(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full h-10 border border-gray-200 rounded-xl px-3 bg-gray-50 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                    <option value="rating">Highest Rated</option>
+                  </select>
+                </div>
+
+                <button
+                  onClick={clearFilters}
+                  className="sm:col-span-2 text-sm text-indigo-600 font-medium hover:underline text-left"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Products Grid */}
+          {error ? (
+            <div className="bg-white rounded-2xl p-12 text-center text-red-500 border border-gray-100 shadow-sm">
+              {error}
             </div>
+          ) : items.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100 shadow-sm">
+              No products found
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {items.map((item) => {
+                  const hasDiscount =
+                    item.discountPrice && item.discountPrice < item.price;
+                  const displayPrice = hasDiscount
+                    ? item.discountPrice
+                    : item.price;
+                  const discountAmount = hasDiscount
+                    ? item.price - item.discountPrice
+                    : 0;
 
-            {/* Products */}
-            {error ? (
-              <div className="bg-[#FCFAF7] p-12 rounded-2xl text-center text-[#D95353] border border-[#E3E0DB]">
-                {error}
-              </div>
-            ) : items.length === 0 ? (
-              <div className="bg-[#FCFAF7] p-12 rounded-2xl text-center text-[#697386] border border-[#E3E0DB]">
-                No products found
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {items.map((item) => {
-                    const hasDiscount =
-                      item.discountPrice && item.discountPrice < item.price;
+                  const tags = Array.isArray(item.tags)
+                    ? item.tags.filter(Boolean)
+                    : typeof item.tags === "string"
+                    ? item.tags
+                        .split(",")
+                        .map((t) => t.trim())
+                        .filter(Boolean)
+                    : [];
 
-                    const displayPrice = hasDiscount
-                      ? item.discountPrice
-                      : item.price;
-
-                    const discountAmount = hasDiscount
-                      ? item.price - item.discountPrice
-                      : 0;
-
-                    const tags = Array.isArray(item.tags)
-                      ? item.tags.filter(Boolean)
-                      : typeof item.tags === "string"
-                        ? item.tags
-                            .split(",")
-                            .map((t) => t.trim())
-                            .filter(Boolean)
-                        : [];
-
-                    return (
-                      <div
-                        key={item._id}
-                        className="bg-[#FCFAF7] rounded-2xl overflow-hidden border border-[#E3E0DB] shadow-sm hover:shadow-md transition flex flex-col"
-                      >
-                        {/* Image */}
-                        <div className="relative bg-[#F3F1ED]">
-                          <div className="h-52 sm:h-56 overflow-hidden">
-                            {item.images?.length > 0 ? (
-                              <img
-                                src={item.images[0]?.url}
-                                alt={item.name || "Product"}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="h-full flex items-center justify-center text-[#8A8A8A]">
-                                No Image
-                              </div>
-                            )}
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => changeFeatured(item)}
-                            className={`absolute top-3 left-3 w-9 h-9 rounded-lg flex items-center justify-center ${
-                              item.featured
-                                ? "bg-[#FFF8E8] text-[#D99A16]"
-                                : "bg-[#F3F1ED] text-[#263653]"
-                            }`}
-                          >
-                            <Star
-                              size={17}
-                              fill={item.featured ? "currentColor" : "none"}
+                  return (
+                    <div
+                      key={item._id}
+                      className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col"
+                    >
+                      <div className="relative bg-gray-50">
+                        <div className="h-52 overflow-hidden">
+                          {item.images?.length > 0 ? (
+                            <img
+                              src={item.images[0]?.url}
+                              alt={item.name || "Product"}
+                              className="w-full h-full object-cover"
                             />
+                          ) : (
+                            <div className="h-full flex items-center justify-center text-gray-300">
+                              <Package size={40} />
+                            </div>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => changeFeatured(item)}
+                          className={`absolute top-3 left-3 w-9 h-9 rounded-xl flex items-center justify-center transition shadow-sm ${
+                            item.featured
+                              ? "bg-amber-50 text-amber-500 border border-amber-200"
+                              : "bg-white/90 text-gray-400 hover:text-amber-500"
+                          }`}
+                        >
+                          <Star
+                            size={16}
+                            fill={item.featured ? "currentColor" : "none"}
+                          />
+                        </button>
+
+                        <span
+                          className={`absolute bottom-3 right-3 px-2.5 py-1 rounded-full text-xs font-medium ${
+                            item.stock > 0
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                              : "bg-red-50 text-red-600 border border-red-100"
+                          }`}
+                        >
+                          {item.stock > 0
+                            ? `${item.stock} in stock`
+                            : "Out of stock"}
+                        </span>
+                      </div>
+
+                      <div className="p-4 flex flex-col flex-1">
+                        <h3 className="font-semibold text-gray-900 line-clamp-1">
+                          {item.name}
+                        </h3>
+
+                        <p className="text-xs text-gray-400 mt-1 capitalize">
+                          {[item.category, item.subcategory, item.brand]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </p>
+
+                        {item.shortDescription && (
+                          <p className="text-sm text-gray-500 mt-2 line-clamp-2 leading-relaxed">
+                            {item.shortDescription}
+                          </p>
+                        )}
+
+                        <div className="flex items-baseline gap-2 mt-3">
+                          <span className="text-xl font-bold text-gray-900">
+                            ${displayPrice}
+                          </span>
+                          {hasDiscount && (
+                            <span className="text-xs font-medium text-emerald-600">
+                              -${discountAmount} off
+                            </span>
+                          )}
+                        </div>
+
+                        {tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {tags.slice(0, 3).map((tag, i) => (
+                              <span
+                                key={i}
+                                className="px-2 py-0.5 bg-gray-50 border border-gray-100 text-gray-500 text-[11px] rounded-md"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="mt-auto pt-4 flex items-center gap-2">
+                          <button
+                            onClick={() =>
+                              navigate(`/dashboard/products/${item._id}/view`)
+                            }
+                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 transition"
+                          >
+                            <Eye size={14} /> View
                           </button>
 
-                          <span
-                            className={`absolute bottom-3 right-3 px-3 py-1.5 rounded-full text-xs font-semibold ${
-                              item.stock > 0
-                                ? "bg-[#EAF8F0] text-[#20965D]"
-                                : "bg-[#FDEEEE] text-[#C94A4A]"
-                            }`}
+                          <button
+                            onClick={() =>
+                              navigate(`/dashboard/products/${item._id}/edit`)
+                            }
+                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 flex items-center justify-center gap-1.5 transition"
                           >
-                            {item.stock > 0
-                              ? `${item.stock} in stock`
-                              : "Out of stock"}
-                          </span>
-                        </div>
+                            <Pencil size={14} /> Edit
+                          </button>
 
-                        {/* Product Info */}
-                        <div className="p-5 flex flex-col flex-1">
-                          <h2 className="font-bold text-lg text-[#172033]">
-                            {item.name}
-                          </h2>
+                          <button
+                            onClick={() => handleQuickEdit(item)}
+                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 flex items-center justify-center transition"
+                            title="Quick Edit"
+                          >
+                            <SlidersHorizontal size={14} />
+                          </button>
 
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1 text-sm font-medium text-[#8A94A6]">
-                            {item.category && (
-                              <span className="capitalize">
-                                {item.category}
-                              </span>
-                            )}
-                            {item.subcategory && (
-                              <>
-                                <span className="text-[#C2C0BB]">•</span>
-                                <span className="capitalize">
-                                  {item.subcategory}
-                                </span>
-                              </>
-                            )}
-                            {item.brand && (
-                              <>
-                                <span className="text-[#C2C0BB]">•</span>
-                                <span>{item.brand}</span>
-                              </>
-                            )}
-                          </div>
-
-                          {item.shortDescription && (
-                            <p className="text-[#344054] text-sm mt-3 leading-6 font-medium line-clamp-2">
-                              {item.shortDescription}
-                            </p>
-                          )}
-
-                          <div className="flex items-end gap-3 mt-7">
-                            <span className="font-extrabold text-[30px] leading-none tracking-tight text-[#263653]">
-                              ${displayPrice}
-                            </span>
-                            {hasDiscount && (
-                              <span className="mb-0.5 text-sm font-semibold text-[#20A464]">
-                                -${discountAmount} off
-                              </span>
-                            )}
-                          </div>
-
-                          {/* Tags */}
-                          {tags.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-3">
-                              {tags.map((tag, index) => (
-                                <span
-                                  key={`${item._id}-tag-${index}`}
-                                  className="px-3 py-1 bg-[#F8F6F3] border border-[#D4CEC5] text-[#596273] text-xs rounded-md"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* Actions */}
-                          <div className="mt-6 pt-4 border-t border-[#E5E1DB]">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() =>
-                                  navigate(
-                                    `/dashboard/products/${item._id}/view`,
-                                  )
-                                }
-                                className="group h-10 px-3 rounded-xl border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066] flex items-center gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#263653] hover:border-[#263653] hover:text-white hover:shadow-md active:translate-y-0 active:scale-[0.97]"
-                              >
-                                <Eye size={15} /> View
-                              </button>
-
-                              <button
-                                onClick={() =>
-                                  navigate(
-                                    `/dashboard/products/${item._id}/edit`,
-                                  )
-                                }
-                                className="group h-10 px-3 rounded-xl border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066] flex items-center gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#EEF1F7] hover:border-[#3157D5] hover:text-[#3157D5] hover:shadow-md active:translate-y-0 active:scale-[0.97]"
-                              >
-                                <Pencil size={15} /> Edit
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => handleQuickEdit(item)}
-                                className="group h-10 px-3 rounded-xl border border-[#D9D5CF] bg-[#F8F6F2] text-[#405066] flex items-center gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#FFF8E8] hover:border-[#D99A16] hover:text-[#D99A16] hover:shadow-md active:translate-y-0 active:scale-[0.97]"
-                              >
-                                <SlidersHorizontal size={15} /> Quick Edit
-                              </button>
-                            </div>
-
-                            <div className="flex justify-end mt-3">
-                              <button
-                                type="button"
-                                onClick={() => handleDelete(item)}
-                                className="h-10 px-3 rounded-xl border border-[#E9C9C6] bg-[#FDF4F3] text-[#C94A4A] flex items-center justify-center gap-1.5 text-xs font-semibold shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#C94A4A] hover:border-[#C94A4A] hover:text-white hover:shadow-md active:translate-y-0 active:scale-[0.97]"
-                              >
-                                <Trash2 size={15} /> Delete
-                              </button>
-                            </div>
-                          </div>
+                          <button
+                            onClick={() => handleDelete(item)}
+                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 flex items-center justify-center transition"
+                            title="Delete"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                  totalItems={totalProducts}
-                  itemsPerPage={LIMIT}
-                />
-              </>
-            )}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                totalItems={totalProducts}
+                itemsPerPage={LIMIT}
+              />
+            </>
+          )}
 
-            {/* Delete Confirmation Modal */}
-            <DeleteConfirmModal
-              isOpen={deleteModalOpen}
-              productId={selectedProduct?._id}
-              productName={selectedProduct?.name}
-              onClose={handleCloseDeleteModal}
-              onDeleted={handleProductDeleted}
-            />
+          <DeleteConfirmModal
+            isOpen={deleteModalOpen}
+            productId={selectedProduct?._id}
+            productName={selectedProduct?.name}
+            onClose={handleCloseDeleteModal}
+            onDeleted={handleProductDeleted}
+          />
 
-            {/* Quick Edit Modal */}
-            <QuickEditModel
-              isOpen={quickEditOpen}
-              productId={quickEditProduct?._id}
-              onClose={handleCloseQuickEdit}
-              onUpdated={handleProductUpdated}
-            />
-          </div>
+          <QuickEditModal
+            isOpen={quickEditOpen}
+            productId={quickEditProduct?._id}
+            product={quickEditProduct}
+            onClose={handleCloseQuickEdit}
+            onUpdated={handleProductUpdated}
+          />
         </div>
       )}
     </DashboardLayout>
