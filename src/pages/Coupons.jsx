@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -9,8 +9,12 @@ export default function Coupons() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [Coupons, setCoupons] = useState([]);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchCoupons = async () => {
       try {
         const response = await api.get("/Coupons");
@@ -44,11 +48,9 @@ export default function Coupons() {
               <p className="text-xs tracking-[0.3em] text-primary-600 font-semibold mb-2">
                 {t("navigation.coupons")}
               </p>
-
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
                 {t("coupons.title")}
               </h1>
-
               <p className="text-gray-500 text-sm">
                 {t("coupons.description")}
               </p>

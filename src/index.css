@@ -67,7 +67,11 @@ html[dir="rtl"] .text-right {
 }
 
 .dark .bg-gray-50\/30,
-.dark .bg-slate-50\/80 {
+.dark .bg-slate-50\/50,
+.dark .bg-slate-50\/60,
+.dark .bg-slate-50\/70,
+.dark .bg-slate-50\/80,
+.dark .bg-slate-100\/70 {
   background-color: rgb(15 23 42 / 0.5);
 }
 
@@ -92,7 +96,9 @@ html[dir="rtl"] .text-right {
 .dark .border-gray-100,
 .dark .border-gray-200,
 .dark .border-gray-300,
+.dark .border-slate-100,
 .dark .border-slate-200,
+.dark .border-slate-200\/80,
 .dark .border-slate-300 {
   border-color: var(--color-border-subtle);
 }

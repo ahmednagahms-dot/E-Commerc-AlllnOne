@@ -1,7 +1,13 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import { ShoppingCart, DollarSign, Users, Package, Search, RefreshCw } from "lucide-react";
+import {
+  ShoppingCart,
+  DollarSign,
+  Users,
+  Package,
+  Search,
+} from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Pagination from "../components/ui/Pagination";
 import api from "../api/axios";
@@ -55,7 +61,7 @@ export default function Carts() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, debouncedSearch]);
+  }, [currentPage, debouncedSearch, t]);
 
   useEffect(() => {
     fetchCarts();
@@ -101,14 +107,14 @@ export default function Carts() {
     },
   ];
 
- const handleRefresh = async () => {
-  try {
-    await fetchCarts();
-    toast.success(t("pages.cartsUpdated"));
-  } catch (error) {
-    toast.error(t("errors.updateCarts"));
-  }
-};
+  const handleRefresh = async () => {
+    try {
+      await fetchCarts();
+      toast.success(t("pages.cartsUpdated"));
+    } catch (error) {
+      toast.error(t("errors.updateCarts"));
+    }
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -282,7 +288,7 @@ export default function Carts() {
                           </td>
                           <td className="py-3" role="cell">
                             <div className="flex flex-col gap-1">
-                              {cart.items.slice(0, 2).map((item) => (
+                              {cart.items?.slice(0, 2).map((item) => (
                                 <span
                                   key={item._id}
                                   className="text-gray-600 text-xs flex items-center gap-1"
@@ -295,7 +301,7 @@ export default function Carts() {
                                   {item.name} × {item.quantity}
                                 </span>
                               ))}
-                              {cart.items.length > 2 && (
+                              {cart.items?.length > 2 && (
                                 <span className="text-xs text-gray-400">
                                   +{cart.items.length - 2} more
                                 </span>
@@ -303,7 +309,7 @@ export default function Carts() {
                             </div>
                           </td>
                           <td className="py-3" role="cell">
-                            {cart.itemCount || cart.items.length}
+                            {cart.itemCount || cart.items?.length || 0}
                           </td>
                           <td className="py-3 font-semibold" role="cell">
                             ${cart.subtotal?.toLocaleString() || "0.00"}
