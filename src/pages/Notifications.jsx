@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -9,18 +9,21 @@ export default function Notifications() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [Notifications, setNotifications] = useState([]);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchNotifications = async () => {
       try {
-        const response = await api.get("/Notifications");
+        const response = await api.get("/notifications");
 
         setNotifications(
           Array.isArray(response.data)
             ? response.data
-            : response.data?.Notifications || response.data?.data || [],
+            : response.data?.notifications || response.data?.data || [],
         );
-        toast.success("Notifications loaded successfully!");
       } catch (error) {
         console.error("Error fetching Notifications:", error);
         setNotifications([]);
@@ -54,16 +57,6 @@ export default function Notifications() {
                 {t("notifications.description")}
               </p>
             </div>
-
-            {/* Loading */}
-            {loading && (
-              <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-12">
-                <h2 className="text-lg font-semibold text-gray-400">
-                  {t("notifications.loading")}
-                </h2>
-              </div>
-            )}
-
             {/* Empty */}
             {!loading && Notifications.length === 0 && (
               <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-12">

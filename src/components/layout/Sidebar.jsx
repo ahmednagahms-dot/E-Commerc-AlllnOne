@@ -10,14 +10,14 @@ const STORE_LOGO_URL =
 
 export default function Sidebar({ onClose }) {
   const { logoutUser, user } = useAuth();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   return (
-    <aside className="w-64 h-screen bg-slate-900 text-slate-300 flex flex-col">
+    <aside className="w-64 h-screen bg-white text-slate-600 flex flex-col border-r border-slate-200">
       {/* Logo */}
-      <div className="px-5 pt-5 pb-4 flex items-center justify-between border-b border-white/10">
+      <div className="px-5 pt-5 pb-4 flex items-center justify-between border-b border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="w-16 h-14 rounded-2xl bg-white shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 p-1.5 shrink-0 flex items-center justify-center">
             <img
               src={STORE_LOGO_URL}
               alt="AllInOne"
@@ -25,14 +25,14 @@ export default function Sidebar({ onClose }) {
             />
           </div>
           <div>
-            <h1 className="font-medium text-sm text-white">AllInOne</h1>
-            <p className="text-[11px] text-slate-400">{t("common.admin")}</p>
+            <h1 className="font-bold text-sm text-slate-900">AllInOne</h1>
+            <p className="text-[11px] text-slate-400">E-commerce Admin</p>
           </div>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="lg:hidden text-slate-400 hover:text-white"
+            className="lg:hidden text-slate-400 hover:text-slate-700"
           >
             <X size={18} />
           </button>
@@ -43,7 +43,7 @@ export default function Sidebar({ onClose }) {
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         {sidebarLinks.map((group) => (
           <div key={group.section} className="mb-4">
-            <p className="px-2 text-[11px] text-slate-500 mb-2 font-medium tracking-wide">
+            <p className="px-3 text-[11px] text-slate-400 mb-2 font-semibold uppercase tracking-wider">
               {t(group.section)}
             </p>
             {group.items.map((item) => {
@@ -55,10 +55,10 @@ export default function Sidebar({ onClose }) {
                   end
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 mb-0.5 rounded-lg text-sm transition ${
+                    `flex items-center gap-3 px-3 py-2.5 mb-0.5 rounded-xl text-sm font-medium transition ${
                       isActive
-                        ? "bg-primary-600/20 text-primary-300 font-medium"
-                        : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                        ? "bg-indigo-50 text-indigo-600 font-semibold"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                     }`
                   }
                 >
@@ -72,9 +72,9 @@ export default function Sidebar({ onClose }) {
       </nav>
 
       {/* User + Logout */}
-      <div className="p-4 border-t border-white/10">
+      <div className="p-4 border-t border-slate-100 bg-slate-50/50">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center text-xs font-medium shrink-0 overflow-hidden">
+          <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden shadow-xs">
             {user?.avatar ? (
               <img
                 src={user.avatar}
@@ -88,10 +88,10 @@ export default function Sidebar({ onClose }) {
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-white text-xs font-medium truncate">
+            <p className="text-slate-900 text-xs font-semibold truncate">
               {user?.username}
             </p>
-            <p className="text-slate-500 text-[11px] capitalize">
+            <p className="text-slate-400 text-[11px] capitalize font-medium">
               {user?.role}
             </p>
           </div>
@@ -101,7 +101,7 @@ export default function Sidebar({ onClose }) {
             await logoutUser();
             window.location.href = "/login";
           }}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-red-400 hover:bg-red-500/10 transition"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-rose-600 hover:bg-rose-50 font-medium transition cursor-pointer"
         >
           <LogOut size={18} />
           {t("navigation.logout")}
