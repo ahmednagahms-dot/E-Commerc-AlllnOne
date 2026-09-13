@@ -26,7 +26,7 @@ export default function Sidebar({ onClose }) {
           </div>
           <div>
             <h1 className="font-medium text-sm text-white">AllInOne</h1>
-            <p className="text-[11px] text-slate-400">E-commerce Admin</p>
+            <p className="text-[11px] text-slate-400">{t("common.admin")}</p>
           </div>
         </div>
         {onClose && (

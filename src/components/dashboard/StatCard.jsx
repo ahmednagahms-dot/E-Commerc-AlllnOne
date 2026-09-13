@@ -1,5 +1,6 @@
 import * as Icons from "lucide-react";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Sparkline from "./Sparkline";
 
 const colorMap = {
@@ -10,6 +11,7 @@ const colorMap = {
 };
 
 export default function StatCard({ title, value, growth, icon, color, sparkData }) {
+  const { t } = useTranslation();
   const Icon = Icons[icon];
   const c = colorMap[color];
   const isPositive = growth >= 0;
@@ -35,7 +37,7 @@ export default function StatCard({ title, value, growth, icon, color, sparkData 
         <span className={isPositive ? "text-success" : "text-danger"}>
           {isPositive ? "+" : ""}{growth}%
         </span>
-        <span className="text-gray-400">vs last period</span>
+        <span className="text-gray-400">{t("dashboard.vsLastPeriod")}</span>
       </div>
 
       <div className="mt-2 -mx-1">

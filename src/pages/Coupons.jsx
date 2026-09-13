@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import api from "../api/axios";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 export default function Coupons() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [Coupons, setCoupons] = useState([]);
 
@@ -33,23 +35,22 @@ export default function Coupons() {
   return (
     <DashboardLayout>
       {loading ? (
-        <PageLoader text="Loading coupons..." />
+        <PageLoader text={t("coupons.loading")} />
       ) : (
-        <div className="animate-fade-in w-full">
-          <div className="p-6 bg-[#f5f7fa] min-h-screen">
+        <div className="animate-fade-in w-full page-surface">
+          <div className="p-6 bg-[#f5f7fa] min-h-screen page-surface">
             {/* Header */}
             <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
               <p className="text-xs tracking-[0.3em] text-primary-600 font-semibold mb-2">
-                Coupons
+                {t("navigation.coupons")}
               </p>
 
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                Coupons overview
+                {t("coupons.title")}
               </h1>
 
               <p className="text-gray-500 text-sm">
-                All active Coupons returned from the API are rendered here with
-                their latest item details.
+                {t("coupons.description")}
               </p>
             </div>
 
@@ -57,7 +58,7 @@ export default function Coupons() {
             {loading && (
               <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-12">
                 <h2 className="text-lg font-semibold text-gray-400">
-                  Loading Coupons...
+                  {t("coupons.loading")}
                 </h2>
               </div>
             )}
@@ -66,7 +67,7 @@ export default function Coupons() {
             {!loading && Coupons.length === 0 && (
               <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-12">
                 <h2 className="text-lg font-semibold text-gray-400">
-                  No Coupons returned from API
+                  {t("coupons.empty")}
                 </h2>
               </div>
             )}

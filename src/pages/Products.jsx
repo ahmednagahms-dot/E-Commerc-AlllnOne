@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Search,
   SlidersHorizontal,
@@ -31,6 +32,7 @@ const CATEGORIES = [
 
 export default function Products() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [items, setItems] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -174,25 +176,25 @@ export default function Products() {
   const stats = [
     {
       icon: "▣",
-      title: "Total Products",
+      title: t("products.totalProducts"),
       count: totalProducts,
       style: "text-[#3157D5] bg-[#EEF1F7]",
     },
     {
       icon: <Star size={19} />,
-      title: "Featured (this page)",
+      title: t("products.featured"),
       count: featuredCount,
       style: "text-[#D99A16] bg-[#FFF8E8]",
     },
     {
       icon: "✓",
-      title: "In Stock (this page)",
+      title: t("products.inStock"),
       count: inStockCount,
       style: "text-[#20A464] bg-[#EAF8F0]",
     },
     {
       icon: "⊘",
-      title: "Out of Stock (this page)",
+      title: t("products.outOfStock"),
       count: outStockCount,
       style: "text-[#D95353] bg-[#FDEEEE]",
     },
@@ -201,17 +203,17 @@ export default function Products() {
   return (
     <DashboardLayout>
       {loading ? (
-        <PageLoader text="Loading products..." />
+          <PageLoader text={t("products.loading")} />
       ) : (
-        <div className="animate-fade-in w-full">
-          <div className="min-h-screen bg-[#F5F3EF] -m-6 p-4 sm:p-6">
+        <div className="animate-fade-in w-full page-surface">
+          <div className="min-h-screen bg-[#F5F3EF] -m-6 p-4 sm:p-6 page-surface">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-7">
               <div>
-                <h1 className="text-3xl font-bold text-[#172033]">Products</h1>
+                <h1 className="text-3xl font-bold text-[#172033]">{t("navigation.products")}</h1>
 
                 <p className="text-[#697386] mt-1">
-                  {totalProducts} products total
+                  {t("products.total", { count: totalProducts })}
                 </p>
               </div>
 
@@ -220,7 +222,7 @@ export default function Products() {
                 className="flex items-center gap-2 bg-[#263653] hover:bg-[#1D2A43] text-white px-5 py-3 rounded-xl transition"
               >
                 <Plus size={18} />
-                Add Product
+                {t("navigation.addProduct")}
               </button>
             </div>
 
@@ -261,7 +263,7 @@ export default function Products() {
 
                   <input
                     type="text"
-                    placeholder="Search products..."
+                    placeholder={t("products.searchPlaceholder")}
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -274,7 +276,7 @@ export default function Products() {
                   className="w-full sm:w-32 h-12 bg-[#1D3CA5] hover:bg-[#172F8F] text-white rounded-xl flex items-center justify-center gap-2"
                 >
                   <Search size={17} />
-                  Search
+                  {t("common.search")}
                 </button>
 
                 <button
@@ -286,7 +288,7 @@ export default function Products() {
                   }`}
                 >
                   <SlidersHorizontal size={20} />
-                  Filter
+                  {t("common.filter")}
                 </button>
               </div>
 
@@ -295,7 +297,7 @@ export default function Products() {
                 <div className="mt-4 pt-4 border-t border-[#E3E0DB] grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-semibold text-[#405066] mb-2">
-                      Categories
+                      {t("products.categories")}
                     </p>
 
                     <select
@@ -306,7 +308,7 @@ export default function Products() {
                       }}
                       className="w-full h-11 border border-[#D9D5CF] rounded-xl px-4 bg-[#F3F1ED] text-[#405066] outline-none"
                     >
-                      <option value="">All Categories</option>
+                      <option value="">{t("products.allCategories")}</option>
 
                       {CATEGORIES.map((cat) => (
                         <option key={cat} value={cat}>
@@ -318,7 +320,7 @@ export default function Products() {
 
                   <div>
                     <p className="text-sm font-semibold text-[#405066] mb-2">
-                      Sort By
+                      {t("products.sortBy")}
                     </p>
 
                     <select
@@ -329,15 +331,15 @@ export default function Products() {
                       }}
                       className="w-full h-11 border border-[#D9D5CF] rounded-xl px-4 bg-[#F3F1ED] text-[#405066] outline-none"
                     >
-                      <option value="">Newest</option>
+                      <option value="">{t("products.newest")}</option>
 
-                      <option value="oldest">Oldest</option>
+                      <option value="oldest">{t("products.oldest")}</option>
 
-                      <option value="price_asc">Price: Low to High</option>
+                      <option value="price_asc">{t("products.priceLowToHigh")}</option>
 
-                      <option value="price_desc">Price: High to Low</option>
+                      <option value="price_desc">{t("products.priceHighToLow")}</option>
 
-                      <option value="rating">Highest Rated</option>
+                      <option value="rating">{t("products.highestRated")}</option>
                     </select>
                   </div>
 
@@ -345,7 +347,7 @@ export default function Products() {
                     onClick={clearFilters}
                     className="sm:col-span-2 text-sm text-[#263653] font-medium text-left hover:underline"
                   >
-                    Clear Filters
+                    {t("products.clearFilters")}
                   </button>
                 </div>
               )}
@@ -358,7 +360,7 @@ export default function Products() {
               </div>
             ) : items.length === 0 ? (
               <div className="bg-[#FCFAF7] p-12 rounded-2xl text-center text-[#697386] border border-[#E3E0DB]">
-                No products found
+                {t("common.noResults")}
               </div>
             ) : (
               <>

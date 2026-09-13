@@ -1,13 +1,15 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useTranslation } from "react-i18next";
 
 export default function SalesOverviewChart({ data }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 lg:col-span-2">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold">Sales Overview</h3>
+        <h3 className="font-semibold">{t("dashboard.salesOverview")}</h3>
         <div className="flex items-center gap-4 text-xs text-gray-500">
-          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary-500" /> Revenue</span>
-          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-purple-400" /> Orders</span>
+          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary-500" /> {t("dashboard.revenue")}</span>
+          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-purple-400" /> {t("dashboard.orders")}</span>
         </div>
       </div>
       <ResponsiveContainer width="100%" height={280}>

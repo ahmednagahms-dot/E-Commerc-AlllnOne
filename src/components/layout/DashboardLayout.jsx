@@ -14,7 +14,7 @@ export default function DashboardLayout({ children }) {
   return (
     <>
       {loading && <SessionLoader />}
-      <div className="bg-slate-50 min-h-screen relative overflow-x-hidden">
+      <div className="bg-surface-alt min-h-screen relative overflow-x-hidden transition-colors">
         {sidebarOpen && (
           <div
             onClick={() => setSidebarOpen(false)}
