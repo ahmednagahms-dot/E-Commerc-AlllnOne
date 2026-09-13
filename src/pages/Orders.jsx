@@ -3,8 +3,10 @@ import axios from "../api/axios";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const Orders = () => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -145,7 +147,7 @@ const Orders = () => {
   return (
     <DashboardLayout>
       {loading ? (
-        <PageLoader text="Loading orders..." />
+        <PageLoader text={t("orders.loading")} />
       ) : (
         <div className="animate-fade-in w-full">
           <div className="p-8 bg-gray-100 min-h-screen">
@@ -153,9 +155,9 @@ const Orders = () => {
             <div className="flex justify-between items-center mb-6">
               <div>
                 <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider block mb-1">
-                  Admin · Management
+                  {t("orders.management")}
                 </span>
-                <h1 className="text-3xl font-bold text-slate-900">Orders</h1>
+                <h1 className="text-3xl font-bold text-slate-900">{t("orders.orders")}</h1>
               </div>
 
               <div className="bg-white border border-gray-200 rounded-lg shadow-md px-5 py-2 text-right">
@@ -163,7 +165,7 @@ const Orders = () => {
                   {totalOrders}
                 </span>
                 <span className="text-xs text-slate-400 pl-2 lowercase">
-                  total orders
+                  {t("orders.totalOrders")}
                 </span>
               </div>
             </div>
@@ -177,7 +179,7 @@ const Orders = () => {
                     type="text"
                     value={searchTerm}
                     onChange={handleFilterChange(setSearchTerm)}
-                    placeholder="Search ID, customer..."
+                    placeholder={t("orders.search")}
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                   />
                 </div>
@@ -188,8 +190,8 @@ const Orders = () => {
                     onChange={handleFilterChange(setStatusFilter)}
                     className="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2 outline-none focus:border-indigo-500 cursor-pointer"
                   >
-                    <option value="">All Status</option>
-                    <option value="pending">Pending</option>
+                    <option value="">{t("orders.allStatus")}</option>
+                    <option value="pending">{t("orders.pending")}</option>
                     <option value="confirmed">Confirmed</option>
                     <option value="processing">Processing</option>
                     <option value="shipped">Shipped</option>
@@ -202,9 +204,9 @@ const Orders = () => {
                     onChange={handleFilterChange(setPaymentFilter)}
                     className="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2 outline-none focus:border-indigo-500 cursor-pointer"
                   >
-                    <option value="">All Payment</option>
-                    <option value="paid">Paid</option>
-                    <option value="unpaid">Unpaid</option>
+                    <option value="">{t("orders.allPayment")}</option>
+                    <option value="paid">{t("orders.paid")}</option>
+                    <option value="unpaid">{t("orders.pending")}</option>
                   </select>
 
                   <select
@@ -212,9 +214,9 @@ const Orders = () => {
                     onChange={handleFilterChange(setMethodFilter)}
                     className="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2 outline-none focus:border-indigo-500 cursor-pointer"
                   >
-                    <option value="">All Methods</option>
-                    <option value="cash">Cash</option>
-                    <option value="card">Card / Stripe</option>
+                    <option value="">{t("orders.allMethods")}</option>
+                    <option value="cash">{t("orders.cash")}</option>
+                    <option value="card">{t("orders.card")}</option>
                   </select>
                 </div>
               </div>
@@ -224,12 +226,12 @@ const Orders = () => {
                 <table className="w-full text-left border-collapse text-sm">
                   <thead className="bg-slate-50/80 border-b border-gray-100 text-slate-400 font-medium text-xs tracking-wider uppercase">
                     <tr>
-                      <th className="py-4 px-6">Order ID</th>
-                      <th className="py-4 px-6">Customer</th>
-                      <th className="py-4 px-6">Date</th>
-                      <th className="py-4 px-6">Status</th>
-                      <th className="py-4 px-6">Payment</th>
-                      <th className="py-4 px-6">Total</th>
+                      <th className="py-4 px-6">{t("orders.orderId")}</th>
+                      <th className="py-4 px-6">{t("pages.customer")}</th>
+                      <th className="py-4 px-6">{t("orders.date")}</th>
+                      <th className="py-4 px-6">{t("orders.status")}</th>
+                      <th className="py-4 px-6">{t("orders.payment")}</th>
+                      <th className="py-4 px-6">{t("orders.total")}</th>
                     </tr>
                   </thead>
 
@@ -240,7 +242,7 @@ const Orders = () => {
                           colSpan="6"
                           className="py-12 text-center text-slate-400 font-medium"
                         >
-                          Loading orders...
+                          {t("orders.loading")}
                         </td>
                       </tr>
                     )}
@@ -262,7 +264,7 @@ const Orders = () => {
                           colSpan="6"
                           className="py-12 text-center text-slate-400 font-medium"
                         >
-                          No orders found
+                          {t("orders.noOrders")}
                         </td>
                       </tr>
                     )}

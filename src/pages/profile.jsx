@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { Camera, Loader2 } from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -11,6 +12,7 @@ import api from "../api/axios";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 export default function Profile() {
+  const { t } = useTranslation();
   const { user, updateUser } = useAuth();
   const [avatar, setAvatar] = useState(user?.avatar || "");
   const [uploading, setUploading] = useState(false);
@@ -30,7 +32,7 @@ export default function Profile() {
       const url = await uploadToCloudinary(file);
       setAvatar(url);
     } catch (err) {
-      toast.error("Failed to upload image. Please try again.");
+      toast.error(t("errors.uploadImage"));
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -48,10 +50,10 @@ export default function Profile() {
       updateUser(response.data.user);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
-      toast.success("Profile updated successfully!");
+      toast.success(t("pages.profileUpdated"));
     } catch (err) {
        toast.error(
-      err.response?.data?.message || "Failed to update profile."
+      err.response?.data?.message || t("errors.updateProfile")
     );
     } finally {
       setSaving(false);
@@ -63,8 +65,8 @@ export default function Profile() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">My Profile</h1>
-        <p className="text-sm text-gray-500">Manage your personal information.</p>
+        <h1 className="text-2xl font-bold">{t("pages.profile")}</h1>
+        <p className="text-sm text-gray-500">{t("pages.profileDescription")}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -94,19 +96,19 @@ export default function Profile() {
 
         {/* Form */}
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-          <h3 className="font-semibold mb-4">Personal Information</h3>
+          <h3 className="font-semibold mb-4">{t("pages.personalInformation")}</h3>
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <Input
-              label="Username"
+              label={t("pages.username")}
               error={errors.username?.message}
-              {...register("username", { required: "Username is required" })}
+              {...register("username", { required: t("errors.usernameRequired") })}
             />
-            <Input label="Email address" value={user.email} disabled className="bg-gray-50" />
-            <Input label="Phone number" {...register("phone")} />
+            <Input label={t("pages.emailAddress")} value={user.email} disabled className="bg-gray-50" />
+            <Input label={t("pages.phoneNumber")} {...register("phone")} />
 
             <div>
               <Button type="submit" disabled={saving || uploading}>
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? t("pages.saving") : t("pages.saveChanges")}
               </Button>
             </div>
           </form>

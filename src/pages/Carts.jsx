@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { ShoppingCart, DollarSign, Users, Package, Search, RefreshCw } from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Pagination from "../components/ui/Pagination";
@@ -9,6 +10,7 @@ import PageLoader from "../components/ui/sessionLoader/PageLoader";
 const LIMIT = 10;
 
 export default function Carts() {
+  const { t, i18n } = useTranslation();
   const [carts, setCarts] = useState([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -43,11 +45,11 @@ export default function Carts() {
       setTotalPages(response.data.totalPages || 1);
     } catch (err) {
       if (err.response?.status === 401) {
-        setError("Session expired. Please login again.");
+        setError(t("errors.sessionExpired"));
       } else if (err.response?.status === 403) {
-        setError("You don't have permission to view this page.");
+        setError(t("errors.permission"));
       } else {
-        setError("Failed to load active carts. Please try again.");
+        setError(t("errors.loadCarts"));
       }
       console.error("Error fetching carts:", err);
     } finally {
@@ -80,19 +82,19 @@ export default function Carts() {
 
   const stats = [
     {
-      title: "Active Carts",
+      title: t("pages.activeCarts"),
       value: total,
       icon: ShoppingCart,
       style: "text-cyan-600 bg-cyan-50",
     },
     {
-      title: "Total Value",
+      title: t("pages.totalValue"),
       value: `$${totalValue.toLocaleString()}`,
       icon: DollarSign,
       style: "text-emerald-600 bg-emerald-50",
     },
     {
-      title: "Unique Customers",
+      title: t("pages.uniqueCustomers"),
       value: uniqueCustomers,
       icon: Users,
       style: "text-purple-600 bg-purple-50",
@@ -102,16 +104,16 @@ export default function Carts() {
  const handleRefresh = async () => {
   try {
     await fetchCarts();
-    toast.success("Carts updated successfully!");
+    toast.success(t("pages.cartsUpdated"));
   } catch (error) {
-    toast.error("Failed to update carts.");
+    toast.error(t("errors.updateCarts"));
   }
 };
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
+    return date.toLocaleDateString(i18n.language === "ar" ? "ar-EG" : "en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -123,18 +125,18 @@ export default function Carts() {
   return (
     <DashboardLayout>
       {loading ? (
-        <PageLoader text="Loading active carts..." />
+        <PageLoader text={t("pages.loadingCarts")} />
       ) : (
         <div className="p-4 sm:p-6 w-full animate-fade-in">
           <div className="mb-6">
             <p className="text-xs font-semibold text-primary-500 tracking-widest uppercase">
-              Admin · Management
+              {t("pages.adminManagement")}
             </p>
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold">Active Carts</h1>
+                <h1 className="text-2xl font-bold">{t("pages.activeCarts")}</h1>
                 <p className="text-sm text-gray-500">
-                  Carts customers currently have items in.
+                  {t("pages.cartDescription")}
                 </p>
               </div>
             </div>
@@ -169,17 +171,17 @@ export default function Carts() {
               <Search size={16} className="text-gray-400" aria-hidden="true" />
               <input
                 type="text"
-                placeholder="Search by customer name or email..."
+                placeholder={t("pages.searchCarts")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="bg-transparent outline-none text-sm w-full"
-                aria-label="Search carts by customer name or email"
+                aria-label={t("pages.searchCarts")}
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
                   className="text-gray-400 hover:text-gray-600"
-                  aria-label="Clear search"
+                  aria-label={t("common.close")}
                 >
                   ×
                 </button>
@@ -198,7 +200,7 @@ export default function Carts() {
                   <div className="flex justify-center mb-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                   </div>
-                  Loading carts...
+                  {t("pages.loadingCarts")}
                 </div>
               ) : error ? (
                 <div className="text-center py-16 text-danger" role="alert">
@@ -207,7 +209,7 @@ export default function Carts() {
                     onClick={handleRefresh}
                     className="mt-4 text-sm text-primary-500 hover:text-primary-600 underline"
                   >
-                    Try again
+                    {t("common.tryAgain")}
                   </button>
                 </div>
               ) : filteredCarts.length === 0 ? (
@@ -218,12 +220,12 @@ export default function Carts() {
                     aria-hidden="true"
                   />
                   <p className="font-medium text-gray-500">
-                    No active carts right now
+                    {t("pages.noActiveCarts")}
                   </p>
                   <p className="text-xs mt-1">
                     {search
-                      ? "No results match your search."
-                      : "Try adjusting your search."}
+                      ? t("pages.noSearchMatch")
+                      : t("pages.adjustSearch")}
                   </p>
                 </div>
               ) : (
@@ -235,19 +237,19 @@ export default function Carts() {
                         role="row"
                       >
                         <th className="py-2 font-medium" scope="col">
-                          Customer
+                          {t("pages.customer")}
                         </th>
                         <th className="py-2 font-medium" scope="col">
-                          Items
+                          {t("pages.items")}
                         </th>
                         <th className="py-2 font-medium" scope="col">
-                          Item Count
+                          {t("pages.itemCount")}
                         </th>
                         <th className="py-2 font-medium" scope="col">
-                          Subtotal
+                          {t("pages.subtotal")}
                         </th>
                         <th className="py-2 font-medium" scope="col">
-                          Last Updated
+                          {t("pages.lastUpdated")}
                         </th>
                       </tr>
                     </thead>
