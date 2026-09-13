@@ -34,7 +34,12 @@ export default function LoginForm() {
 
       navigate("/dashboard");
     } catch (err) {
-      setLoginError(err.response?.data?.message || "Invalid email or password");
+      const errorMessage = err.response?.data?.message;
+      setLoginError(
+        errorMessage
+          ? t(errorMessage, { defaultValue: errorMessage })
+          : t("auth.invalidCredentials")
+      );
     } finally {
       setLoading(false);
     }
