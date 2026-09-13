@@ -103,22 +103,11 @@ export default function Products() {
       const formData = new FormData();
       formData.append("featured", newValue);
 
-
       await api.patch(`/products/update/${item._id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      await api.patch(
-        `/products/update/${item._id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
 
       toast.success("Featured status updated successfully!");
     } catch (err) {
@@ -363,11 +352,7 @@ export default function Products() {
             </div>
 
             {/* Products */}
-            {loading ? (
-              <div className="bg-[#FCFAF7] p-12 rounded-2xl text-center text-[#697386] border border-[#E3E0DB]">
-                Loading products...
-              </div>
-            ) : error ? (
+            {error ? (
               <div className="bg-[#FCFAF7] p-12 rounded-2xl text-center text-[#D95353] border border-[#E3E0DB]">
                 {error}
               </div>
@@ -576,15 +561,6 @@ export default function Products() {
               onDeleted={handleProductDeleted}
             />
 
-            {/* Delete Confirmation Modal */}
-            <DeleteConfirmModal
-              isOpen={deleteModalOpen}
-              productId={selectedProduct?._id}
-              productName={selectedProduct?.name}
-              onClose={handleCloseDeleteModal}
-              onDeleted={handleProductDeleted}
-            />
-
             {/* Quick Edit Modal */}
             <QuickEditModel
               isOpen={quickEditOpen}
@@ -595,27 +571,6 @@ export default function Products() {
           </div>
         </div>
       )}
-          </>
-        )}
-
-        {/* Delete Confirmation Modal */}
-        <DeleteConfirmModal
-          isOpen={deleteModalOpen}
-          productId={selectedProduct?._id}
-          productName={selectedProduct?.name}
-          onClose={handleCloseDeleteModal}
-          onDeleted={handleProductDeleted}
-        />
-
-        {/* Quick Edit Modal */}
-        <QuickEditModel
-          isOpen={quickEditOpen}
-          productId={quickEditProduct?._id}
-          onClose={handleCloseQuickEdit}
-          onUpdated={handleProductUpdated}
-          
-        />
-      </div>
     </DashboardLayout>
   );
 }
