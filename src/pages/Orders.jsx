@@ -99,7 +99,10 @@ const Orders = () => {
 
   /* ---------- Debounce search ---------- */
   useEffect(() => {
-    const handler = setTimeout(() => setDebouncedSearch(searchTerm), 400);
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
@@ -141,7 +144,6 @@ const Orders = () => {
           data.results || data.totalOrders || data.total || list.length || 0
         );
       } catch (err) {
-        // ✅ إصلاح: api instance مش عنده isCancel
         if (err.name === "CanceledError" || err.code === "ERR_CANCELED") {
           return;
         }
@@ -246,16 +248,15 @@ const Orders = () => {
                 <input
                   type="text"
                   value={searchTerm}
-                  onChange={handleFilterChange(setSearchTerm)}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search by ID or customer..."
+                  aria-label="Search orders by ID or customer"
                   className="w-full border border-slate-200 rounded-xl pl-10 pr-9 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
                 />
                 {searchTerm && (
                   <button
-                    onClick={() => {
-                      setSearchTerm("");
-                      setCurrentPage(1);
-                    }}
+                    onClick={() => setSearchTerm("")}
+                    aria-label="Clear search"
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
                     <X className="w-4 h-4" />
@@ -267,6 +268,7 @@ const Orders = () => {
                 <select
                   value={statusFilter}
                   onChange={handleFilterChange(setStatusFilter)}
+                  aria-label="Filter by status"
                   className="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3.5 py-2 outline-none focus:border-indigo-500 cursor-pointer transition-all hover:border-slate-300"
                 >
                   <option value="">All Statuses</option>
@@ -280,6 +282,7 @@ const Orders = () => {
                 <select
                   value={paymentFilter}
                   onChange={handleFilterChange(setPaymentFilter)}
+                  aria-label="Filter by payment status"
                   className="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3.5 py-2 outline-none focus:border-indigo-500 cursor-pointer transition-all hover:border-slate-300"
                 >
                   <option value="">All Payment</option>
@@ -290,6 +293,7 @@ const Orders = () => {
                 <select
                   value={methodFilter}
                   onChange={handleFilterChange(setMethodFilter)}
+                  aria-label="Filter by payment method"
                   className="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3.5 py-2 outline-none focus:border-indigo-500 cursor-pointer transition-all hover:border-slate-300"
                 >
                   <option value="">All Methods</option>
@@ -312,7 +316,11 @@ const Orders = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
+            <div
+              className={`overflow-x-auto transition-opacity duration-150 ${
+                loading ? "opacity-50 pointer-events-none" : "opacity-100"
+              }`}
+            >
               <table className="w-full text-left border-collapse text-sm">
                 <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-400 font-semibold text-xs tracking-wider uppercase">
                   <tr>
@@ -333,7 +341,9 @@ const Orders = () => {
                           <AlertCircle className="w-8 h-8" />
                           <p className="font-medium">{error}</p>
                           <button
-                            onClick={() => fetchOrders()}
+                            onClick={() =>
+                              fetchOrders(new AbortController().signal)
+                            }
                             className="mt-2 text-xs text-indigo-600 underline font-semibold cursor-pointer"
                           >
                             Try Reloading
@@ -458,6 +468,7 @@ const Orders = () => {
                   <button
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                    aria-label="Previous page"
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -467,6 +478,8 @@ const Orders = () => {
                     <button
                       key={num}
                       onClick={() => setCurrentPage(num)}
+                      aria-label={`Go to page ${num}`}
+                      aria-current={num === currentPage ? "page" : undefined}
                       className={`w-8 h-8 flex items-center justify-center rounded-lg border cursor-pointer text-xs font-semibold transition-colors ${
                         num === currentPage
                           ? "bg-indigo-600 text-white border-indigo-600"
@@ -482,6 +495,7 @@ const Orders = () => {
                     onClick={() =>
                       setCurrentPage((p) => Math.min(p + 1, totalPages))
                     }
+                    aria-label="Next page"
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors cursor-pointer"
                   >
                     <ChevronRight className="w-4 h-4" />

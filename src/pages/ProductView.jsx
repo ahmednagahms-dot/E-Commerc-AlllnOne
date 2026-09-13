@@ -27,12 +27,16 @@ export default function ProductView() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchProduct = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const { data } = await api.get(`/products/${id}`);
+        const { data } = await api.get(`/products/${id}`, {
+          signal: controller.signal,
+        });
         const productData = data.product || data;
 
         if (!productData) {
@@ -54,16 +58,23 @@ export default function ProductView() {
           );
         }
       } catch (err) {
+        if (err.name === "CanceledError" || err.code === "ERR_CANCELED") {
+          return;
+        }
         const message =
           err.response?.data?.message || "Failed to load product details.";
         setError(message);
-        toast.error(message);
+        toast.error(message, { toastId: "product-view-fetch-error" });
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProduct();
+
+    return () => controller.abort();
   }, [id]);
 
   const getImageUrl = (image) => {
@@ -120,7 +131,7 @@ export default function ProductView() {
 
   const hasDiscount = discountPrice !== null && discountPrice < price;
   const displayPrice = hasDiscount ? discountPrice : price;
-  const stock = Number(product.stock || 0);
+  const stock = Math.max(0, Number(product.stock || 0));
 
   const infoCards = [
     product.sku && { icon: Hash, label: "SKU", value: product.sku },

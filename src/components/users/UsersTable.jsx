@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import { deleteUser, updateUser } from "../../api/user.api";
 
 const UsersTable = ({ users, setUsers, onEditClick }) => {
@@ -15,14 +16,26 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
     if (!userToDelete) return;
 
     setDeletingId(userToDelete);
+
     try {
       await deleteUser(userToDelete);
-      const updatedUsers = users.filter((u) => u._id !== userToDelete);
+
+      const updatedUsers = users.filter(
+        (u) => u._id !== userToDelete
+      );
+
       setUsers(updatedUsers);
       setUserToDelete(null);
+
+      toast.success("User deleted successfully", {
+        toastId: "user-delete-success",
+      });
     } catch (error) {
       console.error("Error deleting user:", error);
-      alert("Delete Error!");
+
+      toast.error("Failed to delete user", {
+        toastId: "user-delete-error",
+      });
     } finally {
       setDeletingId(null);
     }
@@ -30,16 +43,34 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
 
   const handleToggleVerify = async (id, currentStatus) => {
     setUpdatingId(id);
+
     try {
-      await updateUser(id, { isVerified: !currentStatus });
+      await updateUser(id, {
+        isVerified: !currentStatus,
+      });
 
       const updatedUsers = users.map((u) =>
-        u._id === id ? { ...u, isVerified: !currentStatus } : u,
+        u._id === id
+          ? { ...u, isVerified: !currentStatus }
+          : u
       );
+
       setUsers(updatedUsers);
+
+      toast.success(
+        !currentStatus
+          ? "User verified successfully"
+          : "User verification removed",
+        {
+          toastId: "user-verification-success",
+        }
+      );
     } catch (error) {
       console.error("Error updating verification:", error);
-      alert("Edit Error!");
+
+      toast.error("Failed to update user verification", {
+        toastId: "user-verification-error",
+      });
     } finally {
       setUpdatingId(null);
     }
@@ -56,9 +87,14 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
             <th className="p-4 font-medium">Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {users.map((user) => (
-            <tr key={user._id || user.id} className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-none">
+            <tr
+              key={user._id || user.id}
+              className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-none"
+            >
+              {/* User */}
               <td className="p-4">
                 <div
                   className="flex items-center gap-4 cursor-pointer group"
@@ -75,14 +111,20 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                       {user?.username?.charAt(0).toUpperCase()}
                     </div>
                   )}
+
                   <div>
                     <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
                       {user?.username}
                     </p>
-                    <p className="text-sm text-slate-500">{user?.email}</p>
+
+                    <p className="text-sm text-slate-500">
+                      {user?.email}
+                    </p>
                   </div>
                 </div>
               </td>
+
+              {/* Role */}
               <td className="p-4">
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
@@ -94,6 +136,8 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                   {user?.role}
                 </span>
               </td>
+
+              {/* Verification */}
               <td className="p-4">
                 {user?.isVerified ? (
                   <span className="text-emerald-600 font-semibold flex items-center gap-1 text-sm">
@@ -106,8 +150,10 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                 )}
               </td>
 
+              {/* Actions */}
               <td className="p-4">
                 <div className="flex gap-2">
+                  {/* Edit */}
                   <button
                     onClick={() => onEditClick(user)}
                     title="Edit User"
@@ -124,18 +170,21 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8a4.5 4.5 0 01-1.13-1.897l.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
                       />
                     </svg>
                   </button>
 
+                  {/* Verify / Unverify */}
                   <button
                     onClick={() =>
                       handleToggleVerify(user._id, user.isVerified)
                     }
                     disabled={updatingId === user._id}
                     title={
-                      user.isVerified ? "Remove Verification" : "Verify User"
+                      user.isVerified
+                        ? "Remove Verification"
+                        : "Verify User"
                     }
                     className={`text-white w-9 h-9 rounded-xl flex items-center justify-center transition-colors shadow-sm cursor-pointer ${
                       updatingId === user._id
@@ -157,12 +206,13 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                           r="10"
                           stroke="currentColor"
                           strokeWidth="4"
-                        ></circle>
+                        />
+
                         <path
                           className="opacity-75"
                           fill="currentColor"
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
+                        />
                       </svg>
                     ) : (
                       <svg
@@ -182,6 +232,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     )}
                   </button>
 
+                  {/* Delete */}
                   <button
                     onClick={() => handleDeleteClick(user._id)}
                     title="Delete User"
@@ -206,9 +257,13 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               </td>
             </tr>
           ))}
+
           {users.length === 0 && (
             <tr>
-              <td colSpan="4" className="text-center p-8 text-slate-500 text-sm">
+              <td
+                colSpan="4"
+                className="text-center p-8 text-slate-500 text-sm"
+              >
                 No users found!
               </td>
             </tr>
@@ -222,7 +277,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
             onClick={() => setSelectedViewUser(null)}
-          ></div>
+          />
 
           <aside className="relative w-full md:w-1/2 h-screen bg-white shadow-2xl z-[70] flex flex-col overflow-y-auto">
             <div className="flex justify-between items-start p-6 border-b border-slate-100 bg-white sticky top-0 z-10">
@@ -235,10 +290,12 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                   alt="avatar"
                   className="w-16 h-16 rounded-full object-cover border-2 border-slate-100 shadow-sm"
                 />
+
                 <div>
                   <h2 className="text-2xl font-bold text-slate-800">
                     {selectedViewUser?.username}
                   </h2>
+
                   <span
                     className={`mt-1 inline-block px-3 py-0.5 rounded-full text-xs font-bold uppercase ${
                       selectedViewUser?.role?.toLowerCase() === "admin"
@@ -276,82 +333,38 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
                   <div className="text-slate-500 text-sm font-medium flex items-center gap-2 mb-2">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                      ></path>
-                    </svg>
                     Total Orders
                   </div>
-                  <div className="text-2xl font-extrabold text-slate-800">0</div>
+                  <div className="text-2xl font-extrabold text-slate-800">
+                    0
+                  </div>
                 </div>
 
                 <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
                   <div className="text-slate-500 text-sm font-medium flex items-center gap-2 mb-2">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
                     Current
                   </div>
-                  <div className="text-2xl font-extrabold text-slate-800">0</div>
+                  <div className="text-2xl font-extrabold text-slate-800">
+                    0
+                  </div>
                 </div>
 
                 <div className="p-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 shadow-sm">
                   <div className="text-emerald-600 text-sm font-medium flex items-center gap-2 mb-2">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
                     Paid
                   </div>
-                  <div className="text-2xl font-extrabold text-emerald-700">0</div>
+                  <div className="text-2xl font-extrabold text-emerald-700">
+                    0
+                  </div>
                 </div>
 
                 <div className="p-4 rounded-2xl border border-rose-100 bg-rose-50/50 shadow-sm">
                   <div className="text-rose-500 text-sm font-medium flex items-center gap-2 mb-2">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    </svg>
                     Cancelled
                   </div>
-                  <div className="text-2xl font-extrabold text-rose-600">0</div>
+                  <div className="text-2xl font-extrabold text-rose-600">
+                    0
+                  </div>
                 </div>
               </div>
 
@@ -359,39 +372,15 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                 <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">
                   Contact Info
                 </h3>
+
                 <div className="space-y-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                   <div className="flex items-center gap-3 text-slate-700">
-                    <svg
-                      className="w-5 h-5 text-slate-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      ></path>
-                    </svg>
                     <span className="font-medium">
                       {selectedViewUser?.email}
                     </span>
                   </div>
+
                   <div className="flex items-center gap-3 text-slate-700">
-                    <svg
-                      className="w-5 h-5 text-slate-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      ></path>
-                    </svg>
                     <span className="font-medium">
                       {selectedViewUser?.phone || "—"}
                     </span>
@@ -403,6 +392,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                 <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">
                   Addresses
                 </h3>
+
                 <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                   <p className="text-slate-500 text-sm font-medium">
                     No saved addresses.
@@ -424,23 +414,23 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
                   d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                ></path>
+                />
               </svg>
             </div>
 
             <h3 className="text-xl font-bold text-slate-800 mb-2">
               Are you sure you want to delete this user?
             </h3>
+
             <p className="text-slate-500 text-sm mb-6">
-              If you delete it, you won't be able to recover its data. This step
-              is final.
+              If you delete it, you won't be able to recover its data.
+              This step is final.
             </p>
 
             <div className="flex gap-3 justify-center">
@@ -472,13 +462,15 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                         r="10"
                         stroke="currentColor"
                         strokeWidth="4"
-                      ></circle>
+                      />
+
                       <path
                         className="opacity-75"
                         fill="currentColor"
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
+                      />
                     </svg>
+
                     Deleting...
                   </>
                 ) : (

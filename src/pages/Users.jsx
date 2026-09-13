@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { Users as UsersIcon, Shield, User, UserCheck, Search, Plus } from "lucide-react";
+
 import UsersTable from "../components/users/UsersTable";
 import UserFormModal from "../components/users/UserFormModal";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -14,16 +15,11 @@ const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const loadUsers = async () => {
       try {
+        setIsPageLoading(true);
         const response = await fetchUsers();
         const fetchedData =
           response.data?.users || response.data?.data || response.data;
@@ -32,7 +28,11 @@ const Users = () => {
       } catch (error) {
         console.error("Error fetching users:", error);
         setUsers([]);
-        toast.error("Failed to load users.");
+        toast.error("Failed to load users.", {
+          toastId: "users-fetch-error",
+        });
+      } finally {
+        setIsPageLoading(false);
       }
     };
 
@@ -43,25 +43,27 @@ const Users = () => {
 
   const totalUsers = safeUsers.length;
   const adminsCount = safeUsers.filter(
-    (u) => u?.role === "admin" || u?.role === "ADMIN",
+    (u) => u?.role?.toLowerCase() === "admin"
   ).length;
   const customersCount = safeUsers.filter(
-    (u) => u?.role === "customer" || u?.role === "CUSTOMER",
+    (u) => u?.role?.toLowerCase() === "customer"
   ).length;
   const verifiedCount = safeUsers.filter((u) => u?.isVerified).length;
 
-  const filteredUsers = safeUsers.filter(
-    (user) =>
-      user?.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user?.email?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const filteredUsers = safeUsers.filter((user) => {
+    const query = searchQuery.toLowerCase();
+    const username = (user?.username || "").toLowerCase();
+    const email = (user?.email || "").toLowerCase();
+
+    return username.includes(query) || email.includes(query);
+  });
 
   return (
     <DashboardLayout>
       {isPageLoading ? (
         <PageLoader text="Loading users..." />
       ) : (
-        <div className="p-2 sm:p-4">
+        <div className="p-2 sm:p-4 animate-fade-in">
           {/* Header section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
@@ -175,4 +177,4 @@ const Users = () => {
   );
 };
 
-export default Users; // Note: keep standard export default Users
+export default Users;

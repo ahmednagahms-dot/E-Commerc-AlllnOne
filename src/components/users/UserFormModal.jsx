@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { uploadToCloudinary } from "../../api/cloudinary";
 import { addUser, updateUser } from "../../api/user.api";
 
@@ -10,6 +11,8 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
+    password: "",
     role: "customer",
     verified: false,
     image: "",
@@ -21,6 +24,8 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
       setFormData({
         name: editingUser.username || "",
         email: editingUser.email || "",
+        phone: editingUser.phone || "",
+        password: "", 
         role: editingUser.role ? editingUser.role.toLowerCase() : "customer",
         verified: editingUser.isVerified || false,
         image: editingUser.avatar || "",
@@ -43,10 +48,15 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
 
     try {
       const imageUrl = await uploadToCloudinary(file);
-      setFormData({ ...formData, image: imageUrl });
+      setFormData((prev) => ({ ...prev, image: imageUrl }));
+      toast.success("Image uploaded successfully", {
+        toastId: "avatar-upload-success",
+      });
     } catch (error) {
       console.error(error);
-      alert("Error uploading image!");
+      toast.error("Error uploading image!", {
+        toastId: "avatar-upload-error",
+      });
     } finally {
       setIsUploading(false);
     }
@@ -61,9 +71,14 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
       email: formData.email,
       role: formData.role.toLowerCase(),
       avatar: formData.image,
-      password: "Password123!",
-      phone: "01000000000",
+      phone: formData.phone || "01000000000",
     };
+    
+    if (!editingUser) {
+      payload.password = formData.password || "Password123!";
+    } else if (formData.password) {
+      payload.password = formData.password;
+    }
 
     try {
       if (editingUser) {
@@ -76,9 +91,13 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
 
         setUsers((prev) =>
           prev.map((u) =>
-            u._id === editingUser._id ? { ...u, ...updatedData } : u,
-          ),
+            u._id === editingUser._id ? { ...u, ...updatedData } : u
+          )
         );
+
+        toast.success("User updated successfully", {
+          toastId: "user-update-success",
+        });
       } else {
         const response = await addUser(payload);
         const createdUser =
@@ -86,7 +105,12 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
           response.data?.data ||
           response.data ||
           payload;
+
         setUsers((prev) => [...prev, createdUser]);
+
+        toast.success("User created successfully", {
+          toastId: "user-create-success",
+        });
       }
       handleCloseAnimation();
     } catch (error) {
@@ -94,8 +118,11 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
       const backendError =
         error.response?.data?.message ||
         error.response?.data?.error ||
-        "There is a problem in the server!";
-      alert("Backend message: " + backendError);
+        "There was a problem saving the user.";
+
+      toast.error(backendError, {
+        toastId: "user-save-error",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -108,7 +135,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
       }`}
     >
       <div
-        className={`bg-white p-8 rounded-2xl w-full max-w-md shadow-xl transition-all duration-300 transform ${
+        className={`bg-white p-6 sm:p-8 rounded-2xl w-full max-w-md shadow-xl transition-all duration-300 transform max-h-[90vh] overflow-y-auto ${
           showModal ? "scale-100 translate-y-0" : "scale-95 translate-y-4"
         }`}
       >
@@ -149,7 +176,9 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
 
           {/* Name Field */}
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Name</label>
+            <label className="block text-sm font-medium text-slate-600 mb-1">
+              Name
+            </label>
             <input
               type="text"
               required
@@ -163,7 +192,9 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
 
           {/* Email Field */}
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Email</label>
+            <label className="block text-sm font-medium text-slate-600 mb-1">
+              Email
+            </label>
             <input
               type="email"
               required
@@ -175,22 +206,40 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
             />
           </div>
 
-          {/* Role Selection (Only when editing) */}
-          {editingUser && (
+          {/* Password Field (Only when adding or optionally updating) */}
+          {!editingUser && (
             <div>
-              <label className="block text-sm font-medium text-slate-600 mb-1">Role</label>
-              <select
+              <label className="block text-sm font-medium text-slate-600 mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="Password123!"
                 className="w-full border border-slate-200 bg-slate-50/50 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
-                value={formData.role}
+                value={formData.password}
                 onChange={(e) =>
-                  setFormData({ ...formData, role: e.target.value })
+                  setFormData({ ...formData, password: e.target.value })
                 }
-              >
-                <option value="customer">Customer</option>
-                <option value="admin">Admin</option>
-              </select>
+              />
             </div>
           )}
+
+          {/* Role Selection */}
+          <div>
+            <label className="block text-sm font-medium text-slate-600 mb-1">
+              Role
+            </label>
+            <select
+              className="w-full border border-slate-200 bg-slate-50/50 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+              value={formData.role}
+              onChange={(e) =>
+                setFormData({ ...formData, role: e.target.value })
+              }
+            >
+              <option value="customer">Customer</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
 
           {/* Buttons */}
           <div className="flex gap-3 mt-4">

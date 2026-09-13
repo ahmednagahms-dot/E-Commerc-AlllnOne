@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import { Info } from "lucide-react";
 
@@ -19,6 +20,9 @@ export default function Settings() {
             src={STORE_LOGO_URL}
             alt="AllInOne Store"
             className="w-full h-full object-contain rounded-xl"
+            onError={(e) => {
+              e.target.style.display = "none";
+            }}
           />
         </div>
 
@@ -34,12 +38,12 @@ export default function Settings() {
             Store-level configuration (name, logo, shipping, taxes) requires a
             dedicated backend endpoint that doesn't exist yet. To manage your
             personal account, visit your{" "}
-            <a
-              href="/dashboard/profile"
+            <Link
+              to="/dashboard/profile"
               className="text-indigo-600 hover:text-indigo-700 font-semibold underline"
             >
               Profile page
-            </a>
+            </Link>
             .
           </span>
         </p>

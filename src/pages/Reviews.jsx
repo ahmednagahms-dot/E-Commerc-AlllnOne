@@ -5,18 +5,8 @@ import { FiSearch, FiTrash2, FiPlus, FiMessageSquare } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import DashboardLayout from '../components/layout/DashboardLayout';
-// 1. المسار اتصلح هنا
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
-
-const BASE_URL = 'https://e-commerce-api-3wara.vercel.app';
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token') || localStorage.getItem('userToken');
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
-  };
-};
+import api from "../api/axios";
 
 const formatDate = (dateString) => {
   if (!dateString) return '';
@@ -58,28 +48,24 @@ const AddReviewModal = ({ isOpen, onClose, products, onReviewAdded }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch(`${BASE_URL}/products/${data.productId}/reviews`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          rating,
-          comment: data.comment,
-        }),
+      await api.post(`/products/${data.productId}/reviews`, {
+        rating,
+        comment: data.comment,
       });
 
-      if (response.ok) {
-        reset();
-        setRating(5);
-        onReviewAdded();
-        onClose();
-        toast.success("Review added successfully!");
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || 'Failed to add review');
-      }
+      reset();
+      setRating(5);
+      onReviewAdded();
+      onClose();
+      toast.success("Review added successfully!", {
+        toastId: "review-add-success",
+      });
     } catch (error) {
       console.error('Failed to add review:', error);
-      toast.error("Failed to add review. Please try again.");
+      toast.error(
+        error.response?.data?.message || "Failed to add review. Please try again.",
+        { toastId: "review-add-error" }
+      );
     }
   };
 
@@ -166,7 +152,7 @@ const AddReviewModal = ({ isOpen, onClose, products, onReviewAdded }) => {
   );
 };
 
-const DeleteConfirmModal = ({ isOpen, onClose, onConfirm }) => {
+const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, deleting }) => {
   if (!isOpen) return null;
 
   return (
@@ -179,15 +165,17 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm }) => {
         <div className="flex justify-center space-x-3 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition"
+            disabled={deleting}
+            className="px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg shadow hover:bg-red-700 transition"
+            disabled={deleting}
+            className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg shadow hover:bg-red-700 transition disabled:opacity-60"
           >
-            Delete
+            {deleting ? 'Deleting...' : 'Delete'}
           </button>
         </div>
       </div>
@@ -196,9 +184,10 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm }) => {
 };
 
 const Reviews = () => {
-  // 2. ضفنا حالة التحميل هنا
   const [loading, setLoading] = useState(true);
-  
+  const [refreshing, setRefreshing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const [products, setProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -206,14 +195,15 @@ const Reviews = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedReview, setSelectedReview] = useState(null);
 
-  const fetchData = async () => {
-    // 3. بنشغل التحميل أول ما يبدأ يكلم الـ API
-    setLoading(true);
+  const fetchData = async ({ isInitial = false } = {}) => {
+    if (isInitial) {
+      setLoading(true);
+    } else {
+      setRefreshing(true);
+    }
+
     try {
-      const response = await fetch(`${BASE_URL}/products`, {
-        headers: getAuthHeaders(),
-      });
-      const resData = await response.json();
+      const { data: resData } = await api.get('/products');
 
       const productsList = Array.isArray(resData)
         ? resData
@@ -221,78 +211,77 @@ const Reviews = () => {
 
       setProducts(productsList);
 
-      let extractedReviews = [];
-      productsList.forEach((prod) => {
-        if (prod.reviews && Array.isArray(prod.reviews)) {
-          prod.reviews.forEach((r) => {
-            extractedReviews.push({
-              ...r,
-              productName: prod.title || prod.name || 'Product',
-              productId: prod._id || prod.id,
-            });
-          });
+      // For each product, prefer embedded reviews if present; otherwise
+      // fetch that product's reviews individually. This handles a mix of
+      // products with and without embedded reviews correctly, instead of
+      // an all-or-nothing check across the whole list.
+      const perProductPromises = productsList.map(async (prod) => {
+        const pId = prod._id || prod.id;
+        const productName = prod.title || prod.name || 'Product';
+
+        if (Array.isArray(prod.reviews) && prod.reviews.length > 0) {
+          return prod.reviews.map((r) => ({
+            ...r,
+            productName,
+            productId: pId,
+          }));
+        }
+
+        try {
+          const { data: revData } = await api.get(`/products/${pId}/reviews`);
+          const list = Array.isArray(revData)
+            ? revData
+            : revData.data || revData.reviews || [];
+
+          return list.map((r) => ({
+            ...r,
+            productName,
+            productId: pId,
+          }));
+        } catch (err) {
+          console.error(`Failed to fetch reviews for product ${pId}`, err);
+          return [];
         }
       });
 
-      if (extractedReviews.length === 0) {
-        const promises = productsList.map(async (prod) => {
-          const pId = prod._id || prod.id;
-          try {
-            const revRes = await fetch(`${BASE_URL}/products/${pId}/reviews`, {
-              headers: getAuthHeaders(),
-            });
-            const revData = await revRes.json();
-            const list = Array.isArray(revData)
-              ? revData
-              : revData.data || revData.reviews || [];
-
-            return list.map((r) => ({
-              ...r,
-              productName: prod.title || prod.name || 'Product',
-              productId: pId,
-            }));
-          } catch (err) {
-            console.error(`Failed to fetch reviews for product ${pId}`, err);
-            return [];
-          }
-        });
-
-        const results = await Promise.all(promises);
-        extractedReviews = results.flat();
-      }
-
-      console.log('Fetched Reviews successfully:', extractedReviews);
-      setReviews(extractedReviews);
+      const results = await Promise.all(perProductPromises);
+      setReviews(results.flat());
     } catch (error) {
       console.error('Error fetching data:', error);
+      toast.error("Failed to load reviews.", { toastId: "reviews-fetch-error" });
+      setReviews([]);
     } finally {
-      // 4. بنقفل التحميل أول ما يخلص خالص سواء جاب الداتا أو ضرب إيرور
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchData({ isInitial: true });
   }, []);
 
   const handleDelete = async () => {
     if (!selectedReview) return;
+    const reviewId = selectedReview._id || selectedReview.id;
+
     try {
-      await fetch(
-        `${BASE_URL}/products/${selectedReview.productId}/reviews/${
-          selectedReview._id || selectedReview.id
-        }`,
-        {
-          method: 'DELETE',
-          headers: getAuthHeaders(),
-        }
-      );
+      setDeleting(true);
+      await api.delete(`/products/${selectedReview.productId}/reviews/${reviewId}`);
+
       setIsDeleteModalOpen(false);
       setSelectedReview(null);
-      fetchData(); // ده هيشغل اللودينج الشبح تاني وهو بيجيب الداتا الجديدة، شكلها هيبقى احترافي!
+      toast.success("Review deleted successfully.", {
+        toastId: "review-delete-success",
+      });
+      fetchData();
     } catch (error) {
       console.error('Error deleting review:', error);
-       toast.error("Failed to load reviews.");
+      toast.error(
+        error.response?.data?.message || "Failed to delete review.",
+        { toastId: "review-delete-error" }
+      );
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -313,7 +302,6 @@ const Reviews = () => {
 
   return (
     <DashboardLayout>
-      {/* 5. الشرط بتاعنا اهوه */}
       {loading ? (
         <PageLoader text="Loading reviews..." />
       ) : (
@@ -375,7 +363,11 @@ const Reviews = () => {
             />
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div
+            className={`bg-white rounded-xl shadow-sm overflow-hidden transition-opacity duration-150 ${
+              refreshing ? "opacity-50 pointer-events-none" : "opacity-100"
+            }`}
+          >
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -446,6 +438,7 @@ const Reviews = () => {
             isOpen={isDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
             onConfirm={handleDelete}
+            deleting={deleting}
           />
         </div>
       )}

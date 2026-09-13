@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify"; // 👈 استيراد الـ toast
 import { useAuth } from "../../context/AuthContext";
 import Input from "../ui/Input";
 import SocialLoginButtons from "./SocialLoginButtons";
@@ -34,7 +35,16 @@ export default function LoginForm() {
         return;
       }
 
-      navigate("/dashboard");
+      // 👈 1. إظهار رسالة النجاح
+      toast.success(t("auth.loginSuccess") || "Logged in successfully!", {
+        toastId: "login-success-toast",
+      });
+
+      // 👈 2. انتظار ثانيتين ليرى المستخدم الـ Toast ثم الانتقال للـ Dashboard
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
+
     } catch (err) {
       setLoginError(err.response?.data?.message || t("auth.invalidCredentials"));
     } finally {
@@ -118,7 +128,7 @@ export default function LoginForm() {
             </div>
 
             {loginError && (
-              <p className="text-danger text-xs bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              <p className="text-red-600 text-xs bg-red-50 border border-red-100 rounded-lg px-3 py-2">
                 {loginError}
               </p>
             )}

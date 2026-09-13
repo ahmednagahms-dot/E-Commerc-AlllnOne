@@ -34,7 +34,6 @@ export default function Products() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // قراءة الفئة من الرابط إن وجدت (مثل: /dashboard/products?category=electronics)
   const categoryParam = searchParams.get("category") || "";
 
   const [items, setItems] = useState([]);
@@ -44,6 +43,8 @@ export default function Products() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  const [refetchTrigger, setRefetchTrigger] = useState(0);
 
   const [search, setSearch] = useState("");
   const [searchText, setSearchText] = useState("");
@@ -57,7 +58,6 @@ export default function Products() {
   const [quickEditOpen, setQuickEditOpen] = useState(false);
   const [quickEditProduct, setQuickEditProduct] = useState(null);
 
-  // تحديث الفئة عند تغيير الرابط
   useEffect(() => {
     const currentCatParam = searchParams.get("category") || "";
     setCategory(currentCatParam);
@@ -66,35 +66,52 @@ export default function Products() {
     }
   }, [searchParams]);
 
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const res = await api.get("/products/search", {
-        params: {
-          search: search || undefined,
-          category: category || undefined,
-          sort: sortBy || undefined,
-          page: currentPage,
-          limit: LIMIT,
-        },
-      });
-
-      setItems(res.data.products || []);
-      setTotalProducts(res.data.totalProducts || 0);
-      setTotalPages(res.data.totalPages || 1);
-    } catch (err) {
-      setError("Failed to load products.");
-      toast.error("Failed to load products");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // =========================
+  // Fetch products (race-condition safe)
+  // =========================
   useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await api.get("/products/search", {
+          params: {
+            search: search || undefined,
+            category: category || undefined,
+            sort: sortBy || undefined,
+            page: currentPage,
+            limit: LIMIT,
+          },
+          signal: controller.signal,
+        });
+
+        setItems(res.data.products || []);
+        setTotalProducts(res.data.totalProducts || 0);
+        setTotalPages(res.data.totalPages || 1);
+      } catch (err) {
+        if (err.name === "CanceledError" || err.code === "ERR_CANCELED") {
+          return;
+        }
+        setError("Failed to load products.");
+        toast.error("Failed to load products", {
+          toastId: "products-fetch-error",
+        });
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
     fetchProducts();
-  }, [currentPage, category, sortBy, search]);
+
+    return () => controller.abort();
+  }, [currentPage, category, sortBy, search, refetchTrigger]);
+
+  const refetch = () => setRefetchTrigger((t) => t + 1);
 
   const handleSearch = () => {
     setSearch(searchText.trim());
@@ -120,14 +137,18 @@ export default function Products() {
 
     try {
       await api.patch(`/products/update/${item._id}`, { featured: newValue });
-      toast.success("Featured status updated");
+      toast.success("Featured status updated", {
+        toastId: "product-featured-success",
+      });
     } catch (err) {
       setItems((prev) =>
         prev.map((x) =>
           x._id === item._id ? { ...x, featured: !newValue } : x
         )
       );
-      toast.error("Failed to update featured status");
+      toast.error("Failed to update featured status", {
+        toastId: "product-featured-error",
+      });
     }
   };
 
@@ -142,11 +163,13 @@ export default function Products() {
   };
 
   const handleProductDeleted = () => {
-    toast.success("Product deleted successfully");
+    toast.success("Product deleted successfully", {
+      toastId: "product-delete-success",
+    });
     if (items.length === 1 && currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
     } else {
-      fetchProducts();
+      refetch();
     }
   };
 
@@ -170,7 +193,7 @@ export default function Products() {
   };
 
   const handleProductUpdated = () => {
-    fetchProducts();
+    refetch();
   };
 
   const featuredCount = items.filter((i) => i.featured).length;
@@ -206,7 +229,7 @@ export default function Products() {
 
   return (
     <DashboardLayout>
-      {loading ? (
+      {loading && items.length === 0 ? (
         <PageLoader text="Loading products..." />
       ) : (
         <div className="p-4 sm:p-6 w-full animate-fade-in">
@@ -355,7 +378,11 @@ export default function Products() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div
+                className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 transition-opacity duration-150 ${
+                  loading ? "opacity-50 pointer-events-none" : "opacity-100"
+                }`}
+              >
                 {items.map((item) => {
                   const hasDiscount =
                     item.discountPrice && item.discountPrice < item.price;
