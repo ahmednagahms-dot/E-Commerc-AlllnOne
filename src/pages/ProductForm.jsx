@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
@@ -22,6 +22,8 @@ export default function ProductForm() {
   const [submitting, setSubmitting] = useState(false);
   const [loadingProduct, setLoadingProduct] = useState(isEditMode);
   const [formError, setFormError] = useState("");
+
+  const navigateTimeoutRef = useRef(null);
 
   const {
     register,
@@ -52,9 +54,13 @@ export default function ProductForm() {
   useEffect(() => {
     if (!isEditMode) return;
 
+    const controller = new AbortController();
+
     const fetchProduct = async () => {
       try {
-        const response = await api.get(`/products/${id}`);
+        const response = await api.get(`/products/${id}`, {
+          signal: controller.signal,
+        });
         const product = response.data.product || response.data;
 
         reset({
@@ -69,6 +75,10 @@ export default function ProductForm() {
           subcategory: product.subcategory || "",
           brand: product.brand || "",
           featured: Boolean(product.featured),
+          // NOTE: backend returns this field as `active`. Keeping the form's
+          // internal name as `isActive` for readability, but mapped from/to
+          // `active` on read/write. If your backend actually expects
+          // `isActive` on write, change the two spots marked below.
           isActive: product.active !== false,
         });
 
@@ -77,15 +87,35 @@ export default function ProductForm() {
         setDeletedImages([]);
         setImageFiles([]);
       } catch (err) {
-        toast.error("Failed to load product data.");
+        if (err.name === "CanceledError" || err.code === "ERR_CANCELED") {
+          return;
+        }
+        toast.error("Failed to load product data.", {
+          toastId: "product-fetch-error",
+        });
         navigate("/dashboard/products");
       } finally {
-        setLoadingProduct(false);
+        if (!controller.signal.aborted) {
+          setLoadingProduct(false);
+        }
       }
     };
 
     fetchProduct();
+
+    return () => {
+      controller.abort();
+    };
   }, [id, isEditMode, reset, navigate]);
+
+  // Clean up the post-submit navigation timer if the component unmounts
+  useEffect(() => {
+    return () => {
+      if (navigateTimeoutRef.current) {
+        clearTimeout(navigateTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // =========================
   // Delete existing image
@@ -112,6 +142,14 @@ export default function ProductForm() {
       return;
     }
 
+    if (
+      formData.discountPrice &&
+      Number(formData.discountPrice) >= Number(formData.price)
+    ) {
+      setFormError("Discount price must be less than the original price.");
+      return;
+    }
+
     const data = new FormData();
     data.append("name", formData.name);
     data.append("shortDescription", formData.shortDescription || "");
@@ -126,11 +164,10 @@ export default function ProductForm() {
     if (formData.subcategory) data.append("subcategory", formData.subcategory);
     if (formData.brand) data.append("brand", formData.brand);
     data.append("featured", formData.featured || false);
+    
     data.append("isActive", formData.isActive ?? true);
 
-    if (tags.length > 0) {
-      data.append("tags", JSON.stringify(tags));
-    }
+    tags.forEach((tag) => data.append("tags", tag));
 
     // New images
     imageFiles.forEach((file) => data.append("images", file));
@@ -156,15 +193,23 @@ export default function ProductForm() {
       toast.success(
         isEditMode
           ? "Product updated successfully!"
-          : "Product added successfully!"
+          : "Product added successfully!",
+        {
+          toastId: "product-save-success",
+        }
       );
-      navigate("/dashboard/products");
+
+      navigateTimeoutRef.current = setTimeout(() => {
+        navigate("/dashboard/products");
+      }, 1000);
     } catch (err) {
       const message =
         err.response?.data?.message ||
         "Something went wrong while saving the product.";
       setFormError(message);
-      toast.error(message);
+      toast.error(message, {
+        toastId: "product-save-error",
+      });
     } finally {
       setSubmitting(false);
     }

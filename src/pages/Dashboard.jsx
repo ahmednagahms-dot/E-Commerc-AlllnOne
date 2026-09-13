@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useNavigate } from "react-router-dom"; // 1. استيراد الـ useNavigate
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -25,7 +25,7 @@ import {
 import api from "../api/axios";
 
 export default function Dashboard() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
@@ -48,11 +48,11 @@ export default function Dashboard() {
         api.get("/users/all"),
       ]);
 
-      setOrders(ordersRes.data?.orders || []);
-      setProducts(productsRes.data?.products || []);
-      setCustomers(
-        (usersRes.data?.users || []).filter((u) => u.role === "customer")
-      );
+      setOrders(ordersRes.data?.orders || ordersRes.data || []);
+      setProducts(productsRes.data?.products || productsRes.data || []);
+      
+      const usersList = usersRes.data?.users || usersRes.data || [];
+      setCustomers(usersList.filter((u) => u.role === "customer"));
     } catch (err) {
       console.error("Dashboard error:", err);
       setError("Failed to load dashboard data. Please try again.");
@@ -69,7 +69,8 @@ export default function Dashboard() {
   const availableYears = useMemo(() => {
     const years = getAvailableYears(orders);
     const currentYear = new Date().getFullYear();
-    return years.includes(currentYear) ? years : [currentYear, ...years];
+    const combined = years.includes(currentYear) ? years : [currentYear, ...years];
+    return Array.from(new Set(combined)); // يمنع تكرار السنة في المفاتيح
   }, [orders]);
 
   // ===================== Derived Data =====================
@@ -153,35 +154,6 @@ export default function Dashboard() {
     [orders]
   );
 
-  const recentActivity = useMemo(() => {
-    const list = [];
-
-    recentOrders.slice(0, 3).forEach((order) => {
-      list.push({
-        id: `o-${order._id}`,
-        icon: "ShoppingBag",
-        color: "blue",
-        title: `New order from ${order.shippingAddress?.fullName || "a customer"}`,
-        date: order.createdAt,
-      });
-    });
-
-    [...products]
-      .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
-      .slice(0, 2)
-      .forEach((product) => {
-        list.push({
-          id: `p-${product._id}`,
-          icon: "Package",
-          color: "purple",
-          title: `Product "${product.name}" updated`,
-          date: product.updatedAt,
-        });
-      });
-
-    return list.sort((a, b) => new Date(b.date) - new Date(a.date));
-  }, [recentOrders, products]);
-
   // ===================== Render =====================
   return (
     <DashboardLayout>
@@ -248,24 +220,19 @@ export default function Dashboard() {
               {/* Charts Row */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
                 <SalesOverviewChart data={data.salesData} />
-                {/* 3. ربط زر View all بالانتقال لصفحة المنتجات */}
                 <TopProductsList 
                   products={data.topProducts} 
-                  onViewAll={() => navigate("/dashboard/products") } 
+                  onViewAll={() => navigate("/dashboard/products")} 
                 />
               </div>
 
               {/* Orders + Status */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
                 <RecentOrdersTable orders={recentOrders} />
-                <OrderStatusDonut data={data.statusBreakdown} onViewAll={() => navigate("/products")} />
-              </div>
-
-              {/* Activity + Quick Insights */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="lg:col-span-2">
-              
-                </div>
+                <OrderStatusDonut 
+                  data={data.statusBreakdown} 
+                  onViewAll={() => navigate("/dashboard/orders")} 
+                />
               </div>
             </>
           )}

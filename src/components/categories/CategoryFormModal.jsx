@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Info, FolderPlus, Loader2 } from "lucide-react";
+import { toast } from "react-toastify";
+
 import Modal from "../ui/Modal";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
@@ -16,10 +18,9 @@ export default function CategoryFormModal({ isOpen, onClose, onSaved }) {
     defaultValues: {
       name: "",
     },
-    mode: "onTouched", // Trigger error validation only after input interaction
+    mode: "onTouched",
   });
 
-  // Reset form when modal opens or closes
   useEffect(() => {
     if (!isOpen) {
       reset({ name: "" });
@@ -31,11 +32,19 @@ export default function CategoryFormModal({ isOpen, onClose, onSaved }) {
       const categoryName = formData.name.trim();
       await addCustomCategory(categoryName);
 
+      toast.success(`Category "${categoryName}" added successfully`, {
+        toastId: "add-category-success",
+      });
+
       reset();
       if (onSaved) onSaved();
       if (onClose) onClose();
     } catch (error) {
       console.error("Failed to add category:", error);
+      
+      toast.error(error?.message || "Failed to add category", {
+        toastId: "add-category-error",
+      });
     }
   };
 
@@ -68,7 +77,7 @@ export default function CategoryFormModal({ isOpen, onClose, onSaved }) {
             required: "Category name is required",
             validate: {
               notEmpty: (value) =>
-                value.trim().length > 0 || "Category name cannot be empty spaces",
+                (value && value.trim().length > 0) || "Category name cannot be empty spaces",
             },
           })}
         />

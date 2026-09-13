@@ -178,6 +178,7 @@ const Orders = () => {
 
   const clearFilters = () => {
     setSearchTerm("");
+    setDebouncedSearch("");
     setStatusFilter("");
     setPaymentFilter("");
     setMethodFilter("");
@@ -203,10 +204,9 @@ const Orders = () => {
     return pages;
   };
 
-  /* ---------- Render ---------- */
   return (
     <DashboardLayout>
-      {loading ? (
+      {loading && orders.length === 0 ? (
         <PageLoader text="Loading orders list..." />
       ) : (
         <div className="w-full min-h-screen bg-slate-50/50 p-6 md:p-8">
@@ -253,6 +253,7 @@ const Orders = () => {
                   <button
                     onClick={() => {
                       setSearchTerm("");
+                      setDebouncedSearch("");
                       setCurrentPage(1);
                     }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import api from "../api/axios";
@@ -7,18 +7,21 @@ import PageLoader from "../components/ui/sessionLoader/PageLoader";
 export default function Notifications() {
   const [loading, setLoading] = useState(true);
   const [Notifications, setNotifications] = useState([]);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchNotifications = async () => {
       try {
-        const response = await api.get("/Notifications");
+        const response = await api.get("/notifications");
 
         setNotifications(
           Array.isArray(response.data)
             ? response.data
-            : response.data?.Notifications || response.data?.data || [],
+            : response.data?.notifications || response.data?.data || [],
         );
-        toast.success("Notifications loaded successfully!");
       } catch (error) {
         console.error("Error fetching Notifications:", error);
         setNotifications([]);
@@ -49,19 +52,10 @@ export default function Notifications() {
               </h1>
 
               <p className="text-gray-500 text-sm">
-                All active Notifications returned from the API are rendered here
-                with their latest item details.
+                All active Notifications returned from the API are rendered
+                here with their latest item details.
               </p>
             </div>
-
-            {/* Loading */}
-            {loading && (
-              <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-12">
-                <h2 className="text-lg font-semibold text-gray-400">
-                  Loading Notifications...
-                </h2>
-              </div>
-            )}
 
             {/* Empty */}
             {!loading && Notifications.length === 0 && (
