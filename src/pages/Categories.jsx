@@ -4,8 +4,14 @@ import { Layers, Package, Search, Plus, Trash2 } from "lucide-react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Button from "../components/ui/Button";
 import CategoryFormModal from "../components/categories/CategoryFormModal";
-import { getCustomCategories, removeCustomCategory } from "../data/customCategories";
+import {
+  getCustomCategories,
+  removeCustomCategory,
+} from "../data/customCategories";
 import api from "../api/axios";
+
+import PageLoader from "../components/ui/sessionLoader/PageLoader";
+
 import { toast } from "react-toastify";
 
 export default function Categories() {
@@ -39,100 +45,144 @@ export default function Categories() {
     products.forEach((p) => {
       const cat = p.category?.trim();
       if (!cat) return;
-      if (!map[cat]) map[cat] = { name: cat, count: 0, inStock: 0, image: null, isCustom: false };
+      if (!map[cat])
+        map[cat] = {
+          name: cat,
+          count: 0,
+          inStock: 0,
+          image: null,
+          isCustom: false,
+        };
       map[cat].count += 1;
       if (p.stock > 0) map[cat].inStock += 1;
-      if (!map[cat].image && p.images?.[0]?.url) map[cat].image = p.images[0].url;
+      if (!map[cat].image && p.images?.[0]?.url)
+        map[cat].image = p.images[0].url;
     });
 
     customCats.forEach((cat) => {
-      if (!map[cat]) map[cat] = { name: cat, count: 0, inStock: 0, image: null, isCustom: true };
+      if (!map[cat])
+        map[cat] = {
+          name: cat,
+          count: 0,
+          inStock: 0,
+          image: null,
+          isCustom: true,
+        };
     });
 
     return Object.values(map).sort((a, b) => b.count - a.count);
   }, [products, customCats]);
 
   const filteredCategories = useMemo(() => {
-    return categoriesData.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()));
+    return categoriesData.filter((c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()),
+    );
   }, [categoriesData, search]);
 
   return (
     <DashboardLayout>
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <p className="text-xs font-semibold text-primary-500 tracking-widest uppercase">Catalog</p>
-          <h1 className="text-2xl font-bold">Categories</h1>
-          <p className="text-sm text-gray-500">
-            Categories are derived from your live products — there's no separate categories endpoint yet.
-          </p>
-        </div>
-        <Button className="flex items-center gap-2" onClick={() => setShowFormModal(true)}>
-          <Plus size={16} /> Add Category
-        </Button>
-      </div>
-
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-6">
-        <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg max-w-sm">
-          <Search size={16} className="text-gray-400" />
-          <input
-            placeholder="Search categories..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent outline-none text-sm w-full"
-          />
-        </div>
-      </div>
-
       {loading ? (
-        <div className="text-center py-16 text-gray-400">Loading categories...</div>
-      ) : error ? (
-        <div className="text-center py-16 text-danger">{error}</div>
-      ) : filteredCategories.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
-          No categories found.
-        </div>
+        <PageLoader text="Loading categories..." />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCategories.map((cat) => (
-            <div key={cat.name} className="relative">
-              <button
-                onClick={() => navigate(`/dashboard/products?category=${encodeURIComponent(cat.name)}`)}
-                className="w-full bg-white rounded-xl border border-gray-100 shadow-sm p-5 text-left hover:shadow-md transition flex items-center gap-4"
-              >
-                <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex items-center justify-center shrink-0">
-                  {cat.image ? (
-                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <Layers size={22} className="text-gray-400" />
+        <div className="animate-fade-in w-full">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-xs font-semibold text-primary-500 tracking-widest uppercase">
+                Catalog
+              </p>
+              <h1 className="text-2xl font-bold">Categories</h1>
+              <p className="text-sm text-gray-500">
+                Categories are derived from your live products — there's no
+                separate categories endpoint yet.
+              </p>
+            </div>
+            <Button
+              className="flex items-center gap-2"
+              onClick={() => setShowFormModal(true)}
+            >
+              <Plus size={16} /> Add Category
+            </Button>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-6">
+            <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg max-w-sm">
+              <Search size={16} className="text-gray-400" />
+              <input
+                placeholder="Search categories..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="bg-transparent outline-none text-sm w-full"
+              />
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-16 text-gray-400">
+              Loading categories...
+            </div>
+          ) : error ? (
+            <div className="text-center py-16 text-danger">{error}</div>
+          ) : filteredCategories.length === 0 ? (
+            <div className="text-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
+              No categories found.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredCategories.map((cat) => (
+                <div key={cat.name} className="relative">
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/products?category=${encodeURIComponent(cat.name)}`,
+                      )
+                    }
+                    className="w-full bg-white rounded-xl border border-gray-100 shadow-sm p-5 text-left hover:shadow-md transition flex items-center gap-4"
+                  >
+                    <div className="w-14 h-14 rounded-xl bg-gray-100 overflow-hidden flex items-center justify-center shrink-0">
+                      {cat.image ? (
+                        <img
+                          src={cat.image}
+                          alt={cat.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Layers size={22} className="text-gray-400" />
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold capitalize">{cat.name}</h3>
+                      <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+                        <Package size={12} /> {cat.count} product
+                        {cat.count !== 1 ? "s" : ""}
+                      </p>
+                      <p className="text-xs text-success mt-0.5">
+                        {cat.inStock} in stock
+                      </p>
+                    </div>
+                  </button>
+
+                  {cat.isCustom && cat.count === 0 && (
+                    <button
+                      onClick={() =>
+                        setCustomCats(removeCustomCategory(cat.name))
+                      }
+                      className="absolute top-3 right-3 text-gray-300 hover:text-danger"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   )}
                 </div>
-                <div>
-                  <h3 className="font-semibold capitalize">{cat.name}</h3>
-                  <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                    <Package size={12} /> {cat.count} product{cat.count !== 1 ? "s" : ""}
-                  </p>
-                  <p className="text-xs text-success mt-0.5">{cat.inStock} in stock</p>
-                </div>
-              </button>
-
-              {cat.isCustom && cat.count === 0 && (
-                <button
-                  onClick={() => setCustomCats(removeCustomCategory(cat.name))}
-                  className="absolute top-3 right-3 text-gray-300 hover:text-danger"
-                >
-                  <Trash2 size={16} />
-                </button>
-              )}
+              ))}
             </div>
-          ))}
+          )}
+
+          <CategoryFormModal
+            isOpen={showFormModal}
+            onClose={() => setShowFormModal(false)}
+            onSaved={() => setCustomCats(getCustomCategories())}
+          />
         </div>
       )}
-
-      <CategoryFormModal
-        isOpen={showFormModal}
-        onClose={() => setShowFormModal(false)}
-        onSaved={() => setCustomCats(getCustomCategories())}
-      />
     </DashboardLayout>
   );
 }

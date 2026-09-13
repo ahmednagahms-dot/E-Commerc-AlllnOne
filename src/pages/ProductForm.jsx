@@ -7,6 +7,7 @@ import Button from "../components/ui/Button";
 import ProductFormFields from "../components/products/ProductFormFields";
 import { ArrowLeft, PackagePlus } from "lucide-react";
 import api from "../api/axios";
+import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 export default function ProductForm() {
   const { id } = useParams();

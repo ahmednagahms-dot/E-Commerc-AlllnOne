@@ -4,8 +4,18 @@ import UsersTable from "../components/users/UsersTable";
 import UserFormModal from "../components/users/UserFormModal";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import { fetchUsers } from "../api/user.api";
+import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 const Users = () => {
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,6 +60,9 @@ const Users = () => {
 
   return (
     <DashboardLayout>
+      {isPageLoading ? (
+        <PageLoader text="Loading users..." />
+      ) : (
       <div className="p-6">
         <div className="flex justify-between items-end mb-8">
           <div>
@@ -201,6 +214,7 @@ const Users = () => {
           />
         )}
       </div>
+      )}
     </DashboardLayout>
   );
 };

@@ -55,7 +55,7 @@ export default function Sidebar({ onClose }) {
                   end
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 mb-1 rounded-lg text-sm transition ${
+                    `flex items-center gap-3 px-3 py-2.5 mb-0.5 rounded-lg text-sm transition ${
                       isActive
                         ? "bg-primary-600/20 text-primary-300 font-medium"
                         : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
