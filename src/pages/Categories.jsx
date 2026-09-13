@@ -13,8 +13,10 @@ import api from "../api/axios";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 export default function Categories() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,8 +33,8 @@ export default function Categories() {
         setProducts(response.data.products || []);
         setError(null);
       } catch (err) {
-        setError("Failed to load categories.");
-         toast.error("Failed to load categories.");
+        setError(t("errors.loadCategories"));
+         toast.error(t("errors.loadCategories"));
       } finally {
         setLoading(false);
       }
@@ -82,25 +84,24 @@ export default function Categories() {
   return (
     <DashboardLayout>
       {loading ? (
-        <PageLoader text="Loading categories..." />
+        <PageLoader text={t("pages.loadingCategories")} />
       ) : (
         <div className="animate-fade-in w-full">
           <div className="flex items-center justify-between mb-6">
             <div>
               <p className="text-xs font-semibold text-primary-500 tracking-widest uppercase">
-                Catalog
+                {t("pages.catalog")}
               </p>
-              <h1 className="text-2xl font-bold">Categories</h1>
+              <h1 className="text-2xl font-bold">{t("pages.categories")}</h1>
               <p className="text-sm text-gray-500">
-                Categories are derived from your live products — there's no
-                separate categories endpoint yet.
+                {t("pages.categoryDescription")}
               </p>
             </div>
             <Button
               className="flex items-center gap-2"
               onClick={() => setShowFormModal(true)}
             >
-              <Plus size={16} /> Add Category
+              <Plus size={16} /> {t("pages.addCategory")}
             </Button>
           </div>
 
@@ -108,7 +109,7 @@ export default function Categories() {
             <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg max-w-sm">
               <Search size={16} className="text-gray-400" />
               <input
-                placeholder="Search categories..."
+                placeholder={t("pages.searchCategories")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="bg-transparent outline-none text-sm w-full"
@@ -118,13 +119,13 @@ export default function Categories() {
 
           {loading ? (
             <div className="text-center py-16 text-gray-400">
-              Loading categories...
+              {t("pages.loadingCategories")}
             </div>
           ) : error ? (
             <div className="text-center py-16 text-danger">{error}</div>
           ) : filteredCategories.length === 0 ? (
             <div className="text-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
-              No categories found.
+              {t("pages.noCategories")}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -152,11 +153,10 @@ export default function Categories() {
                     <div>
                       <h3 className="font-semibold capitalize">{cat.name}</h3>
                       <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                        <Package size={12} /> {cat.count} product
-                        {cat.count !== 1 ? "s" : ""}
+                        <Package size={12} /> {t("pages.productsCount", { count: cat.count })}
                       </p>
                       <p className="text-xs text-success mt-0.5">
-                        {cat.inStock} in stock
+                        {cat.inStock} {t("pages.inStock")}
                       </p>
                     </div>
                   </button>

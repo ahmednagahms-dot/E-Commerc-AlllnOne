@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import UsersTable from "../components/users/UsersTable";
 import UserFormModal from "../components/users/UserFormModal";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -7,6 +8,7 @@ import { fetchUsers } from "../api/user.api";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 const Users = () => {
+  const { t } = useTranslation();
   const [isPageLoading, setIsPageLoading] = useState(true);
 
   useEffect(() => {
@@ -34,7 +36,7 @@ const Users = () => {
       } catch (error) {
         console.error("Error fetching users:", error);
         setUsers([]);
-         toast.error("Failed to load users.");
+         toast.error(t("errors.loadUsers"));
       }
     };
 
@@ -61,20 +63,20 @@ const Users = () => {
   return (
     <DashboardLayout>
       {isPageLoading ? (
-        <PageLoader text="Loading users..." />
+        <PageLoader text={t("pages.loadingUsers")} />
       ) : (
       <div className="p-6">
         <div className="flex justify-between items-end mb-8">
           <div>
             <p style={{ color: "#4F46E5" }} className="font-semibold tracking-wider text-sm mb-1">
-              USER MANAGEMENT
+              {t("pages.userManagement")}
             </p>
-            <h1 className="text-3xl font-bold text-gray-800">Manage Users</h1>
+            <h1 className="text-3xl font-bold text-gray-800">{t("pages.manageUsers")}</h1>
           </div>
           <div className="flex gap-4 items-center">
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder={t("pages.searchUsers")}
               className="border border-gray-300 rounded-full px-4 py-2 w-64 focus:outline-none focus:ring-1 focus:ring-blue-200 shadow-md"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -87,7 +89,7 @@ const Users = () => {
               style={{ backgroundColor: "#4F46E5" }}
               className="text-white px-6 py-2 rounded-full font-medium focus:scale-90 hover:scale-102 transition-all shadow-md hover:shadow-lg"
             >
-              + Add User
+              + {t("pages.addUser")}
             </button>
           </div>
         </div>
@@ -95,7 +97,7 @@ const Users = () => {
         <div className="grid grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center hover:-translate-y-2 transition-all duration-300 ease-in-out">
             <div>
-              <p className="text-gray-500 text-sm">Total Users</p>
+              <p className="text-gray-500 text-sm">{t("pages.totalUsers")}</p>
               <p className="text-2xl font-bold">{totalUsers}</p>
             </div>
             <div
@@ -120,7 +122,7 @@ const Users = () => {
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center hover:-translate-y-2 transition-all duration-300 ease-in-out">
             <div>
-              <p className="text-gray-500 text-sm">Admins</p>
+              <p className="text-gray-500 text-sm">{t("pages.admins")}</p>
               <p className="text-2xl font-bold">{adminsCount}</p>
             </div>
             <div
@@ -145,7 +147,7 @@ const Users = () => {
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center hover:-translate-y-2 transition-all duration-300 ease-in-out">
             <div>
-              <p className="text-gray-500 text-sm">Customers</p>
+              <p className="text-gray-500 text-sm">{t("pages.customers")}</p>
               <p className="text-2xl font-bold">{customersCount}</p>
             </div>
             <div
@@ -170,7 +172,7 @@ const Users = () => {
           </div>
           <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 flex justify-between items-center hover:-translate-y-2 transition-all duration-300 ease-in-out">
             <div>
-              <p className="text-gray-500 text-sm">Verified</p>
+              <p className="text-gray-500 text-sm">{t("pages.verified")}</p>
               <p className="text-2xl font-bold">{verifiedCount}</p>
             </div>
             <div
