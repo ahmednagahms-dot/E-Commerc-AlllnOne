@@ -46,7 +46,12 @@ export default function LoginForm() {
       }, 1000);
 
     } catch (err) {
-      setLoginError(err.response?.data?.message || t("auth.invalidCredentials"));
+      const errorMessage = err.response?.data?.message;
+      setLoginError(
+        errorMessage
+          ? t(errorMessage, { defaultValue: errorMessage })
+          : t("auth.invalidCredentials")
+      );
     } finally {
       setLoading(false);
     }

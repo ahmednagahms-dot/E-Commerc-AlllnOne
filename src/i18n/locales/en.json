@@ -52,7 +52,8 @@
     "logOut":"Sign Out",
     "massage" : "Sign in to your account to access the admin dashboard",
     "or": "Sign in to your ShopEase admin account",
-    "rememberMe": "Remember Me"
+    "rememberMe": "Remember Me",
+    "invalidCredentials": "Invalid email or password"
   },
 
   "bannar": {
