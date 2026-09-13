@@ -1,12 +1,11 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/profile";
-import Orders from './pages/Orders';
+import Orders from "./pages/Orders";
 import Carts from "./pages/Carts";
 import Wishlists from "./pages/Wishlists";
 import Coupons from "./pages/Coupons";
@@ -16,71 +15,66 @@ import Products from "./pages/Products";
 import ProductView from "./pages/ProductView";
 import Settings from "./pages/Settings";
 import Reviews from "./pages/Reviews";
-
 import Users from "./pages/Users";
 import Categories from "./pages/Categories";
 
+import ProtectedRoute from "./routes/ProtectedRoute";
+
+// ✅ قائمة الـ routes المحمية (كلها تحت /dashboard)
+const protectedRoutes = [
+  { path: "/dashboard", element: <Dashboard /> },
+  { path: "/dashboard/profile", element: <Profile /> },
+  { path: "/dashboard/orders", element: <Orders /> },
+  { path: "/dashboard/carts", element: <Carts /> },
+  { path: "/dashboard/wishlists", element: <Wishlists /> },
+  { path: "/dashboard/coupons", element: <Coupons /> },
+  { path: "/dashboard/notifications", element: <Notifications /> },
+
+  // Products
+  { path: "/dashboard/products", element: <Products /> },
+  { path: "/dashboard/products/new", element: <ProductForm /> },
+  { path: "/dashboard/products/:id/edit", element: <ProductForm /> },
+  { path: "/dashboard/products/edit/:id", element: <ProductForm /> },
+  { path: "/dashboard/products/:id/view", element: <ProductView /> },
+
+  // Categories, Reviews, Users, Settings
+  { path: "/dashboard/categories", element: <Categories /> },
+  { path: "/dashboard/reviews", element: <Reviews /> },
+  { path: "/dashboard/settings", element: <Settings /> },
+  { path: "/dashboard/users", element: <Users /> },
+];
 
 function App() {
   return (
     <>
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Routes>
 
-      {/* Protected Routes */}
-      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-      <Route path="/dashboard/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      <Route path="/dashboard/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-      <Route path="/dashboard/carts" element={<ProtectedRoute><Carts /></ProtectedRoute>} />
+        <Route path="/login" element={<Login />} />
 
-      <Route path="/dashboard/Wishlists" element={<ProtectedRoute><Wishlists/></ProtectedRoute>} />
-      <Route path="/dashboard/Coupons" element={<ProtectedRoute><Coupons/></ProtectedRoute>} />
-      <Route path="/dashboard/Notifications" element={<ProtectedRoute><Notifications/></ProtectedRoute>} />
-
-
-      <Route path="/dashboard/wishlists" element={<ProtectedRoute><Wishlists /></ProtectedRoute>} />
-      <Route path="/dashboard/coupons" element={<ProtectedRoute><Coupons /></ProtectedRoute>} />
-
-      {/* Products Routes */}
-
-      <Route path="/dashboard/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
-      <Route path="/dashboard/products/new" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
-      <Route path="/dashboard/products/edit/:id" element={<ProtectedRoute><ProductForm /></ProtectedRoute>} />
-      <Route path="/dashboard/products/:id/view" element={<ProtectedRoute><ProductView /></ProtectedRoute>} />
-      <Route path="/dashboard/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
-
-      {/* Settings & Users Routes */}
-      <Route path="/dashboard/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-      <Route path="/dashboard/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+     
+        {protectedRoutes.map(({ path, element }) => (
+          <Route
+            key={path}
+            path={path}
+            element={<ProtectedRoute>{element}</ProtectedRoute>}
+          />
+        ))}
 
       
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
 
-
-      {/* Catch-all route - redirect to dashboard */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-  <Route 
-  path="/dashboard/reviews" 
-  element={
-    <ProtectedRoute>
-      <Reviews />
-    </ProtectedRoute>
-  } 
-/>
-    </Routes>
-    
-     <ToastContainer
-  position="top-right"
-  autoClose={3000}
-  hideProgressBar={false}
-  newestOnTop
-  closeOnClick
-  pauseOnHover
-  draggable
-  toastClassName="!bg-[#FCFAF7] !text-[#263653] !rounded-2xl !border !border-[#E3E0DB] !shadow-lg !w-[calc(100vw-2rem)] sm:!w-[380px] !min-h-[60px] !font-medium"
-  progressClassName="!bg-[#20A464]"
-/>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        toastClassName="!bg-surface !text-ink !rounded-2xl !border !border-surface-border !shadow-lg !w-[calc(100vw-2rem)] sm:!w-[380px] !min-h-[60px] !font-medium"
+        progressClassName="!bg-success"
+      />
     </>
   );
 }

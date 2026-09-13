@@ -22,7 +22,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
       setUserToDelete(null);
     } catch (error) {
       console.error("Error deleting user:", error);
-      alert("Delete Erorr.!");
+      alert("Delete Error!");
     } finally {
       setDeletingId(null);
     }
@@ -39,17 +39,17 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
       setUsers(updatedUsers);
     } catch (error) {
       console.error("Error updating verification:", error);
-      alert("Edit Erorr.!");
+      alert("Edit Error!");
     } finally {
       setUpdatingId(null);
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="text-gray-500 text-sm bg-gray-200 text-gray-500">
+          <tr className="text-slate-500 text-sm bg-slate-100">
             <th className="p-4 font-medium">User</th>
             <th className="p-4 font-medium">Role</th>
             <th className="p-4 font-medium">Verified</th>
@@ -58,24 +58,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-              {/* <td className="p-4 flex items-center gap-4">
-                {user?.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt={user.username}
-                    className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm"
-                  />
-                ) : (
-                  <div className="w-12 h-12 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm">
-                    {user?.username?.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div>
-                  <p className="font-bold text-gray-800">{user?.username}</p>
-                  <p className="text-sm text-gray-500">{user?.email}</p>
-                </div>
-              </td> */}
+            <tr key={user._id || user.id} className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-none">
               <td className="p-4">
                 <div
                   className="flex items-center gap-4 cursor-pointer group"
@@ -85,7 +68,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     <img
                       src={user.avatar}
                       alt={user.username}
-                      className="w-12 h-12 rounded-full object-cover border border-gray-200 shadow-sm group-hover:opacity-80 transition-opacity"
+                      className="w-12 h-12 rounded-full object-cover border border-slate-200 shadow-sm group-hover:opacity-80 transition-opacity"
                     />
                   ) : (
                     <div className="w-12 h-12 bg-slate-800 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-sm group-hover:opacity-80 transition-opacity">
@@ -93,19 +76,19 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     </div>
                   )}
                   <div>
-                    <p className="font-bold text-gray-800 group-hover:text-blue-600 transition-colors">
+                    <p className="font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
                       {user?.username}
                     </p>
-                    <p className="text-sm text-gray-500">{user?.email}</p>
+                    <p className="text-sm text-slate-500">{user?.email}</p>
                   </div>
                 </div>
               </td>
               <td className="p-4">
                 <span
-                  className={`bg-blue-50 px-3 py-1 rounded-full text-xs font-bold uppercase ${
+                  className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
                     user?.role?.toLowerCase() === "customer"
-                      ? "text-green-800"
-                      : "text-purple-800"
+                      ? "bg-emerald-50 text-emerald-700"
+                      : "bg-purple-50 text-purple-700"
                   }`}
                 >
                   {user?.role}
@@ -113,11 +96,11 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               </td>
               <td className="p-4">
                 {user?.isVerified ? (
-                  <span className="text-green-600 font-semibold flex items-center gap-1">
+                  <span className="text-emerald-600 font-semibold flex items-center gap-1 text-sm">
                     Verified
                   </span>
                 ) : (
-                  <span className="text-red-500 font-semibold flex items-center gap-1">
+                  <span className="text-rose-500 font-semibold flex items-center gap-1 text-sm">
                     Not Verified
                   </span>
                 )}
@@ -128,8 +111,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                   <button
                     onClick={() => onEditClick(user)}
                     title="Edit User"
-                    style={{ backgroundColor: "#0284C7" }}
-                    className="text-white w-9 h-9 rounded-[10px] flex items-center justify-center hover:bg-blue-600 transition-colors shadow-sm"
+                    className="text-white w-9 h-9 rounded-xl bg-sky-500 hover:bg-sky-600 flex items-center justify-center transition-colors shadow-sm cursor-pointer"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -155,7 +137,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     title={
                       user.isVerified ? "Remove Verification" : "Verify User"
                     }
-                    className={`text-white w-9 h-9 rounded-[10px] flex items-center justify-center transition-colors shadow-sm ${
+                    className={`text-white w-9 h-9 rounded-xl flex items-center justify-center transition-colors shadow-sm cursor-pointer ${
                       updatingId === user._id
                         ? "bg-emerald-400 cursor-wait"
                         : "bg-emerald-500 hover:bg-emerald-600"
@@ -203,7 +185,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                   <button
                     onClick={() => handleDeleteClick(user._id)}
                     title="Delete User"
-                    className="text-white w-9 h-9 rounded-[10px] flex items-center justify-center transition-colors shadow-sm bg-red-500 hover:bg-red-600"
+                    className="text-white w-9 h-9 rounded-xl flex items-center justify-center transition-colors shadow-sm bg-rose-500 hover:bg-rose-600 cursor-pointer"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -226,8 +208,8 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
           ))}
           {users.length === 0 && (
             <tr>
-              <td colSpan="4" className="text-center p-6 text-gray-500">
-                Not Found Users!
+              <td colSpan="4" className="text-center p-8 text-slate-500 text-sm">
+                No users found!
               </td>
             </tr>
           )}
@@ -242,8 +224,8 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
             onClick={() => setSelectedViewUser(null)}
           ></div>
 
-          <aside className="relative w-full md:w-1/2 h-screen bg-white shadow-2xl z-[70] flex flex-col animate-slide-in-right overflow-y-auto">
-            <div className="flex justify-between items-start p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
+          <aside className="relative w-full md:w-1/2 h-screen bg-white shadow-2xl z-[70] flex flex-col overflow-y-auto">
+            <div className="flex justify-between items-start p-6 border-b border-slate-100 bg-white sticky top-0 z-10">
               <div className="flex items-center gap-4">
                 <img
                   src={
@@ -251,7 +233,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     "https://cdn-icons-png.flaticon.com/512/149/149071.png"
                   }
                   alt="avatar"
-                  className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shadow-sm"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-slate-100 shadow-sm"
                 />
                 <div>
                   <h2 className="text-2xl font-bold text-slate-800">
@@ -271,7 +253,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
 
               <button
                 onClick={() => setSelectedViewUser(null)}
-                className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-full transition-colors"
+                className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-2 rounded-full transition-colors cursor-pointer"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -290,10 +272,10 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               </button>
             </div>
 
-            <div className="p-6 space-y-8 flex-1 bg-gray-50/30">
+            <div className="p-6 space-y-8 flex-1 bg-slate-50/30">
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl border border-gray-100 bg-white shadow-sm">
-                  <div className="text-gray-500 text-sm font-medium flex items-center gap-2 mb-2">
+                <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
+                  <div className="text-slate-500 text-sm font-medium flex items-center gap-2 mb-2">
                     <svg
                       className="w-4 h-4"
                       fill="none"
@@ -309,13 +291,11 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     </svg>
                     Total Orders
                   </div>
-                  <div className="text-2xl font-extrabold text-slate-800">
-                    0
-                  </div>
+                  <div className="text-2xl font-extrabold text-slate-800">0</div>
                 </div>
 
-                <div className="p-4 rounded-2xl border border-gray-100 bg-white shadow-sm">
-                  <div className="text-gray-500 text-sm font-medium flex items-center gap-2 mb-2">
+                <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
+                  <div className="text-slate-500 text-sm font-medium flex items-center gap-2 mb-2">
                     <svg
                       className="w-4 h-4"
                       fill="none"
@@ -331,13 +311,11 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     </svg>
                     Current
                   </div>
-                  <div className="text-2xl font-extrabold text-slate-800">
-                    0
-                  </div>
+                  <div className="text-2xl font-extrabold text-slate-800">0</div>
                 </div>
 
-                <div className="p-4 rounded-2xl border border-green-100 bg-green-50/50 shadow-sm">
-                  <div className="text-green-600 text-sm font-medium flex items-center gap-2 mb-2">
+                <div className="p-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 shadow-sm">
+                  <div className="text-emerald-600 text-sm font-medium flex items-center gap-2 mb-2">
                     <svg
                       className="w-4 h-4"
                       fill="none"
@@ -353,13 +331,11 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     </svg>
                     Paid
                   </div>
-                  <div className="text-2xl font-extrabold text-green-700">
-                    0
-                  </div>
+                  <div className="text-2xl font-extrabold text-emerald-700">0</div>
                 </div>
 
-                <div className="p-4 rounded-2xl border border-red-100 bg-red-50/50 shadow-sm">
-                  <div className="text-red-500 text-sm font-medium flex items-center gap-2 mb-2">
+                <div className="p-4 rounded-2xl border border-rose-100 bg-rose-50/50 shadow-sm">
+                  <div className="text-rose-500 text-sm font-medium flex items-center gap-2 mb-2">
                     <svg
                       className="w-4 h-4"
                       fill="none"
@@ -375,18 +351,18 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     </svg>
                     Cancelled
                   </div>
-                  <div className="text-2xl font-extrabold text-red-600">0</div>
+                  <div className="text-2xl font-extrabold text-rose-600">0</div>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">
+                <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">
                   Contact Info
                 </h3>
-                <div className="space-y-4 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="space-y-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                   <div className="flex items-center gap-3 text-slate-700">
                     <svg
-                      className="w-5 h-5 text-gray-400"
+                      className="w-5 h-5 text-slate-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -404,7 +380,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                   </div>
                   <div className="flex items-center gap-3 text-slate-700">
                     <svg
-                      className="w-5 h-5 text-gray-400"
+                      className="w-5 h-5 text-slate-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -424,10 +400,10 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               </div>
 
               <div>
-                <h3 className="text-xs font-bold text-gray-400 mb-4 uppercase tracking-widest">
+                <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">
                   Addresses
                 </h3>
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                   <p className="text-slate-500 text-sm font-medium">
                     No saved addresses.
                   </p>
@@ -438,12 +414,13 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {userToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity">
-          <div className="bg-white rounded-2xl p-6 w-[400px] shadow-2xl transform transition-all scale-100 opacity-100 text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white rounded-2xl p-6 w-[400px] shadow-2xl transform transition-all text-center">
+            <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
-                className="w-8 h-8 text-red-500"
+                className="w-8 h-8 text-rose-500"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -458,10 +435,10 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               </svg>
             </div>
 
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
-              Are you sure to delete him/her ?
+            <h3 className="text-xl font-bold text-slate-800 mb-2">
+              Are you sure you want to delete this user?
             </h3>
-            <p className="text-gray-500 text-sm mb-6">
+            <p className="text-slate-500 text-sm mb-6">
               If you delete it, you won't be able to recover its data. This step
               is final.
             </p>
@@ -470,7 +447,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               <button
                 onClick={() => setUserToDelete(null)}
                 disabled={deletingId !== null}
-                className="px-5 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-50"
+                className="px-5 py-2.5 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 Cancel
               </button>
@@ -478,7 +455,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               <button
                 onClick={confirmDelete}
                 disabled={deletingId !== null}
-                className="px-5 py-2.5 bg-red-500 text-white font-medium rounded-xl hover:bg-red-600 transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-wait shadow-sm shadow-red-200"
+                className="px-5 py-2.5 bg-rose-500 text-white font-medium rounded-xl hover:bg-rose-600 transition-colors flex items-center gap-2 disabled:opacity-70 disabled:cursor-wait shadow-sm shadow-rose-200 cursor-pointer"
               >
                 {deletingId !== null ? (
                   <>
@@ -502,7 +479,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Deleting in progress...
+                    Deleting...
                   </>
                 ) : (
                   "Delete"

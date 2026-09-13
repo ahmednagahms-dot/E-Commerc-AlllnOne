@@ -46,7 +46,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
       setFormData({ ...formData, image: imageUrl });
     } catch (error) {
       console.error(error);
-      alert("Error.!");
+      alert("Error uploading image!");
     } finally {
       setIsUploading(false);
     }
@@ -60,7 +60,6 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
       username: formData.name,
       email: formData.email,
       role: formData.role.toLowerCase(),
-      // isVerified: formData.verified === "true" || formData.verified === true,
       avatar: formData.image,
       password: "Password123!",
       phone: "01000000000",
@@ -95,8 +94,8 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
       const backendError =
         error.response?.data?.message ||
         error.response?.data?.error ||
-        " There problem in server.! ";
-      alert(" Backend talk: " + backendError);
+        "There is a problem in the server!";
+      alert("Backend message: " + backendError);
     } finally {
       setIsSaving(false);
     }
@@ -109,16 +108,17 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
       }`}
     >
       <div
-        className={`bg-white p-8 rounded-2xl w-[400px] shadow-xl transition-all duration-300 transform ${
+        className={`bg-white p-8 rounded-2xl w-full max-w-md shadow-xl transition-all duration-300 transform ${
           showModal ? "scale-100 translate-y-0" : "scale-95 translate-y-4"
         }`}
       >
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+        <h2 className="text-2xl font-bold mb-6 text-slate-900">
           {editingUser ? "Edit User" : "Add New User"}
         </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* Avatar Upload */}
           <div className="flex flex-col items-center gap-3 mb-2">
-            <div className="relative w-24 h-24 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden bg-slate-50 group hover:border-slate-500 transition-colors">
+            <div className="relative w-24 h-24 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden bg-slate-50 group hover:border-indigo-500 transition-colors">
               {isUploading ? (
                 <div className="text-slate-500 text-xs text-center flex flex-col items-center gap-1">
                   <span className="animate-spin text-lg">⏳</span>
@@ -131,7 +131,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="text-slate-400 text-xs text-center px-2 group-hover:text-slate-600 transition-colors">
+                <div className="text-slate-400 text-xs text-center px-2 group-hover:text-indigo-600 transition-colors">
                   <span className="text-2xl block mb-1">📸</span>
                   Click to Upload
                 </div>
@@ -147,12 +147,13 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
             </div>
           </div>
 
+          {/* Name Field */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Name</label>
+            <label className="block text-sm font-medium text-slate-600 mb-1">Name</label>
             <input
               type="text"
               required
-              className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-800 transition-shadow"
+              className="w-full border border-slate-200 bg-slate-50/50 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -160,12 +161,13 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
             />
           </div>
 
+          {/* Email Field */}
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Email</label>
+            <label className="block text-sm font-medium text-slate-600 mb-1">Email</label>
             <input
               type="email"
               required
-              className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-800 transition-shadow"
+              className="w-full border border-slate-200 bg-slate-50/50 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
               value={formData.email}
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
@@ -173,45 +175,29 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
             />
           </div>
 
+          {/* Role Selection (Only when editing) */}
           {editingUser && (
-            <div className="flex gap-4">
-              <div className="w-100">
-                <label className="block text-sm text-gray-600 mb-1">Role</label>
-                <select
-                  className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-800 transition-shadow"
-                  value={formData.role}
-                  onChange={(e) =>
-                    setFormData({ ...formData, role: e.target.value })
-                  }
-                >
-                  <option value="customer">Customer</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-
-              {/* <div className="w-1/2">
-                <label className="block text-sm text-gray-600 mb-1">
-                  Verified
-                </label>
-                <select
-                  className="w-full border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-800 transition-shadow"
-                  value={formData.verified}
-                  onChange={(e) =>
-                    setFormData({ ...formData, verified: e.target.value })
-                  }
-                >
-                  <option value={false}>No</option>
-                  <option value={true}>Verified</option>
-                </select>
-              </div> */}
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">Role</label>
+              <select
+                className="w-full border border-slate-200 bg-slate-50/50 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+                value={formData.role}
+                onChange={(e) =>
+                  setFormData({ ...formData, role: e.target.value })
+                }
+              >
+                <option value="customer">Customer</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
           )}
 
-          <div className="flex gap-4 mt-4">
+          {/* Buttons */}
+          <div className="flex gap-3 mt-4">
             <button
               type="button"
               onClick={handleCloseAnimation}
-              className="w-1/2 bg-gray-100 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+              className="w-1/2 bg-slate-100 text-slate-700 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -219,8 +205,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
             <button
               type="submit"
               disabled={isUploading || isSaving}
-              style={{backgroundColor:"#4F46E5"}}
-              className="w-1/2 text-white py-2 rounded-lg font-medium transition-all hover:scale-102 active:scale-95 shadow-md disabled:opacity-70 disabled:cursor-wait disabled:hover:scale-100 flex justify-center items-center gap-2"
+              className="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-semibold transition-all shadow-xs disabled:opacity-70 disabled:cursor-wait flex justify-center items-center gap-2 cursor-pointer"
             >
               {isSaving ? (
                 <>
@@ -246,8 +231,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
                   </svg>
                   {editingUser ? "Updating..." : "Adding..."}
                 </>
-              ) : 
-              editingUser ? (
+              ) : editingUser ? (
                 "Update User"
               ) : (
                 "Save User"

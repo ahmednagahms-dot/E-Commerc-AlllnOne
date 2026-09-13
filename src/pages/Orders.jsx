@@ -1,8 +1,84 @@
-import React, { useState, useEffect } from "react";
-import axios from "../api/axios";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Search,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Package,
+  AlertCircle,
+} from "lucide-react";
+
 import DashboardLayout from "../components/layout/DashboardLayout";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
-import { toast } from "react-toastify";
+import OrderDetailsDrawer from "../components/orders/OrderDetailsDrawer";
+import api from "../api/axios";
+
+const PAGE_LIMIT = 15;
+
+const STATUS_CONFIG = {
+  pending: {
+    label: "Pending",
+    bg: "bg-amber-500/10",
+    text: "text-amber-700",
+    border: "border-amber-200",
+  },
+  confirmed: {
+    label: "Confirmed",
+    bg: "bg-sky-500/10",
+    text: "text-sky-700",
+    border: "border-sky-200",
+  },
+  processing: {
+    label: "Processing",
+    bg: "bg-indigo-500/10",
+    text: "text-indigo-700",
+    border: "border-indigo-200",
+  },
+  shipped: {
+    label: "Shipped",
+    bg: "bg-purple-500/10",
+    text: "text-purple-700",
+    border: "border-purple-200",
+  },
+  delivered: {
+    label: "Delivered",
+    bg: "bg-emerald-500/10",
+    text: "text-emerald-700",
+    border: "border-emerald-200",
+  },
+  cancelled: {
+    label: "Cancelled",
+    bg: "bg-rose-500/10",
+    text: "text-rose-700",
+    border: "border-rose-200",
+  },
+};
+
+const formatCurrency = (amount) => {
+  const num = Number(amount) || 0;
+  return `${num.toFixed(2)} EGP`;
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "N/A";
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+};
+
+const getOrderTotal = (order) =>
+  Number(
+    order?.totalOrderPrice ||
+      order?.totalPrice ||
+      order?.price ||
+      order?.total ||
+      0
+  );
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -10,6 +86,7 @@ const Orders = () => {
   const [error, setError] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [paymentFilter, setPaymentFilter] = useState("");
   const [methodFilter, setMethodFilter] = useState("");
@@ -18,117 +95,104 @@ const Orders = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
 
-  // States الخاصة بالـ Drawer وتعديل حالة الطلب
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [newStatus, setNewStatus] = useState("");
-  const [updating, setUpdating] = useState(false);
 
+  /* ---------- Debounce search ---------- */
   useEffect(() => {
-    const fetchOrders = async () => {
+    const handler = setTimeout(() => setDebouncedSearch(searchTerm), 400);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  /* ---------- Fetch orders ---------- */
+  const fetchOrders = useCallback(
+    async (signal) => {
       setLoading(true);
       setError(null);
 
       try {
         const params = {
           page: currentPage,
-          limit: 15,
+          limit: PAGE_LIMIT,
           sort: "-createdAt",
         };
 
-        if (searchTerm.trim()) params.keyword = searchTerm.trim();
+        if (debouncedSearch.trim()) params.keyword = debouncedSearch.trim();
         if (statusFilter) params.status = statusFilter;
         if (paymentFilter === "paid") params.isPaid = true;
         if (paymentFilter === "unpaid") params.isPaid = false;
         if (methodFilter) params.paymentMethodType = methodFilter;
 
-        const response = await axios.get("/orders/admin", { params });
-
+        const response = await api.get("/orders/admin", { params, signal });
         const data = response.data;
+
         const list = Array.isArray(data)
           ? data
           : data.orders || data.data || data.result || [];
 
         setOrders(list);
-
         setTotalPages(
           data.paginationResult?.numberOfPages ||
             data.totalPages ||
             data.numOfPages ||
-            Math.ceil((data.results || list.length) / 10) ||
-            1,
+            Math.ceil((data.results || list.length) / PAGE_LIMIT) ||
+            1
         );
-
         setTotalOrders(
-          data.results || data.totalOrders || data.total || list.length || 0,
+          data.results || data.totalOrders || data.total || list.length || 0
         );
-
       } catch (err) {
+        // ✅ إصلاح: api instance مش عنده isCancel
+        if (err.name === "CanceledError" || err.code === "ERR_CANCELED") {
+          return;
+        }
+
         console.error("API Error:", err);
+
         if (err.response?.status === 401) {
-          setError(
-            "Unauthorized (401): Invalid or expired token, or user is not an Admin.",
-          );
+          setError("Unauthorized (401): Invalid or expired admin session.");
         } else if (err.response?.status === 404) {
           setError("Endpoint Not Found (404)");
         } else {
           setError(
-            err.response?.data?.message || "Failed to connect to the server.",
+            err.response?.data?.message || "Failed to load orders from server."
           );
         }
         setOrders([]);
-        toast.error("Failed to load orders.");
       } finally {
-        setLoading(false);
+        if (!signal?.aborted) setLoading(false);
       }
-    };
+    },
+    [currentPage, debouncedSearch, statusFilter, paymentFilter, methodFilter]
+  );
 
-    fetchOrders();
-  }, [currentPage, searchTerm, statusFilter, paymentFilter, methodFilter]);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchOrders(controller.signal);
+    return () => controller.abort();
+  }, [fetchOrders]);
 
-  // تحديث حالة الطلب
-  const handleUpdateStatus = async () => {
-    if (!selectedOrder) return;
-    try {
-      setUpdating(true);
-      const orderId = selectedOrder._id || selectedOrder.id;
-
-      await axios.patch(`/orders/admin/${orderId}/status`, {
-        status: newStatus,
-      });
-
-      setOrders((prev) =>
-        prev.map((ord) =>
-          ord._id === orderId || ord.id === orderId
-            ? { ...ord, status: newStatus }
-            : ord,
-        ),
-      );
-
-      setSelectedOrder(prev => ({ ...prev, status: newStatus }));
-      toast.success("Order status updated successfully!");
-    } catch (err) {
-      console.error("Failed to update status:", err);
-      toast.error(err.response?.data?.message || "Failed to update order status.");
-    } finally {
-      setUpdating(false);
-    }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return "N/A";
-
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
+  /* ---------- Handlers ---------- */
   const handleFilterChange = (setter) => (e) => {
     setter(e.target.value);
     setCurrentPage(1);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("");
+    setPaymentFilter("");
+    setMethodFilter("");
+    setCurrentPage(1);
+  };
+
+  const handleOrderUpdated = (orderId, updates) => {
+    setOrders((prev) =>
+      prev.map((ord) =>
+        ord._id === orderId || ord.id === orderId
+          ? { ...ord, ...updates }
+          : ord
+      )
+    );
   };
 
   const pageNumbers = () => {
@@ -136,166 +200,197 @@ const Orders = () => {
     const start = Math.max(1, currentPage - 2);
     const end = Math.min(totalPages, start + 4);
 
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
+    for (let i = start; i <= end; i++) pages.push(i);
     return pages;
   };
 
+  /* ---------- Render ---------- */
   return (
     <DashboardLayout>
-      {loading ? (
-        <PageLoader text="Loading orders..." />
+      {loading && orders.length === 0 ? (
+        <PageLoader text="Loading orders list..." />
       ) : (
-        <div className="animate-fade-in w-full">
-          <div className="p-8 bg-gray-100 min-h-screen">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider block mb-1">
-                  Admin · Management
-                </span>
-                <h1 className="text-3xl font-bold text-slate-900">Orders</h1>
-              </div>
+        <div className="w-full min-h-screen bg-slate-50/50 p-6 md:p-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div>
+              <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider block mb-1">
+                Admin · Management
+              </span>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+                Orders Overview
+              </h1>
+            </div>
 
-              <div className="bg-white border border-gray-200 rounded-lg shadow-md px-5 py-2 text-right">
-                <span className="text-2xl font-bold text-gray-900">
+            <div className="bg-white border border-slate-200/80 rounded-xl shadow-sm px-5 py-2.5 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                <Package className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-2xl font-bold text-slate-900 leading-none block">
                   {totalOrders}
                 </span>
-                <span className="text-xs text-slate-400 pl-2 lowercase">
-                  total orders
+                <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                  Total Orders
                 </span>
               </div>
             </div>
+          </div>
 
-            {/* Main Container */}
-            <div className="bg-white rounded-xl shadow-md border border-gray-200/80 overflow-hidden mb-6">
-              {/* Filters & Search */}
-              <div className="p-4 border-b border-gray-200/80 flex flex-wrap gap-4 justify-between items-center">
-                <div className="min-w-[280px] flex-1">
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={handleFilterChange(setSearchTerm)}
-                    placeholder="Search ID, customer..."
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  />
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <select
-                    value={statusFilter}
-                    onChange={handleFilterChange(setStatusFilter)}
-                    className="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2 outline-none focus:border-indigo-500 cursor-pointer"
+          {/* Main Card */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden mb-6">
+            {/* Toolbar */}
+            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/30 flex flex-wrap gap-3 justify-between items-center">
+              <div className="relative min-w-[260px] flex-1">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleFilterChange(setSearchTerm)}
+                  placeholder="Search by ID or customer..."
+                  className="w-full border border-slate-200 rounded-xl pl-10 pr-9 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm("");
+                      setCurrentPage(1);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
-                    <option value="">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
-                  </select>
-
-                  <select
-                    value={paymentFilter}
-                    onChange={handleFilterChange(setPaymentFilter)}
-                    className="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2 outline-none focus:border-indigo-500 cursor-pointer"
-                  >
-                    <option value="">All Payment</option>
-                    <option value="paid">Paid</option>
-                    <option value="unpaid">Unpaid</option>
-                  </select>
-
-                  <select
-                    value={methodFilter}
-                    onChange={handleFilterChange(setMethodFilter)}
-                    className="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg px-4 py-2 outline-none focus:border-indigo-500 cursor-pointer"
-                  >
-                    <option value="">All Methods</option>
-                    <option value="cash">Cash</option>
-                    <option value="card">Card / Stripe</option>
-                  </select>
-                </div>
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
               </div>
 
-              {/* Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse text-sm">
-                  <thead className="bg-slate-50/80 border-b border-gray-100 text-slate-400 font-medium text-xs tracking-wider uppercase">
+              <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                <select
+                  value={statusFilter}
+                  onChange={handleFilterChange(setStatusFilter)}
+                  className="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3.5 py-2 outline-none focus:border-indigo-500 cursor-pointer transition-all hover:border-slate-300"
+                >
+                  <option value="">All Statuses</option>
+                  {Object.entries(STATUS_CONFIG).map(([value, { label }]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={paymentFilter}
+                  onChange={handleFilterChange(setPaymentFilter)}
+                  className="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3.5 py-2 outline-none focus:border-indigo-500 cursor-pointer transition-all hover:border-slate-300"
+                >
+                  <option value="">All Payment</option>
+                  <option value="paid">Paid</option>
+                  <option value="unpaid">Unpaid</option>
+                </select>
+
+                <select
+                  value={methodFilter}
+                  onChange={handleFilterChange(setMethodFilter)}
+                  className="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3.5 py-2 outline-none focus:border-indigo-500 cursor-pointer transition-all hover:border-slate-300"
+                >
+                  <option value="">All Methods</option>
+                  <option value="cash">Cash</option>
+                  <option value="card">Card / Stripe</option>
+                </select>
+
+                {(statusFilter ||
+                  paymentFilter ||
+                  methodFilter ||
+                  searchTerm) && (
+                  <button
+                    onClick={clearFilters}
+                    className="text-xs font-semibold text-rose-600 hover:text-rose-700 px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                  >
+                    Reset Filters
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-sm">
+                <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-400 font-semibold text-xs tracking-wider uppercase">
+                  <tr>
+                    <th className="py-3.5 px-6">Order ID</th>
+                    <th className="py-3.5 px-6">Customer</th>
+                    <th className="py-3.5 px-6">Date</th>
+                    <th className="py-3.5 px-6">Status</th>
+                    <th className="py-3.5 px-6">Payment</th>
+                    <th className="py-3.5 px-6">Total</th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-slate-100 text-slate-700">
+                  {error && (
                     <tr>
-                      <th className="py-4 px-6">Order ID</th>
-                      <th className="py-4 px-6">Customer</th>
-                      <th className="py-4 px-6">Date</th>
-                      <th className="py-4 px-6">Status</th>
-                      <th className="py-4 px-6">Payment</th>
-                      <th className="py-4 px-6">Total</th>
+                      <td colSpan="6" className="py-12 text-center">
+                        <div className="flex flex-col items-center justify-center gap-2 text-rose-500">
+                          <AlertCircle className="w-8 h-8" />
+                          <p className="font-medium">{error}</p>
+                          <button
+                            onClick={() => fetchOrders()}
+                            className="mt-2 text-xs text-indigo-600 underline font-semibold cursor-pointer"
+                          >
+                            Try Reloading
+                          </button>
+                        </div>
+                      </td>
                     </tr>
-                  </thead>
+                  )}
 
-                  <tbody className="divide-y divide-gray-50 text-slate-700">
-                    {loading && (
-                      <tr>
-                        <td
-                          colSpan="6"
-                          className="py-12 text-center text-slate-400 font-medium"
-                        >
-                          Loading orders...
-                        </td>
-                      </tr>
-                    )}
+                  {!error && orders.length === 0 && (
+                    <tr>
+                      <td colSpan="6" className="py-12 text-center">
+                        <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
+                          <Package className="w-8 h-8 stroke-1" />
+                          <p className="font-medium text-slate-500">
+                            No orders found
+                          </p>
+                          <p className="text-xs">
+                            Try adjusting your filters or search criteria.
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
 
-                    {!loading && error && (
-                      <tr>
-                        <td
-                          colSpan="6"
-                          className="py-12 text-center text-red-500 font-medium"
-                        >
-                          {error}
-                        </td>
-                      </tr>
-                    )}
+                  {!error &&
+                    orders.map((order) => {
+                      const statusKey =
+                        order.status?.toLowerCase() || "pending";
+                      const statusInfo =
+                        STATUS_CONFIG[statusKey] || STATUS_CONFIG.pending;
+                      const isPaid =
+                        order.isPaid || order.paymentStatus === "paid";
 
-                    {!loading && !error && orders.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan="6"
-                          className="py-12 text-center text-slate-400 font-medium"
-                        >
-                          No orders found
-                        </td>
-                      </tr>
-                    )}
-
-                    {!loading &&
-                      !error &&
-                      orders.map((order) => (
+                      return (
                         <tr
                           key={order._id || order.id}
-                          onClick={() => {
-                            setSelectedOrder(order);
-                            setNewStatus(order.status || "pending");
-                          }}
-                          className="hover:bg-indigo-50/40 transition-colors duration-150 cursor-pointer group"
+                          onClick={() => setSelectedOrder(order)}
+                          className="hover:bg-slate-50/80 transition-colors duration-150 cursor-pointer group"
                         >
                           <td className="py-4 px-6 font-semibold text-indigo-600 group-hover:underline">
                             #
                             {order._id
-                              ? order._id.slice(-8)
+                              ? order._id.slice(-8).toUpperCase()
                               : order.id || "N/A"}
                           </td>
 
                           <td className="py-4 px-6">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 font-bold flex items-center justify-center text-xs border border-indigo-100 uppercase">
+                              <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 font-bold flex items-center justify-center text-xs border border-indigo-100 uppercase shrink-0">
                                 {order.user?.name
                                   ? order.user.name.charAt(0)
                                   : order.shippingAddress?.fullName
-                                    ? order.shippingAddress.fullName.charAt(0)
-                                    : "U"}
+                                  ? order.shippingAddress.fullName.charAt(0)
+                                  : "U"}
                               </div>
-
-                              <span className="font-medium text-slate-800">
+                              <span className="font-medium text-slate-800 line-clamp-1">
                                 {order.user?.name ||
                                   order.shippingAddress?.fullName ||
                                   "Customer"}
@@ -308,20 +403,26 @@ const Orders = () => {
                           </td>
 
                           <td className="py-4 px-6">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-100">
-                              • {order.status || "Pending"}
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${statusInfo.bg} ${statusInfo.text} ${statusInfo.border}`}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                              {statusInfo.label}
                             </span>
                           </td>
 
                           <td className="py-4 px-6">
                             <div className="flex flex-col gap-1 items-start">
-                              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200">
-                                {order.isPaid || order.paymentStatus === "paid"
-                                  ? "Paid"
-                                  : "Pending"}
+                              <span
+                                className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border ${
+                                  isPaid
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                    : "bg-amber-50 text-amber-700 border-amber-200"
+                                }`}
+                              >
+                                {isPaid ? "Paid" : "Unpaid"}
                               </span>
-
-                              <span className="text-[11px] text-slate-400 pl-0.5">
+                              <span className="text-[11px] text-slate-400 capitalize">
                                 {order.paymentMethodType ||
                                   order.paymentMethod ||
                                   "Cash"}
@@ -330,34 +431,25 @@ const Orders = () => {
                           </td>
 
                           <td className="py-4 px-6 font-semibold text-slate-900">
-                            {(() => {
-                              const price =
-                                order.totalOrderPrice ||
-                                order.totalPrice ||
-                                order.price ||
-                                order.total ||
-                                0;
-                              return typeof price === "number"
-                                ? price.toLocaleString()
-                                : Number(price || 0).toLocaleString();
-                            })()}{" "}
-                            EGP
+                            {formatCurrency(getOrderTotal(order))}
                           </td>
                         </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
 
-              {/* Pagination */}
-              <div className="p-4 text-sm flex flex-wrap gap-4 items-center justify-between border-t border-gray-100 text-slate-500">
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="p-4 text-sm flex flex-wrap gap-4 items-center justify-between border-t border-slate-100 text-slate-500">
                 <div>
-                  page{" "}
-                  <span className="font-semibold text-indigo-700">
+                  Showing page{" "}
+                  <span className="font-semibold text-slate-800">
                     {currentPage}
                   </span>{" "}
                   of{" "}
-                  <span className="font-semibold text-indigo-700">
+                  <span className="font-semibold text-slate-800">
                     {totalPages}
                   </span>
                 </div>
@@ -366,19 +458,19 @@ const Orders = () => {
                   <button
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                    className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-500 hover:text-white transition-colors duration-150 cursor-pointer"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors cursor-pointer"
                   >
-                    &lt;
+                    <ChevronLeft className="w-4 h-4" />
                   </button>
 
                   {pageNumbers().map((num) => (
                     <button
                       key={num}
                       onClick={() => setCurrentPage(num)}
-                      className={`w-7 h-7 flex items-center justify-center rounded-lg border cursor-pointer text-xs font-medium transition-colors duration-150 ${
+                      className={`w-8 h-8 flex items-center justify-center rounded-lg border cursor-pointer text-xs font-semibold transition-colors ${
                         num === currentPage
-                          ? "bg-indigo-500 text-white border-indigo-500"
-                          : "border-slate-200 text-slate-600 hover:bg-indigo-500 hover:text-white"
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "border-slate-200 text-slate-600 hover:bg-slate-100"
                       }`}
                     >
                       {num}
@@ -390,265 +482,21 @@ const Orders = () => {
                     onClick={() =>
                       setCurrentPage((p) => Math.min(p + 1, totalPages))
                     }
-                    className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-indigo-500 hover:text-white transition-colors duration-150 cursor-pointer"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors cursor-pointer"
                   >
-                    &gt;
+                    <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
-            </div>
-
-            {/* Slide-over Drawer with Smooth Animation */}
-            <div
-              className={`fixed inset-0 overflow-hidden z-50 transition-all duration-300 ${
-                selectedOrder
-                  ? "visible opacity-100"
-                  : "invisible opacity-0 delay-300"
-              }`}
-            >
-              <div
-                className={`absolute inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 ${
-                  selectedOrder ? "opacity-100" : "opacity-0"
-                }`}
-                onClick={() => setSelectedOrder(null)}
-              />
-
-              <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
-                <div
-                  className={`w-screen max-w-md bg-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto transform transition-transform duration-300 ease-in-out ${
-                    selectedOrder ? "translate-x-0" : "translate-x-full"
-                  }`}
-                >
-                  <div>
-                    {/* Header */}
-                    <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-                      <div>
-                        <span className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wider block">
-                          Order Detail
-                        </span>
-                        <h2 className="text-xl font-extrabold text-slate-900">
-                          #
-                          {selectedOrder?._id
-                            ? selectedOrder._id.slice(-8)
-                            : selectedOrder?.id}
-                        </h2>
-                      </div>
-                      <button
-                        onClick={() => setSelectedOrder(null)}
-                        className="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer"
-                      >
-                        ✕
-                      </button>
-                    </div>
-
-                    {/* Status Badges */}
-                    <div className="flex flex-wrap items-center gap-2 my-4">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-amber-50 text-amber-600 border border-amber-200/60 shadow-xs">
-                        {selectedOrder?.isPaid ||
-                        selectedOrder?.paymentStatus === "paid"
-                          ? "Paid"
-                          : "Pending Payment"}
-                      </span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200/60 shadow-xs">
-                        {selectedOrder?.paymentMethodType ||
-                          selectedOrder?.paymentMethod ||
-                          "Cash"}
-                      </span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-200/60 shadow-xs">
-                        {selectedOrder?.status || "Pending"}
-                      </span>
-                    </div>
-
-                    {/* Info Box */}
-                    <div className="bg-slate-50/70 border border-slate-100 rounded-xl p-4 space-y-2.5 text-sm text-slate-600 my-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-slate-400 font-medium">
-                          Placed Date
-                        </span>
-                        <span className="font-semibold text-slate-800">
-                          {formatDate(selectedOrder?.createdAt)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-slate-400 font-medium">
-                          Customer
-                        </span>
-                        <span className="font-semibold text-slate-800">
-                          {selectedOrder?.user?.name ||
-                            selectedOrder?.shippingAddress?.fullName ||
-                            "Customer"}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-slate-400 font-medium">
-                          Email
-                        </span>
-                        <span className="font-semibold text-slate-800 text-xs truncate max-w-[200px]">
-                          {selectedOrder?.user?.email || "N/A"}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center pt-1 border-t border-slate-200/60">
-                        <span className="text-xs text-slate-400 font-medium">
-                          Ship to Address
-                        </span>
-                        <span className="font-semibold text-slate-800 text-right truncate max-w-[210px]">
-                          {selectedOrder?.shippingAddress?.city
-                            ? `${selectedOrder.shippingAddress.city} - `
-                            : ""}
-                          {selectedOrder?.shippingAddress?.address || "N/A"}
-                        </span>
-                      </div>
-                      {selectedOrder?.shippingAddress?.phone && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-slate-400 font-medium">
-                            Phone
-                          </span>
-                          <span className="font-semibold text-slate-800">
-                            {selectedOrder.shippingAddress.phone}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Items Section (Robust Fallback) */}
-                    <h3 className="text-xs font-bold uppercase text-slate-400 tracking-wider mb-3">
-                      Order Items
-                    </h3>
-                    <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-                      {(() => {
-                        const itemsList =
-                          selectedOrder?.cartItems ||
-                          selectedOrder?.items ||
-                          selectedOrder?.orderItems ||
-                          [];
-
-                        if (itemsList.length === 0) {
-                          return (
-                            <div className="text-center py-4 text-slate-400 text-xs bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                              No items found for this order
-                            </div>
-                          );
-                        }
-
-                        return itemsList.map((item, idx) => (
-                          <div
-                            key={idx}
-                            className="flex justify-between items-center p-2.5 rounded-lg border border-slate-100 bg-white shadow-2xs"
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0 overflow-hidden">
-                                {item.product?.imageCover ||
-                                item.imageCover ||
-                                item.image ? (
-                                  <img
-                                    src={
-                                      item.product?.imageCover ||
-                                      item.imageCover ||
-                                      item.image
-                                    }
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <span>📦</span>
-                                )}
-                              </div>
-                              <div>
-                                <h4 className="font-semibold text-slate-800 text-xs line-clamp-1 max-w-[180px]">
-                                  {item.product?.title ||
-                                    item.title ||
-                                    item.name ||
-                                    "Product"}
-                                </h4>
-                                <span className="text-xs text-slate-400 font-medium">
-                                  Qty: {item.quantity || 1}
-                                </span>
-                              </div>
-                            </div>
-                            <span className="font-bold text-slate-900 text-xs">
-                              {(
-                                (item.price || 0) * (item.quantity || 1)
-                              ).toLocaleString()}{" "}
-                              EGP
-                            </span>
-                          </div>
-                        ));
-                      })()}
-                    </div>
-
-                    {/* Update Status Section */}
-                    <div className="mt-5 pt-4 border-t border-gray-100">
-                      <label className="text-xs font-bold uppercase text-slate-400 tracking-wider block mb-2">
-                        Update Status
-                      </label>
-                      <select
-                        value={newStatus}
-                        onChange={(e) => setNewStatus(e.target.value)}
-                        className="w-full bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-indigo-500 cursor-pointer shadow-2xs"
-                      >
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Totals & Actions */}
-                  <div className="border-t border-gray-100 pt-4 mt-4 space-y-3">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between text-xs text-slate-500">
-                        <span>Subtotal</span>
-                        <span>
-                          {(
-                            selectedOrder?.totalOrderPrice ||
-                            selectedOrder?.totalPrice ||
-                            0
-                          ).toLocaleString()}{" "}
-                          EGP
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-xs text-slate-500">
-                        <span>Shipping</span>
-                        <span>Free</span>
-                      </div>
-                      <div className="flex justify-between text-sm pt-2 border-t border-dashed border-slate-200">
-                        <span className="font-bold text-slate-800">
-                          Total Amount
-                        </span>
-                        <span className="font-extrabold text-indigo-600 text-base">
-                          {(
-                            selectedOrder?.totalOrderPrice ||
-                            selectedOrder?.totalPrice ||
-                            0
-                          ).toLocaleString()}{" "}
-                          EGP
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setSelectedOrder(null)}
-                        className="w-1/3 bg-slate-100 text-slate-700 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-all cursor-pointer"
-                      >
-                        Close
-                      </button>
-                      <button
-                        onClick={handleUpdateStatus}
-                        disabled={updating}
-                        className="w-2/3 bg-slate-900 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-all shadow-md disabled:opacity-50 cursor-pointer"
-                      >
-                        {updating ? "Saving..." : "Save Changes"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
+
+          {/* Drawer */}
+          <OrderDetailsDrawer
+            order={selectedOrder}
+            onClose={() => setSelectedOrder(null)}
+            onUpdated={handleOrderUpdated}
+          />
         </div>
       )}
     </DashboardLayout>
