@@ -183,3 +183,11 @@ html[dir="rtl"] .text-right {
 .animate-progress-sweep {
   animation: progress-sweep 1.2s infinite ease-in-out;
 }
+
+.sidebar-edge {
+  border-inline-end: 1px solid #1e293b;
+}
+
+.dark .sidebar-edge {
+  border-inline-end-color: #64748b;
+}

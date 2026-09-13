@@ -13,7 +13,7 @@ export default function Sidebar({ onClose }) {
   const {t} = useTranslation();
 
   return (
-    <aside className="w-64 h-screen bg-slate-900 text-slate-300 flex flex-col">
+    <aside className="sidebar-edge w-64 h-screen bg-slate-900 text-slate-300 flex flex-col">
       {/* Logo */}
       <div className="px-5 pt-5 pb-4 flex items-center justify-between border-b border-white/10">
         <div className="flex items-center gap-3">
