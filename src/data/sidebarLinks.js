@@ -5,7 +5,7 @@ export const sidebarLinks = [
       { label: "navigation.dashboard", path: "/dashboard", icon: "LayoutDashboard" },
       { label: "navigation.products", path: "/dashboard/products", icon: "Package" },
       { label: "navigation.addProduct", path: "/dashboard/products/new", icon: "PackagePlus" },
-      { label: "Categories", path: "/dashboard/categories", icon: "Layers" },
+      { label: "navigation.categories", path: "/dashboard/categories", icon: "Layers" },
       { label: "navigation.orders", path: "/dashboard/orders", icon: "FileText" },
       { label: "navigation.carts", path: "/dashboard/carts", icon: "ShoppingCart" },
       { label: "navigation.users", path: "/dashboard/users", icon: "Users" },

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
@@ -25,6 +26,7 @@ import {
 import api from "../api/axios";
 
 export default function Dashboard() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   const [orders, setOrders] = useState([]);
@@ -105,7 +107,7 @@ export default function Dashboard() {
     return {
       stats: [
         {
-          title: "Total Revenue",
+          title: t("dashboard.totalRevenue"),
           value: `$${revenue.toLocaleString()}`,
           growth: calcGrowth(revenue, prevRevenue),
           icon: "Wallet",
@@ -113,7 +115,7 @@ export default function Dashboard() {
           sparkData: revenueSeries,
         },
         {
-          title: "Total Orders",
+          title: t("dashboard.totalOrders"),
           value: periodOrders.length.toLocaleString(),
           growth: calcGrowth(periodOrders.length, prevOrders.length),
           icon: "ShoppingBag",
@@ -121,7 +123,7 @@ export default function Dashboard() {
           sparkData: ordersSeries,
         },
         {
-          title: "Total Customers",
+          title: t("dashboard.totalCustomers"),
           value: customers.length.toLocaleString(),
           growth: calcGrowth(periodCustomers.length, prevCustomers.length),
           icon: "Users",
@@ -129,7 +131,7 @@ export default function Dashboard() {
           sparkData: customersSeries,
         },
         {
-          title: "Total Products",
+          title: t("dashboard.totalProducts"),
           value: products.length.toLocaleString(),
           growth: calcGrowth(periodProducts.length, prevProducts.length),
           icon: "Package",
@@ -144,7 +146,7 @@ export default function Dashboard() {
       topProducts: buildTopProducts(periodOrders),
       statusBreakdown: buildOrderStatusBreakdown(periodOrders),
     };
-  }, [orders, products, customers, year, month]);
+  }, [orders, products, customers, year, month, t]);
 
   const recentOrders = useMemo(
     () =>
@@ -158,15 +160,16 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       {loading ? (
-        <PageLoader text="Loading dashboard..." />
+        <PageLoader text={t("dashboard.loading")} />
       ) : (
         <div className="p-4 sm:p-6 w-full animate-fade-in">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-              <p className="text-sm text-gray-500 mt-0.5">
-                Real-time overview of your store’s performance
+              <h1 className="text-2xl font-bold">{t("dashboard.title")}</h1>
+
+              <p className="text-sm text-gray-500">
+                {t("dashboard.subtitle")}
               </p>
             </div>
 
@@ -194,6 +197,14 @@ export default function Dashboard() {
                   </option>
                 ))}
               </select>
+
+              <button
+                onClick={() => fetchAll(true)}
+                disabled={loading}
+                className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? t("dashboard.refreshing") : t("common.refresh")}
+              </button>
             </div>
           </div>
 

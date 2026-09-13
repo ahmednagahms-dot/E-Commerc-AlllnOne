@@ -5,6 +5,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 const COLORS = {
   pending: "#f59e0b",
@@ -42,6 +43,7 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 export default function OrderStatusDonut({ data = [] }) {
+  const { t } = useTranslation();
   const total = data.reduce((sum, item) => sum + (item.count || 0), 0);
 
   const chartData = STATUS_ORDER.map((status) => {
@@ -59,9 +61,9 @@ export default function OrderStatusDonut({ data = [] }) {
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/80 h-full flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-gray-800">
-            Orders by Status
+            {t("dashboard.ordersByStatus")}
           </h3>
-          <span className="text-xs text-gray-400">This period</span>
+          <span className="text-xs text-gray-400">{t("dashboard.thisPeriod")}</span>
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-2 text-gray-400">
           <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center">
@@ -78,9 +80,9 @@ export default function OrderStatusDonut({ data = [] }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-800">
-          Orders by Status
+          {t("dashboard.ordersByStatus")}
         </h3>
-        <span className="text-xs text-gray-400">This period</span>
+        <span className="text-xs text-gray-400">{t("dashboard.thisPeriod")}</span>
       </div>
 
       {/* Centered Donut */}
@@ -114,7 +116,7 @@ export default function OrderStatusDonut({ data = [] }) {
           <p className="text-2xl font-bold text-gray-900 leading-none tracking-tight">
             {total}
           </p>
-          <p className="text-[11px] text-gray-400 mt-1 font-medium">Total</p>
+          <p className="text-[11px] text-gray-400 mt-1 font-medium">{t("common.total")}</p>
         </div>
       </div>
 

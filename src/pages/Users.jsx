@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { Users as UsersIcon, Shield, User, UserCheck, Search, Plus } from "lucide-react";
-
+import { useTranslation } from "react-i18next";
+import {
+  Users as UsersIcon,
+  Shield,
+  User,
+  UserCheck,
+  Search,
+  Plus,
+} from "lucide-react";
 import UsersTable from "../components/users/UsersTable";
 import UserFormModal from "../components/users/UserFormModal";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -9,12 +16,12 @@ import { fetchUsers } from "../api/user.api";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 const Users = () => {
+  const { t } = useTranslation();
   const [isPageLoading, setIsPageLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
-
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -28,7 +35,7 @@ const Users = () => {
       } catch (error) {
         console.error("Error fetching users:", error);
         setUsers([]);
-        toast.error("Failed to load users.", {
+        toast.error(t("errors.loadUsers") || "Failed to load users.", {
           toastId: "users-fetch-error",
         });
       } finally {
@@ -37,7 +44,7 @@ const Users = () => {
     };
 
     loadUsers();
-  }, []);
+  }, [t]);
 
   const safeUsers = Array.isArray(users) ? users : [];
 
@@ -61,17 +68,17 @@ const Users = () => {
   return (
     <DashboardLayout>
       {isPageLoading ? (
-        <PageLoader text="Loading users..." />
+        <PageLoader text={t("pages.loadingUsers") || "Loading users..."} />
       ) : (
         <div className="p-2 sm:p-4 animate-fade-in">
           {/* Header section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div>
               <p className="text-indigo-600 font-semibold tracking-wider text-xs uppercase mb-1">
-                User Management
+                {t("pages.userManagement") || "User Management"}
               </p>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-                Manage Users
+                {t("pages.manageUsers") || "Manage Users"}
               </h1>
             </div>
 
@@ -83,7 +90,7 @@ const Users = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Search users..."
+                  placeholder={t("pages.searchUsers") || "Search users..."}
                   className="bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2 w-full sm:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-xs transition"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -98,7 +105,7 @@ const Users = () => {
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all shadow-xs cursor-pointer"
               >
                 <Plus size={18} />
-                Add User
+                {t("pages.addUser") || "Add User"}
               </button>
             </div>
           </div>
@@ -108,7 +115,9 @@ const Users = () => {
             {/* Total Users */}
             <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 flex justify-between items-center hover:-translate-y-1 transition-all duration-300">
               <div>
-                <p className="text-slate-500 text-xs font-medium mb-1">Total Users</p>
+                <p className="text-slate-500 text-xs font-medium mb-1">
+                  {t("pages.totalUsers") || "Total Users"}
+                </p>
                 <p className="text-2xl font-bold text-slate-900">{totalUsers}</p>
               </div>
               <div className="bg-blue-50 text-blue-600 w-12 h-12 rounded-xl flex items-center justify-center">
@@ -119,7 +128,9 @@ const Users = () => {
             {/* Admins */}
             <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 flex justify-between items-center hover:-translate-y-1 transition-all duration-300">
               <div>
-                <p className="text-slate-500 text-xs font-medium mb-1">Admins</p>
+                <p className="text-slate-500 text-xs font-medium mb-1">
+                  {t("pages.admins") || "Admins"}
+                </p>
                 <p className="text-2xl font-bold text-slate-900">{adminsCount}</p>
               </div>
               <div className="bg-purple-50 text-purple-600 w-12 h-12 rounded-xl flex items-center justify-center">
@@ -130,8 +141,12 @@ const Users = () => {
             {/* Customers */}
             <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 flex justify-between items-center hover:-translate-y-1 transition-all duration-300">
               <div>
-                <p className="text-slate-500 text-xs font-medium mb-1">Customers</p>
-                <p className="text-2xl font-bold text-slate-900">{customersCount}</p>
+                <p className="text-slate-500 text-xs font-medium mb-1">
+                  {t("pages.customers") || "Customers"}
+                </p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {customersCount}
+                </p>
               </div>
               <div className="bg-teal-50 text-teal-600 w-12 h-12 rounded-xl flex items-center justify-center">
                 <User size={22} />
@@ -141,8 +156,12 @@ const Users = () => {
             {/* Verified */}
             <div className="bg-white p-5 rounded-2xl shadow-xs border border-slate-200/80 flex justify-between items-center hover:-translate-y-1 transition-all duration-300">
               <div>
-                <p className="text-slate-500 text-xs font-medium mb-1">Verified</p>
-                <p className="text-2xl font-bold text-slate-900">{verifiedCount}</p>
+                <p className="text-slate-500 text-xs font-medium mb-1">
+                  {t("pages.verified") || "Verified"}
+                </p>
+                <p className="text-2xl font-bold text-slate-900">
+                  {verifiedCount}
+                </p>
               </div>
               <div className="bg-amber-50 text-amber-600 w-12 h-12 rounded-xl flex items-center justify-center">
                 <UserCheck size={22} />

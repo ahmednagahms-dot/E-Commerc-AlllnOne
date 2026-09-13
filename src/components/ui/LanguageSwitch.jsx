@@ -37,8 +37,8 @@ const LanguageSwitcher = () => {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center gap-2 rounded-lg p-2 hover:bg-gray-100 transition"
-        aria-label="Change language"
+        className="flex items-center gap-2 rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+        aria-label={i18n.language === "ar" ? "تغيير اللغة" : "Change language"}
       >
         <Globe size={20} />
 
@@ -50,12 +50,12 @@ const LanguageSwitcher = () => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-lg border bg-white p-1 shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-lg border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-1 shadow-lg">
           {/* English */}
           <button
             type="button"
             onClick={() => changeLanguage("en")}
-            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-gray-100"
+            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-700"
           >
             <span>English</span>
 
@@ -66,7 +66,7 @@ const LanguageSwitcher = () => {
           <button
             type="button"
             onClick={() => changeLanguage("ar")}
-            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-gray-100"
+            className="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-slate-700"
           >
             <span>العربية</span>
 

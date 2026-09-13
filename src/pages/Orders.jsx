@@ -10,6 +10,8 @@ import {
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import OrderDetailsDrawer from "../components/orders/OrderDetailsDrawer";
 import api from "../api/axios";
 
@@ -81,6 +83,7 @@ const getOrderTotal = (order) =>
   );
 
 const Orders = () => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -210,17 +213,17 @@ const Orders = () => {
   return (
     <DashboardLayout>
       {loading && orders.length === 0 ? (
-        <PageLoader text="Loading orders list..." />
+        <PageLoader text={t("orders.loading") || "Loading orders list..."} />
       ) : (
         <div className="w-full min-h-screen bg-slate-50/50 p-6 md:p-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <div>
               <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider block mb-1">
-                Admin · Management
+                {t("orders.management") || "Admin · Management"}
               </span>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                Orders Overview
+                {t("orders.orders") || "Orders Overview"}
               </h1>
             </div>
 
@@ -233,12 +236,11 @@ const Orders = () => {
                   {totalOrders}
                 </span>
                 <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
-                  Total Orders
+                  {t("orders.totalOrders") || "Total Orders"}
                 </span>
               </div>
             </div>
           </div>
-
           {/* Main Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden mb-6">
             {/* Toolbar */}
@@ -248,14 +250,18 @@ const Orders = () => {
                 <input
                   type="text"
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search by ID or customer..."
+                  onChange={handleFilterChange(setSearchTerm)}
+                  placeholder={t("orders.search") || "Search by ID or customer..."}
                   aria-label="Search orders by ID or customer"
                   className="w-full border border-slate-200 rounded-xl pl-10 pr-9 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
                 />
                 {searchTerm && (
                   <button
-                    onClick={() => setSearchTerm("")}
+                    onClick={() => {
+                      setSearchTerm("");
+                      setDebouncedSearch("");
+                      setCurrentPage(1);
+                    }}
                     aria-label="Clear search"
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
@@ -324,12 +330,12 @@ const Orders = () => {
               <table className="w-full text-left border-collapse text-sm">
                 <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-400 font-semibold text-xs tracking-wider uppercase">
                   <tr>
-                    <th className="py-3.5 px-6">Order ID</th>
-                    <th className="py-3.5 px-6">Customer</th>
-                    <th className="py-3.5 px-6">Date</th>
-                    <th className="py-3.5 px-6">Status</th>
-                    <th className="py-3.5 px-6">Payment</th>
-                    <th className="py-3.5 px-6">Total</th>
+                    <th className="py-3.5 px-6">{t("orders.orderId") || "Order ID"}</th>
+                    <th className="py-3.5 px-6">{t("pages.customer") || "Customer"}</th>
+                    <th className="py-3.5 px-6">{t("orders.date") || "Date"}</th>
+                    <th className="py-3.5 px-6">{t("orders.status") || "Status"}</th>
+                    <th className="py-3.5 px-6">{t("orders.payment") || "Payment"}</th>
+                    <th className="py-3.5 px-6">{t("orders.total") || "Total"}</th>
                   </tr>
                 </thead>
 
@@ -346,7 +352,7 @@ const Orders = () => {
                             }
                             className="mt-2 text-xs text-indigo-600 underline font-semibold cursor-pointer"
                           >
-                            Try Reloading
+                            {t("common.tryAgain") || "Try Reloading"}
                           </button>
                         </div>
                       </td>
@@ -359,7 +365,7 @@ const Orders = () => {
                         <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
                           <Package className="w-8 h-8 stroke-1" />
                           <p className="font-medium text-slate-500">
-                            No orders found
+                            {t("orders.noOrders") || "No orders found"}
                           </p>
                           <p className="text-xs">
                             Try adjusting your filters or search criteria.

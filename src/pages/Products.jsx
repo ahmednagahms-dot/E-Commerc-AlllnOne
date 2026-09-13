@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Search,
@@ -32,6 +33,7 @@ const CATEGORIES = [
 
 export default function Products() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const categoryParam = searchParams.get("category") || "";
@@ -43,7 +45,7 @@ export default function Products() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [refetchTrigger, setRefetchTrigger] = useState(0);
 
   const [search, setSearch] = useState("");
@@ -202,25 +204,25 @@ export default function Products() {
 
   const stats = [
     {
-      title: "Total Products",
+      title: t("products.totalProducts") || "Total Products",
       count: totalProducts,
       icon: Package,
       color: "bg-indigo-50 text-indigo-600",
     },
     {
-      title: "Featured (page)",
+      title: t("products.featured") || "Featured (page)",
       count: featuredCount,
       icon: Star,
       color: "bg-amber-50 text-amber-600",
     },
     {
-      title: "In Stock (page)",
+      title: t("products.inStock") || "In Stock (page)",
       count: inStockCount,
       icon: Package,
       color: "bg-emerald-50 text-emerald-600",
     },
     {
-      title: "Out of Stock (page)",
+      title: t("products.outOfStock") || "Out of Stock (page)",
       count: outStockCount,
       icon: Package,
       color: "bg-red-50 text-red-600",
@@ -230,24 +232,27 @@ export default function Products() {
   return (
     <DashboardLayout>
       {loading && items.length === 0 ? (
-        <PageLoader text="Loading products..." />
+        <PageLoader text={t("products.loading") || "Loading products..."} />
       ) : (
         <div className="p-4 sm:p-6 w-full animate-fade-in">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Products</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {t("navigation.products") || "Products"}
+              </h1>
               <p className="text-sm text-gray-500 mt-0.5">
-                {totalProducts} products total
+                {t("products.total", { count: totalProducts }) ||
+                  `${totalProducts} products total`}
               </p>
             </div>
 
             <button
               onClick={() => navigate("/dashboard/products/new")}
-              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-sm"
+              className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-sm cursor-pointer"
             >
               <Plus size={18} />
-              Add Product
+              {t("navigation.addProduct") || "Add Product"}
             </button>
           </div>
 
@@ -288,7 +293,9 @@ export default function Products() {
                 />
                 <input
                   type="text"
-                  placeholder="Search products..."
+                  placeholder={
+                    t("products.searchPlaceholder") || "Search products..."
+                  }
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
@@ -298,22 +305,22 @@ export default function Products() {
 
               <button
                 onClick={handleSearch}
-                className="h-11 px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition shadow-sm"
+                className="h-11 px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
               >
                 <Search size={16} />
-                Search
+                {t("common.search") || "Search"}
               </button>
 
               <button
                 onClick={() => setShowFilters((prev) => !prev)}
-                className={`h-11 px-4 rounded-xl border text-sm font-medium flex items-center justify-center gap-2 transition ${
+                className={`h-11 px-4 rounded-xl border text-sm font-medium flex items-center justify-center gap-2 transition cursor-pointer ${
                   showFilters
                     ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
                     : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
                 }`}
               >
                 <SlidersHorizontal size={16} />
-                Filters
+                {t("products.filters") || "Filters"}
               </button>
             </div>
 
@@ -321,14 +328,16 @@ export default function Products() {
               <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">
-                    Category
+                    {t("products.categories") || "Category"}
                   </label>
                   <select
                     value={category}
                     onChange={(e) => handleCategoryChange(e.target.value)}
-                    className="w-full h-10 border border-gray-200 rounded-xl px-3 bg-gray-50 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full h-10 border border-gray-200 rounded-xl px-3 bg-gray-50 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
                   >
-                    <option value="">All Categories</option>
+                    <option value="">
+                      {t("products.allCategories") || "All Categories"}
+                    </option>
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
                         {cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -339,7 +348,7 @@ export default function Products() {
 
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1.5 block">
-                    Sort By
+                    {t("products.sortBy") || "Sort By"}
                   </label>
                   <select
                     value={sortBy}
@@ -347,21 +356,31 @@ export default function Products() {
                       setSortBy(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full h-10 border border-gray-200 rounded-xl px-3 bg-gray-50 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full h-10 border border-gray-200 rounded-xl px-3 bg-gray-50 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
                   >
-                    <option value="">Newest</option>
-                    <option value="oldest">Oldest</option>
-                    <option value="price_asc">Price: Low to High</option>
-                    <option value="price_desc">Price: High to Low</option>
-                    <option value="rating">Highest Rated</option>
+                    <option value="">
+                      {t("products.newest") || "Newest"}
+                    </option>
+                    <option value="oldest">
+                      {t("products.oldest") || "Oldest"}
+                    </option>
+                    <option value="price_asc">
+                      {t("products.priceLowToHigh") || "Price: Low to High"}
+                    </option>
+                    <option value="price_desc">
+                      {t("products.priceHighToLow") || "Price: High to Low"}
+                    </option>
+                    <option value="rating">
+                      {t("products.highestRated") || "Highest Rated"}
+                    </option>
                   </select>
                 </div>
 
                 <button
                   onClick={clearFilters}
-                  className="sm:col-span-2 text-sm text-indigo-600 font-medium hover:underline text-left"
+                  className="sm:col-span-2 text-sm text-indigo-600 font-medium hover:underline text-left cursor-pointer"
                 >
-                  Clear all filters
+                  {t("products.clearFilters") || "Clear all filters"}
                 </button>
               </div>
             )}
@@ -374,7 +393,7 @@ export default function Products() {
             </div>
           ) : items.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100 shadow-sm">
-              No products found
+              {t("common.noResults") || "No products found"}
             </div>
           ) : (
             <>
@@ -425,7 +444,7 @@ export default function Products() {
                         <button
                           type="button"
                           onClick={() => changeFeatured(item)}
-                          className={`absolute top-3 left-3 w-9 h-9 rounded-xl flex items-center justify-center transition shadow-sm ${
+                          className={`absolute top-3 left-3 w-9 h-9 rounded-xl flex items-center justify-center transition shadow-sm cursor-pointer ${
                             item.featured
                               ? "bg-amber-50 text-amber-500 border border-amber-200"
                               : "bg-white/90 text-gray-400 hover:text-amber-500"
@@ -496,7 +515,7 @@ export default function Products() {
                             onClick={() =>
                               navigate(`/dashboard/products/${item._id}/view`)
                             }
-                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 transition"
+                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 transition cursor-pointer"
                           >
                             <Eye size={14} /> View
                           </button>
@@ -505,14 +524,14 @@ export default function Products() {
                             onClick={() =>
                               navigate(`/dashboard/products/${item._id}/edit`)
                             }
-                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 flex items-center justify-center gap-1.5 transition"
+                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 flex items-center justify-center gap-1.5 transition cursor-pointer"
                           >
                             <Pencil size={14} /> Edit
                           </button>
 
                           <button
                             onClick={() => handleQuickEdit(item)}
-                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 flex items-center justify-center transition"
+                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 flex items-center justify-center transition cursor-pointer"
                             title="Quick Edit"
                           >
                             <SlidersHorizontal size={14} />
@@ -520,7 +539,7 @@ export default function Products() {
 
                           <button
                             onClick={() => handleDelete(item)}
-                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 flex items-center justify-center transition"
+                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 flex items-center justify-center transition cursor-pointer"
                             title="Delete"
                           >
                             <Trash2 size={14} />

@@ -10,8 +10,10 @@ import {
 import api from "../api/axios";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 export default function Categories() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,8 +30,8 @@ export default function Categories() {
         setProducts(response.data.products || []);
         setError(null);
       } catch (err) {
-        setError("Failed to load categories.");
-        toast.error("Failed to load categories.");
+        setError(t("errors.loadCategories"));
+         toast.error(t("errors.loadCategories"));
       } finally {
         setLoading(false);
       }
@@ -79,20 +81,18 @@ export default function Categories() {
   return (
     <DashboardLayout>
       {loading ? (
-        <PageLoader text="Loading categories..." />
+        <PageLoader text={t("pages.loadingCategories")} />
       ) : (
         <div className="p-4 sm:p-6 w-full animate-fade-in">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <span className="text-xs font-semibold text-indigo-600 tracking-wider uppercase">
-                Catalog
-              </span>
-              <h1 className="text-2xl font-bold text-gray-900 mt-0.5">
-                Categories
-              </h1>
-              <p className="text-sm text-gray-500 mt-0.5">
-                Categories are derived from your live products.
+              <p className="text-xs font-semibold text-primary-500 tracking-widest uppercase">
+                {t("pages.catalog")}
+              </p>
+              <h1 className="text-2xl font-bold">{t("pages.categories")}</h1>
+              <p className="text-sm text-gray-500">
+                {t("pages.categoryDescription")}
               </p>
             </div>
 
@@ -100,7 +100,7 @@ export default function Categories() {
               onClick={() => setShowFormModal(true)}
               className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-sm"
             >
-              <Plus size={18} /> Add Category
+              <Plus size={16} /> {t("pages.addCategory")}
             </button>
           </div>
 
@@ -112,8 +112,7 @@ export default function Categories() {
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
               />
               <input
-                type="text"
-                placeholder="Search categories..."
+                placeholder={t("pages.searchCategories")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full h-11 bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
@@ -121,14 +120,13 @@ export default function Categories() {
             </div>
           </div>
 
-          {/* Categories Grid */}
-          {error ? (
-            <div className="bg-white rounded-2xl p-12 text-center text-red-500 border border-gray-100 shadow-sm">
-              {error}
+          {loading ? (
+            <div className="text-center py-16 text-gray-400">
+              {t("pages.loadingCategories")}
             </div>
           ) : filteredCategories.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 text-center text-gray-400 border border-gray-100 shadow-sm">
-              No categories found
+            <div className="text-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
+              {t("pages.noCategories")}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -163,13 +161,10 @@ export default function Categories() {
                         {cat.name}
                       </h3>
                       <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                        <Package size={12} className="text-gray-400" />
-                        <span>
-                          {cat.count} product{cat.count !== 1 ? "s" : ""}
-                        </span>
+                        <Package size={12} /> {t("pages.productsCount", { count: cat.count })}
                       </p>
-                      <p className="text-xs font-medium text-emerald-600 mt-1">
-                        {cat.inStock} in stock
+                      <p className="text-xs text-success mt-0.5">
+                        {cat.inStock} {t("pages.inStock")}
                       </p>
                     </div>
                   </button>

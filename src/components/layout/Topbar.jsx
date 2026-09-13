@@ -1,8 +1,9 @@
-import { Bell, Menu, User } from "lucide-react";
+import { Bell, Menu, User, Sun, Moon } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { sidebarLinks } from "../../data/sidebarLinks";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import LanguageSwitcher from "../ui/LanguageSwitch";
 import { useTranslation } from "react-i18next";
 
@@ -12,6 +13,7 @@ const allPages = sidebarLinks.flatMap((group) =>
 
 export default function Topbar({ onMenuClick }) {
   const { user } = useAuth();
+    const { isDark, toggleTheme } = useTheme();
   const { t } = useTranslation();
   const { pathname } = useLocation();
 
@@ -20,7 +22,7 @@ export default function Topbar({ onMenuClick }) {
   const pageTitle = currentPage?.label || "navigation.dashboard";
 
   return (
-    <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20 shadow-sm">
+    <header className="h-16 bg-surface border-b border-border-subtle flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20 shadow-sm transition-colors">
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuClick}
@@ -44,6 +46,13 @@ export default function Topbar({ onMenuClick }) {
 
       <div className="flex items-center gap-4">
         <LanguageSwitcher />
+        <button
+          onClick={toggleTheme}
+          className="text-gray-500 hover:bg-gray-100 p-2 rounded-lg dark:text-gray-300 dark:hover:bg-gray-800"
+          aria-label={t(isDark ? "common.lightMode" : "common.darkMode")}
+        >
+          {isDark ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
         <button className="relative text-gray-500 hover:bg-gray-100 p-2 rounded-lg">
           <Bell size={18} />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500"></span>

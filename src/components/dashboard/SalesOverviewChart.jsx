@@ -7,9 +7,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
+  const { t } = useTranslation();
 
   return (
     <div className="bg-white border border-gray-100 shadow-lg rounded-xl px-3.5 py-2.5 text-sm">
@@ -51,8 +53,8 @@ export default function SalesOverviewChart({ data }) {
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-            Orders
           </span>
+
         </div>
       </div>
 

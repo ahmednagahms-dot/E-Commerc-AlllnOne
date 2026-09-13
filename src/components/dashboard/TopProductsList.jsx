@@ -1,6 +1,8 @@
 import { Package } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function TopProductsList({ products = [], onViewAll }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 h-full flex flex-col">
       {/* Header */}
