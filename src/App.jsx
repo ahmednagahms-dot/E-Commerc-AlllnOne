@@ -1,82 +1,104 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useState, useMemo } from 'react';
+import { INITIAL_WISHLIST } from './data/wishlistData';
+import Navbar from './components/Navbar';
+import WishlistHeader from './components/WishlistHeader';
+import FilterBar from './components/FilterBar';
+import ProductCard from './components/ProductCard';
+import EmptyState from './components/EmptyState';
+import FeaturesFooter from './components/FeaturesFooter';
 
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/profile";
-import Orders from "./pages/Orders";
-import Carts from "./pages/Carts";
-import Wishlists from "./pages/Wishlists";
-import Coupons from "./pages/Coupons";
-import Notifications from "./pages/Notifications";
-import ProductForm from "./pages/ProductForm";
-import Products from "./pages/Products";
-import ProductView from "./pages/ProductView";
-import Settings from "./pages/Settings";
-import Reviews from "./pages/Reviews";
-import Users from "./pages/Users";
-import Categories from "./pages/Categories";
+import Toast from './components/Toast';
 
-import ProtectedRoute from "./routes/ProtectedRoute";
+export default function App() {
+  const [wishlist, setWishlist] = useState(INITIAL_WISHLIST);
+  const [cartCount, setCartCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('recently');
+  const [toastMessage, setToastMessage] = useState(null);
 
-// ✅ قائمة الـ routes المحمية (كلها تحت /dashboard)
-const protectedRoutes = [
-  { path: "/dashboard", element: <Dashboard /> },
-  { path: "/dashboard/profile", element: <Profile /> },
-  { path: "/dashboard/orders", element: <Orders /> },
-  { path: "/dashboard/carts", element: <Carts /> },
-  { path: "/dashboard/wishlists", element: <Wishlists /> },
-  { path: "/dashboard/coupons", element: <Coupons /> },
-  { path: "/dashboard/notifications", element: <Notifications /> },
+  const showToast = (message, type = 'success') => {
+    setToastMessage({ message, type });
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
-  // Products
-  { path: "/dashboard/products", element: <Products /> },
-  { path: "/dashboard/products/new", element: <ProductForm /> },
-  { path: "/dashboard/products/:id/edit", element: <ProductForm /> },
-  { path: "/dashboard/products/edit/:id", element: <ProductForm /> },
-  { path: "/dashboard/products/:id/view", element: <ProductView /> },
+  const removeItem = (id, title) => {
+    setWishlist(prev => prev.filter(item => item.id !== id));
+    showToast(`Removed "${title}" from your wishlist.`, 'info');
+  };
 
-  // Categories, Reviews, Users, Settings
-  { path: "/dashboard/categories", element: <Categories /> },
-  { path: "/dashboard/reviews", element: <Reviews /> },
-  { path: "/dashboard/settings", element: <Settings /> },
-  { path: "/dashboard/users", element: <Users /> },
-];
+  const clearWishlist = () => {
+    if (wishlist.length === 0) return;
+    setWishlist([]);
+    showToast('Your wishlist has been cleared.', 'info');
+  };
 
-function App() {
+  const addToCart = (item) => {
+    setCartCount(prev => prev + 1);
+    showToast(`Added "${item.title}" to cart!`);
+  };
+
+  const moveAllToCart = () => {
+    if (wishlist.length === 0) return;
+    setCartCount(prev => prev + wishlist.length);
+    showToast(`Moved all ${wishlist.length} items to your cart!`);
+    setWishlist([]);
+  };
+
+  const filteredWishlist = useMemo(() => {
+    return wishlist
+      .filter(item => {
+        const query = searchQuery.toLowerCase();
+        return item.title.toLowerCase().includes(query) || 
+               item.category.toLowerCase().includes(query);
+      })
+      .sort((a, b) => {
+        if (sortBy === 'price-low') return a.price - b.price;
+        if (sortBy === 'price-high') return b.price - a.price;
+        if (sortBy === 'rating') return b.rating - a.rating;
+        return new Date(b.dateAdded) - new Date(a.dateAdded);
+      });
+  }, [wishlist, searchQuery, sortBy]);
+
   return (
-    <>
-      <Routes>
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans pb-12 antialiased">
+      <Toast toastMessage={toastMessage} />
+      <Navbar cartCount={cartCount} />
 
-        <Route path="/login" element={<Login />} />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <WishlistHeader 
+          itemsCount={wishlist.length} 
+          onMoveAllToCart={moveAllToCart} 
+          onClearWishlist={clearWishlist} 
+        />
 
-     
-        {protectedRoutes.map(({ path, element }) => (
-          <Route
-            key={path}
-            path={path}
-            element={<ProtectedRoute>{element}</ProtectedRoute>}
+        <FilterBar 
+          searchQuery={searchQuery} 
+          setSearchQuery={setSearchQuery} 
+          sortBy={sortBy} 
+          setSortBy={setSortBy} 
+        />
+
+        {filteredWishlist.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            {filteredWishlist.map((product) => (
+              <ProductCard 
+                key={product.id} 
+                product={product} 
+                onAddToCart={addToCart} 
+                onRemoveItem={removeItem} 
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState 
+            searchQuery={searchQuery} 
+            setSearchQuery={setSearchQuery} 
+            onReset={() => setWishlist(INITIAL_WISHLIST)} 
           />
-        ))}
+        )}
 
-      
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
-
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        draggable
-        toastClassName="!bg-surface !text-ink !rounded-2xl !border !border-surface-border !shadow-lg !w-[calc(100vw-2rem)] sm:!w-[380px] !min-h-[60px] !font-medium"
-        progressClassName="!bg-success"
-      />
-    </>
+        <FeaturesFooter />
+      </main>
+    </div>
   );
 }
-
-export default App;
