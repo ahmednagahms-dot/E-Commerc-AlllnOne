@@ -56,23 +56,6 @@ const STATUS_CONFIG = {
   },
 };
 
-const formatCurrency = (amount) => {
-  const num = Number(amount) || 0;
-  return `${num.toFixed(2)} EGP`;
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return "N/A";
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "N/A";
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-};
-
 const getOrderTotal = (order) =>
   Number(
     order?.totalOrderPrice ||
@@ -83,10 +66,30 @@ const getOrderTotal = (order) =>
   );
 
 const Orders = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const formatCurrency = (amount) => {
+    const num = Number(amount) || 0;
+    return t("orders.currency", {
+      amount: num.toFixed(2),
+      defaultValue: `${num.toFixed(2)} EGP`,
+    });
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return t("orders.na");
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return t("orders.na");
+
+    return new Intl.DateTimeFormat(i18n.language === "ar" ? "ar-EG" : "en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+  };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -97,7 +100,6 @@ const Orders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
-
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   /* ---------- Debounce search ---------- */
@@ -154,12 +156,12 @@ const Orders = () => {
         console.error("API Error:", err);
 
         if (err.response?.status === 401) {
-          setError("Unauthorized (401): Invalid or expired admin session.");
+          setError(t("orders.unauthorized"));
         } else if (err.response?.status === 404) {
-          setError("Endpoint Not Found (404)");
+          setError(t("orders.notFound"));
         } else {
           setError(
-            err.response?.data?.message || "Failed to load orders from server."
+            err.response?.data?.message || t("orders.loadFailed")
           );
         }
         setOrders([]);
@@ -167,7 +169,7 @@ const Orders = () => {
         if (!signal?.aborted) setLoading(false);
       }
     },
-    [currentPage, debouncedSearch, statusFilter, paymentFilter, methodFilter]
+    [currentPage, debouncedSearch, statusFilter, paymentFilter, methodFilter, t]
   );
 
   useEffect(() => {
@@ -213,17 +215,17 @@ const Orders = () => {
   return (
     <DashboardLayout>
       {loading && orders.length === 0 ? (
-        <PageLoader text={t("orders.loading") || "Loading orders list..."} />
+        <PageLoader text={t("orders.loading")} />
       ) : (
         <div className="w-full min-h-screen bg-slate-50/50 p-6 md:p-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <div>
               <span className="text-xs font-semibold text-indigo-600 uppercase tracking-wider block mb-1">
-                {t("orders.management") || "Admin · Management"}
+                {t("orders.management")}
               </span>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                {t("orders.orders") || "Orders Overview"}
+                {t("orders.orders")}
               </h1>
             </div>
 
@@ -236,24 +238,25 @@ const Orders = () => {
                   {totalOrders}
                 </span>
                 <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
-                  {t("orders.totalOrders") || "Total Orders"}
+                  {t("orders.totalOrders")}
                 </span>
               </div>
             </div>
           </div>
+
           {/* Main Card */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden mb-6">
             {/* Toolbar */}
-            <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/30 flex flex-wrap gap-3 justify-between items-center">
+            <div className="p-4 sm:p-5 border-b border-slate-100 dark:bg-slate-800/40 flex flex-wrap gap-3 justify-between items-center">
               <div className="relative min-w-[260px] flex-1">
-                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Search className="w-4 h-4 absolute left-3.5 rtl:left-auto rtl:right-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={handleFilterChange(setSearchTerm)}
-                  placeholder={t("orders.search") || "Search by ID or customer..."}
-                  aria-label="Search orders by ID or customer"
-                  className="w-full border border-slate-200 rounded-xl pl-10 pr-9 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                  placeholder={t("orders.search")}
+                  aria-label={t("orders.searchAria")}
+                  className="w-full border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-9 rtl:pl-9 rtl:pr-10 py-2 text-sm bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-slate-400"
                 />
                 {searchTerm && (
                   <button
@@ -262,8 +265,8 @@ const Orders = () => {
                       setDebouncedSearch("");
                       setCurrentPage(1);
                     }}
-                    aria-label="Clear search"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    aria-label={t("orders.clearSearch")}
+                    className="absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -274,13 +277,13 @@ const Orders = () => {
                 <select
                   value={statusFilter}
                   onChange={handleFilterChange(setStatusFilter)}
-                  aria-label="Filter by status"
+                  aria-label={t("orders.filterStatusAria")}
                   className="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3.5 py-2 outline-none focus:border-indigo-500 cursor-pointer transition-all hover:border-slate-300"
                 >
-                  <option value="">All Statuses</option>
+                  <option value="">{t("orders.allStatus")}</option>
                   {Object.entries(STATUS_CONFIG).map(([value, { label }]) => (
                     <option key={value} value={value}>
-                      {label}
+                      {t(`orders.${value}`) || label}
                     </option>
                   ))}
                 </select>
@@ -288,23 +291,23 @@ const Orders = () => {
                 <select
                   value={paymentFilter}
                   onChange={handleFilterChange(setPaymentFilter)}
-                  aria-label="Filter by payment status"
+                  aria-label={t("orders.filterPaymentAria")}
                   className="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3.5 py-2 outline-none focus:border-indigo-500 cursor-pointer transition-all hover:border-slate-300"
                 >
-                  <option value="">All Payment</option>
-                  <option value="paid">Paid</option>
-                  <option value="unpaid">Unpaid</option>
+                  <option value="">{t("orders.allPayment")}</option>
+                  <option value="paid">{t("orders.paid")}</option>
+                  <option value="unpaid">{t("orders.unpaid")}</option>
                 </select>
 
                 <select
                   value={methodFilter}
                   onChange={handleFilterChange(setMethodFilter)}
-                  aria-label="Filter by payment method"
+                  aria-label={t("orders.filterMethodAria")}
                   className="bg-white border border-slate-200 text-slate-700 text-sm rounded-xl px-3.5 py-2 outline-none focus:border-indigo-500 cursor-pointer transition-all hover:border-slate-300"
                 >
-                  <option value="">All Methods</option>
-                  <option value="cash">Cash</option>
-                  <option value="card">Card / Stripe</option>
+                  <option value="">{t("orders.allMethods")}</option>
+                  <option value="cash">{t("orders.cash")}</option>
+                  <option value="card">{t("orders.card")}</option>
                 </select>
 
                 {(statusFilter ||
@@ -313,9 +316,9 @@ const Orders = () => {
                   searchTerm) && (
                   <button
                     onClick={clearFilters}
-                    className="text-xs font-semibold text-rose-600 hover:text-rose-700 px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-colors"
+                    className="text-xs font-semibold text-rose-600 hover:text-rose-700 px-2 py-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
                   >
-                    Reset Filters
+                    {t("orders.resetFilters")}
                   </button>
                 )}
               </div>
@@ -327,15 +330,15 @@ const Orders = () => {
                 loading ? "opacity-50 pointer-events-none" : "opacity-100"
               }`}
             >
-              <table className="w-full text-left border-collapse text-sm">
+              <table className="w-full text-left rtl:text-right border-collapse text-sm">
                 <thead className="bg-slate-50/80 border-b border-slate-100 text-slate-400 font-semibold text-xs tracking-wider uppercase">
                   <tr>
-                    <th className="py-3.5 px-6">{t("orders.orderId") || "Order ID"}</th>
-                    <th className="py-3.5 px-6">{t("pages.customer") || "Customer"}</th>
-                    <th className="py-3.5 px-6">{t("orders.date") || "Date"}</th>
-                    <th className="py-3.5 px-6">{t("orders.status") || "Status"}</th>
-                    <th className="py-3.5 px-6">{t("orders.payment") || "Payment"}</th>
-                    <th className="py-3.5 px-6">{t("orders.total") || "Total"}</th>
+                    <th className="py-3.5 px-6">{t("orders.orderId")}</th>
+                    <th className="py-3.5 px-6">{t("orders.customer")}</th>
+                    <th className="py-3.5 px-6">{t("orders.date")}</th>
+                    <th className="py-3.5 px-6">{t("orders.status")}</th>
+                    <th className="py-3.5 px-6">{t("orders.payment")}</th>
+                    <th className="py-3.5 px-6">{t("orders.total")}</th>
                   </tr>
                 </thead>
 
@@ -352,7 +355,7 @@ const Orders = () => {
                             }
                             className="mt-2 text-xs text-indigo-600 underline font-semibold cursor-pointer"
                           >
-                            {t("common.tryAgain") || "Try Reloading"}
+                            {t("common.tryAgain")}
                           </button>
                         </div>
                       </td>
@@ -365,10 +368,10 @@ const Orders = () => {
                         <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
                           <Package className="w-8 h-8 stroke-1" />
                           <p className="font-medium text-slate-500">
-                            {t("orders.noOrders") || "No orders found"}
+                            {t("orders.noOrders")}
                           </p>
                           <p className="text-xs">
-                            Try adjusting your filters or search criteria.
+                            {t("orders.adjustFiltersHint")}
                           </p>
                         </div>
                       </td>
@@ -388,13 +391,13 @@ const Orders = () => {
                         <tr
                           key={order._id || order.id}
                           onClick={() => setSelectedOrder(order)}
-                          className="hover:bg-slate-50/80 transition-colors duration-150 cursor-pointer group"
+                          className="hover:bg-surface-hover/70 transition-colors duration-150 cursor-pointer group"
                         >
                           <td className="py-4 px-6 font-semibold text-indigo-600 group-hover:underline">
                             #
                             {order._id
                               ? order._id.slice(-8).toUpperCase()
-                              : order.id || "N/A"}
+                              : order.id || t("orders.na")}
                           </td>
 
                           <td className="py-4 px-6">
@@ -409,7 +412,7 @@ const Orders = () => {
                               <span className="font-medium text-slate-800 line-clamp-1">
                                 {order.user?.name ||
                                   order.shippingAddress?.fullName ||
-                                  "Customer"}
+                                  t("orders.customer")}
                               </span>
                             </div>
                           </td>
@@ -423,7 +426,7 @@ const Orders = () => {
                               className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${statusInfo.bg} ${statusInfo.text} ${statusInfo.border}`}
                             >
                               <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                              {statusInfo.label}
+                              {t(`orders.${statusKey}`) || statusInfo.label}
                             </span>
                           </td>
 
@@ -436,12 +439,16 @@ const Orders = () => {
                                     : "bg-amber-50 text-amber-700 border-amber-200"
                                 }`}
                               >
-                                {isPaid ? "Paid" : "Unpaid"}
+                                {isPaid ? t("orders.paid") : t("orders.unpaid")}
                               </span>
                               <span className="text-[11px] text-slate-400 capitalize">
-                                {order.paymentMethodType ||
-                                  order.paymentMethod ||
-                                  "Cash"}
+                                {order.paymentMethodType?.toLowerCase() === "card"
+                                  ? t("orders.card")
+                                  : order.paymentMethodType?.toLowerCase() === "cash"
+                                  ? t("orders.cash")
+                                  : order.paymentMethodType ||
+                                    order.paymentMethod ||
+                                    t("orders.cash")}
                               </span>
                             </div>
                           </td>
@@ -460,31 +467,27 @@ const Orders = () => {
             {totalPages > 1 && (
               <div className="p-4 text-sm flex flex-wrap gap-4 items-center justify-between border-t border-slate-100 text-slate-500">
                 <div>
-                  Showing page{" "}
-                  <span className="font-semibold text-slate-800">
-                    {currentPage}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-semibold text-slate-800">
-                    {totalPages}
-                  </span>
+                  {t("orders.showingPage", {
+                    current: currentPage,
+                    total: totalPages,
+                  })}
                 </div>
 
                 <div className="flex gap-1 items-center">
                   <button
                     disabled={currentPage === 1}
                     onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                    aria-label="Previous page"
+                    aria-label={t("orders.prevPage")}
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors cursor-pointer"
                   >
-                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
                   </button>
 
                   {pageNumbers().map((num) => (
                     <button
                       key={num}
                       onClick={() => setCurrentPage(num)}
-                      aria-label={`Go to page ${num}`}
+                      aria-label={t("orders.goToPage", { page: num })}
                       aria-current={num === currentPage ? "page" : undefined}
                       className={`w-8 h-8 flex items-center justify-center rounded-lg border cursor-pointer text-xs font-semibold transition-colors ${
                         num === currentPage
@@ -501,10 +504,10 @@ const Orders = () => {
                     onClick={() =>
                       setCurrentPage((p) => Math.min(p + 1, totalPages))
                     }
-                    aria-label="Next page"
+                    aria-label={t("orders.nextPage")}
                     className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors cursor-pointer"
                   >
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-4 h-4 rtl:rotate-180" />
                   </button>
                 </div>
               </div>

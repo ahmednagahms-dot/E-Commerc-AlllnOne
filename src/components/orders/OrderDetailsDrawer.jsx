@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import {
   X,
   Package,
@@ -7,42 +8,42 @@ import {
 import { toast } from "react-toastify";
 import api from "../../api/axios";
 
-/* ---------- Helpers ---------- */
-
-const formatCurrency = (amount) => {
-  const num = Number(amount) || 0;
-  return `${num.toFixed(2)} EGP`;
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return "N/A";
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "N/A";
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-};
-
-const STATUS_OPTIONS = [
-  { value: "pending", label: "Pending" },
-  { value: "confirmed", label: "Confirmed" },
-  { value: "processing", label: "Processing" },
-  { value: "shipped", label: "Shipped" },
-  { value: "delivered", label: "Delivered" },
-  { value: "cancelled", label: "Cancelled" },
-];
-
-/* ---------- Component ---------- */
-
 export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
+  const { t, i18n } = useTranslation();
   const [newStatus, setNewStatus] = useState("");
   const [adminNote, setAdminNote] = useState("");
   const [updating, setUpdating] = useState(false);
 
   const isOpen = Boolean(order);
+
+  const STATUS_OPTIONS = [
+    { value: "pending", label: t("orders.pending") },
+    { value: "confirmed", label: t("orders.confirmed") },
+    { value: "processing", label: t("orders.processing") },
+    { value: "shipped", label: t("orders.shipped") },
+    { value: "delivered", label: t("orders.delivered") },
+    { value: "cancelled", label: t("orders.cancelled") },
+  ];
+
+  const formatCurrency = (amount) => {
+    const num = Number(amount) || 0;
+    return t("orders.currency", { amount: num.toFixed(2) });
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return t("orders.na");
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return t("orders.na");
+
+    return date.toLocaleDateString(
+      i18n.language === "ar" ? "ar-EG" : "en-GB",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
 
   // Sync local state when order changes
   useEffect(() => {
@@ -77,7 +78,7 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
 
       await api.patch(`/orders/admin/${orderId}/status`, payload);
 
-      toast.success("Order status updated successfully!");
+      toast.success(t("orders.statusUpdatedSuccess"));
 
       // إبلاغ الصفحة الأم إنه اتعمل update
       if (typeof onUpdated === "function") {
@@ -93,7 +94,7 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
         err.response?.data?.error ||
         (typeof err.response?.data === "string"
           ? err.response.data
-          : "Failed to update order status.");
+          : t("orders.statusUpdateFailed"));
 
       toast.error(serverMsg);
     } finally {
@@ -104,12 +105,19 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
   /* ---------- Derived ---------- */
 
   const orderId = order?._id || order?.id;
-  const shortId = orderId ? orderId.slice(-8).toUpperCase() : "N/A";
+  const shortId = orderId ? orderId.slice(-8).toUpperCase() : t("orders.na");
   const isPaid = order?.isPaid || order?.paymentStatus === "paid";
 
   const statusKey = order?.status?.toLowerCase() || "pending";
   const statusLabel =
-    STATUS_OPTIONS.find((s) => s.value === statusKey)?.label || "Pending";
+    STATUS_OPTIONS.find((s) => s.value === statusKey)?.label || t("orders.pending");
+
+  const getPaymentMethodLabel = (method) => {
+    const m = (method || "").toLowerCase();
+    if (m === "cash") return t("orders.cash");
+    if (m === "card" || m === "stripe") return t("orders.card");
+    return method || t("orders.cash");
+  };
 
   const itemsList =
     order?.cartItems || order?.items || order?.orderItems || [];
@@ -155,7 +163,7 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">
-                    Order Detail
+                    {t("orders.detail")}
                   </span>
                   <h2 className="text-xl font-bold text-slate-900">
                     #{shortId}
@@ -163,8 +171,8 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
                 </div>
                 <button
                   onClick={onClose}
-                  className="text-slate-400 hover:text-slate-600 transition-colors p-1"
-                  aria-label="Close drawer"
+                  className="text-slate-400 hover:text-slate-600 transition-colors p-1 cursor-pointer"
+                  aria-label={t("common.close")}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -184,24 +192,24 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
                         : "bg-amber-100 text-amber-800"
                     }`}
                   >
-                    {isPaid ? "Paid" : "Pending"}
+                    {isPaid ? t("orders.paid") : t("orders.pending")}
                   </span>
                 </div>
                 <span className="text-xs font-medium text-slate-400 capitalize">
-                  {order?.paymentMethodType || order?.paymentMethod || "Cash"}
+                  {getPaymentMethodLabel(order?.paymentMethodType || order?.paymentMethod)}
                 </span>
               </div>
 
               {/* ---------- Info ---------- */}
               <div className="mb-6">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                  Info
+                  {t("orders.info")}
                 </span>
                 <div className="bg-white border border-slate-100 rounded-2xl p-4 space-y-3 text-sm">
-                  <InfoRow label="Placed" value={formatDate(order?.createdAt)} />
+                  <InfoRow label={t("orders.placedDate")} value={formatDate(order?.createdAt)} />
 
                   <InfoRow
-                    label="Customer"
+                    label={t("orders.customer")}
                     value={
                       <span className="flex items-center gap-1">
                         {order?.user?.name ||
@@ -215,12 +223,12 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
                   />
 
                   <InfoRow
-                    label="Email"
+                    label={t("orders.email")}
                     value={order?.user?.email || "—"}
                   />
 
                   <InfoRow
-                    label="Ship to"
+                    label={t("orders.shipAddress")}
                     value={
                       [
                         order?.shippingAddress?.city,
@@ -236,17 +244,17 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
               {/* ---------- Items ---------- */}
               <div className="mb-6">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                  Items ({itemsList.length})
+                  {t("orders.itemsWithCount", { count: itemsList.length })}
                 </span>
 
                 {itemsList.length === 0 ? (
                   <div className="text-sm text-slate-400 text-center py-4">
-                    No items
+                    {t("orders.noItems")}
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {itemsList.map((item, idx) => (
-                      <OrderItem key={idx} item={item} />
+                      <OrderItem key={idx} item={item} formatCurrency={formatCurrency} />
                     ))}
                   </div>
                 )}
@@ -256,22 +264,22 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
               <div className="mb-6">
                 <div className="bg-white border border-slate-100 rounded-2xl p-4 space-y-3 text-sm">
                   <InfoRow
-                    label="Subtotal"
+                    label={t("orders.subtotal")}
                     value={formatCurrency(subtotal)}
                     muted
                   />
                   <InfoRow
-                    label="Shipping"
-                    value={formatCurrency(shipping)}
+                    label={t("orders.shipping")}
+                    value={shipping > 0 ? formatCurrency(shipping) : t("orders.free")}
                     muted
                   />
                   <InfoRow
-                    label="Tax"
+                    label={t("orders.tax")}
                     value={formatCurrency(tax)}
                     muted
                   />
                   <div className="flex justify-between items-center pt-2 border-t border-slate-100">
-                    <span className="font-bold text-slate-900">Total</span>
+                    <span className="font-bold text-slate-900">{t("orders.total")}</span>
                     <span className="font-bold text-base text-slate-900">
                       {formatCurrency(total)}
                     </span>
@@ -282,7 +290,7 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
               {/* ---------- Update Status ---------- */}
               <div className="space-y-3">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Update Status
+                  {t("orders.updateStatus")}
                 </span>
 
                 <select
@@ -300,7 +308,7 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
                 <textarea
                   value={adminNote}
                   onChange={(e) => setAdminNote(e.target.value)}
-                  placeholder="Admin note (optional)..."
+                  placeholder={t("orders.adminNotePlaceholder")}
                   className="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:bg-white focus:border-slate-400 transition-all resize-none min-h-[90px]"
                 />
 
@@ -309,7 +317,7 @@ export default function OrderDetailsDrawer({ order, onClose, onUpdated }) {
                   disabled={updating}
                   className="w-full bg-[#0F172A] hover:bg-slate-800 text-white font-semibold py-3.5 rounded-xl transition-colors cursor-pointer disabled:opacity-50 text-sm mt-2"
                 >
-                  {updating ? "Saving..." : "Save changes"}
+                  {updating ? t("common.saving") : t("orders.saveChanges")}
                 </button>
               </div>
             </>
@@ -331,7 +339,7 @@ function InfoRow({ label, value, muted = false }) {
       <span
         className={`${
           muted ? "font-semibold text-slate-900" : "font-semibold text-slate-900"
-        } text-right`}
+        } text-end`}
       >
         {value}
       </span>
@@ -339,8 +347,9 @@ function InfoRow({ label, value, muted = false }) {
   );
 }
 
-function OrderItem({ item }) {
-  const title = item.product?.title || item.title || item.name || "Product";
+function OrderItem({ item, formatCurrency }) {
+  const { t } = useTranslation();
+  const title = item.product?.title || item.title || item.name || t("reviews.product");
   const image = item.product?.imageCover || item.imageCover || item.image;
   const price = item.price || 0;
   const quantity = item.quantity || 1;

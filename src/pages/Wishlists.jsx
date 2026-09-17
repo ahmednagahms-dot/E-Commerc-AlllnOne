@@ -100,21 +100,21 @@ export default function Wishlists() {
                     >
                       <div className="mb-3 flex items-center justify-between">
                         <h3 className="font-bold text-gray-800">
-                          Wishlist #{index + 1}
+                          {t("wishlists.wishlistNumber", { number: index + 1 })}
                         </h3>
                         <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-600">
-                          {productsList.length} Items
+                          {t("wishlists.itemsCount", { count: productsList.length })}
                         </span>
                       </div>
 
                       <div className="border-t border-gray-100 pt-3 text-xs text-gray-500">
                         <p className="mb-1">
-                          <span className="font-medium text-gray-700">User:</span>{" "}
+                          <span className="font-medium text-gray-700">{t("wishlists.user")}:</span>{" "}
                           {userDetail}
                         </p>
                         {item._id && (
                           <p className="truncate font-mono text-[10px] text-gray-400">
-                            ID: {item._id}
+                            {t("wishlists.id")}: {item._id}
                           </p>
                         )}
                       </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { AlertTriangle } from "lucide-react";
 import Modal from "../ui/Modal";
 import Button from "../ui/Button";
@@ -11,6 +12,7 @@ export default function DeleteConfirmModal({
   onClose,
   onDeleted,
 }) {
+  const { t } = useTranslation();
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,7 +34,7 @@ export default function DeleteConfirmModal({
       onClose();
     } catch (err) {
       setError(
-        err.response?.data?.message || "Failed to delete product. Please try again."
+        err.response?.data?.message || t("products.deleteModal.error")
       );
     } finally {
       setDeleting(false);
@@ -46,17 +48,17 @@ export default function DeleteConfirmModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Delete Product">
+    <Modal isOpen={isOpen} onClose={handleClose} title={t("products.deleteModal.title")}>
       <div className="space-y-4">
         <div className="flex items-start gap-3 bg-red-50 border border-red-100 rounded-xl p-3.5">
           <AlertTriangle className="shrink-0 text-red-500 mt-0.5" size={18} />
           <div className="text-sm">
             <p className="text-gray-800">
-              Are you sure you want to delete{" "}
-              <span className="font-semibold text-gray-900">{productName}</span>?
+              {t("products.deleteModal.confirm")}{" "}
+              <span className="font-semibold text-gray-900">{productName}</span>؟
             </p>
             <p className="text-xs text-red-600 mt-1">
-              This action is permanent and cannot be undone.
+              {t("products.deleteModal.warning")}
             </p>
           </div>
         </div>
@@ -74,7 +76,7 @@ export default function DeleteConfirmModal({
             onClick={handleClose}
             disabled={deleting}
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             type="button"
@@ -82,7 +84,7 @@ export default function DeleteConfirmModal({
             onClick={handleDelete}
             disabled={deleting}
           >
-            {deleting ? "Deleting..." : "Delete"}
+            {deleting ? t("products.deleteModal.deleting") : t("common.delete")}
           </Button>
         </div>
       </div>

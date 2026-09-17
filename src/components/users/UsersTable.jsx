@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { deleteUser, updateUser } from "../../api/user.api";
 
 const UsersTable = ({ users, setUsers, onEditClick }) => {
+  const { t } = useTranslation();
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [userToDelete, setUserToDelete] = useState(null);
@@ -27,13 +29,13 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
       setUsers(updatedUsers);
       setUserToDelete(null);
 
-      toast.success("User deleted successfully", {
+      toast.success(t("users.userDeleteSuccess"), {
         toastId: "user-delete-success",
       });
     } catch (error) {
       console.error("Error deleting user:", error);
 
-      toast.error("Failed to delete user", {
+      toast.error(t("users.userDeleteError"), {
         toastId: "user-delete-error",
       });
     } finally {
@@ -59,8 +61,8 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
 
       toast.success(
         !currentStatus
-          ? "User verified successfully"
-          : "User verification removed",
+          ? t("users.userVerifySuccess")
+          : t("users.userUnverifySuccess"),
         {
           toastId: "user-verification-success",
         }
@@ -68,7 +70,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
     } catch (error) {
       console.error("Error updating verification:", error);
 
-      toast.error("Failed to update user verification", {
+      toast.error(t("users.userVerifyError"), {
         toastId: "user-verification-error",
       });
     } finally {
@@ -80,11 +82,11 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
     <div className="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
       <table className="w-full text-left border-collapse">
         <thead>
-          <tr className="text-slate-500 text-sm bg-slate-100">
-            <th className="p-4 font-medium">User</th>
-            <th className="p-4 font-medium">Role</th>
-            <th className="p-4 font-medium">Verified</th>
-            <th className="p-4 font-medium">Actions</th>
+          <tr className="text-slate-500 text-sm dark:bg-slate-800/40 bg-slate-100">
+            <th className="p-4 font-medium">{t("users.user")}</th>
+            <th className="p-4 font-medium">{t("users.role")}</th>
+            <th className="p-4 font-medium">{t("users.verified")}</th>
+            <th className="p-4 font-medium">{t("users.actions")}</th>
           </tr>
         </thead>
 
@@ -92,7 +94,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
           {users.map((user) => (
             <tr
               key={user._id || user.id}
-              className="hover:bg-slate-50/50 transition-colors border-b border-slate-100 last:border-none"
+              className="hover:bg-surface-hover/70 transition-colors border-b border-slate-100 last:border-none"
             >
               {/* User */}
               <td className="p-4">
@@ -133,7 +135,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                       : "bg-purple-50 text-purple-700"
                   }`}
                 >
-                  {user?.role}
+                  {user?.role?.toLowerCase() === "admin" ? t("users.admin") : t("users.customer")}
                 </span>
               </td>
 
@@ -141,11 +143,11 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               <td className="p-4">
                 {user?.isVerified ? (
                   <span className="text-emerald-600 font-semibold flex items-center gap-1 text-sm">
-                    Verified
+                    {t("users.verified")}
                   </span>
                 ) : (
                   <span className="text-rose-500 font-semibold flex items-center gap-1 text-sm">
-                    Not Verified
+                    {t("users.notVerified")}
                   </span>
                 )}
               </td>
@@ -156,7 +158,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                   {/* Edit */}
                   <button
                     onClick={() => onEditClick(user)}
-                    title="Edit User"
+                    title={t("users.editUser")}
                     className="text-white w-9 h-9 rounded-xl bg-sky-500 hover:bg-sky-600 flex items-center justify-center transition-colors shadow-sm cursor-pointer"
                   >
                     <svg
@@ -183,8 +185,8 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                     disabled={updatingId === user._id}
                     title={
                       user.isVerified
-                        ? "Remove Verification"
-                        : "Verify User"
+                        ? t("users.removeVerification")
+                        : t("users.verifyUser")
                     }
                     className={`text-white w-9 h-9 rounded-xl flex items-center justify-center transition-colors shadow-sm cursor-pointer ${
                       updatingId === user._id
@@ -235,7 +237,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                   {/* Delete */}
                   <button
                     onClick={() => handleDeleteClick(user._id)}
-                    title="Delete User"
+                    title={t("users.deleteUser")}
                     className="text-white w-9 h-9 rounded-xl flex items-center justify-center transition-colors shadow-sm bg-rose-500 hover:bg-rose-600 cursor-pointer"
                   >
                     <svg
@@ -264,7 +266,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                 colSpan="4"
                 className="text-center p-8 text-slate-500 text-sm"
               >
-                No users found!
+                {t("users.noUsers")}
               </td>
             </tr>
           )}
@@ -273,7 +275,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
 
       {/* Sidebar / Aside Overlay */}
       {selectedViewUser && (
-        <div className="fixed inset-0 z-[60] flex justify-end overflow-hidden">
+        <div className="fixed inset-0 z-[1000] flex justify-end overflow-hidden ">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
             onClick={() => setSelectedViewUser(null)}
@@ -303,13 +305,14 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                         : "bg-slate-100 text-slate-700"
                     }`}
                   >
-                    {selectedViewUser?.role}
+                    {selectedViewUser?.role?.toLowerCase() === "admin" ? t("users.admin") : t("users.customer")}
                   </span>
                 </div>
               </div>
 
               <button
                 onClick={() => setSelectedViewUser(null)}
+                aria-label={t("common.close")}
                 className="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-2 rounded-full transition-colors cursor-pointer"
               >
                 <svg
@@ -329,11 +332,11 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
               </button>
             </div>
 
-            <div className="p-6 space-y-8 flex-1 bg-slate-50/30">
+            <div className="p-6 space-y-8 flex-1 dark:bg-slate-800/40">
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
-                  <div className="text-slate-500 text-sm font-medium flex items-center gap-2 mb-2">
-                    Total Orders
+                <div className="p-4 rounded-2xl border border-slate-100 bg-white  shadow-sm">
+                  <div className="text-slate-500  text-sm font-medium flex items-center gap-2 mb-2">
+                    {t("users.view.totalOrders")}
                   </div>
                   <div className="text-2xl font-extrabold text-slate-800">
                     0
@@ -342,25 +345,25 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
 
                 <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
                   <div className="text-slate-500 text-sm font-medium flex items-center gap-2 mb-2">
-                    Current
+                    {t("users.view.current")}
                   </div>
                   <div className="text-2xl font-extrabold text-slate-800">
                     0
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 shadow-sm">
+                <div className="p-4 rounded-2xl border border-slate-100 bg-white  shadow-sm">
                   <div className="text-emerald-600 text-sm font-medium flex items-center gap-2 mb-2">
-                    Paid
+                    {t("users.view.paid")}
                   </div>
                   <div className="text-2xl font-extrabold text-emerald-700">
                     0
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl border border-rose-100 bg-rose-50/50 shadow-sm">
+                <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm">
                   <div className="text-rose-500 text-sm font-medium flex items-center gap-2 mb-2">
-                    Cancelled
+                    {t("users.view.cancelled")}
                   </div>
                   <div className="text-2xl font-extrabold text-rose-600">
                     0
@@ -370,7 +373,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
 
               <div>
                 <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">
-                  Contact Info
+                  {t("users.view.contactInfo")}
                 </h3>
 
                 <div className="space-y-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
@@ -390,12 +393,12 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
 
               <div>
                 <h3 className="text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest">
-                  Addresses
+                  {t("users.view.addresses")}
                 </h3>
 
                 <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
                   <p className="text-slate-500 text-sm font-medium">
-                    No saved addresses.
+                    {t("users.view.noAddresses")}
                   </p>
                 </div>
               </div>
@@ -425,12 +428,11 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
             </div>
 
             <h3 className="text-xl font-bold text-slate-800 mb-2">
-              Are you sure you want to delete this user?
+              {t("users.deleteModal.title")}
             </h3>
 
             <p className="text-slate-500 text-sm mb-6">
-              If you delete it, you won't be able to recover its data.
-              This step is final.
+              {t("users.deleteModal.warning")}
             </p>
 
             <div className="flex gap-3 justify-center">
@@ -439,7 +441,7 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                 disabled={deletingId !== null}
                 className="px-5 py-2.5 bg-slate-100 text-slate-700 font-medium rounded-xl hover:bg-slate-200 transition-colors disabled:opacity-50 cursor-pointer"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
 
               <button
@@ -471,10 +473,10 @@ const UsersTable = ({ users, setUsers, onEditClick }) => {
                       />
                     </svg>
 
-                    Deleting...
+                    {t("users.deleteModal.deleting")}
                   </>
                 ) : (
-                  "Delete"
+                  t("common.delete")
                 )}
               </button>
             </div>

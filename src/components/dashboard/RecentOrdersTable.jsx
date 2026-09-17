@@ -16,7 +16,7 @@ export default function RecentOrdersTable({ orders }) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-left text-gray-400 border-b">
+            <tr className="text-left rtl:text-right text-gray-400 border-b">
               <th className="py-2 font-medium">{t("dashboard.order")}</th>
               <th className="py-2 font-medium">{t("dashboard.customer")}</th>
               <th className="py-2 font-medium">{t("dashboard.date")}</th>
@@ -29,7 +29,7 @@ export default function RecentOrdersTable({ orders }) {
               <tr><td colSpan={5} className="text-center py-6 text-gray-400">{t("dashboard.noOrders")}</td></tr>
             ) : (
               orders.map((o) => (
-                <tr key={o._id} className="border-b last:border-0 cursor-pointer hover:bg-gray-50" onClick={() => navigate("/dashboard/orders")}>
+                <tr key={o._id} className="border-b last:border-0 cursor-pointer hover:bg-surface-hover/70 transition-colors" onClick={() => navigate("/dashboard/orders")}>
                   <td className="py-3 font-medium text-primary-600">#{o._id.slice(-6)}</td>
                   <td className="py-3 flex items-center gap-2">
                     <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-[10px] font-semibold">
@@ -40,7 +40,9 @@ export default function RecentOrdersTable({ orders }) {
                   <td className="py-3 text-gray-500">{new Date(o.createdAt).toLocaleDateString(i18n.language === "ar" ? "ar-EG" : "en-US", { month: "short", day: "numeric" })}</td>
                   <td className="py-3 font-medium">${o.totalPrice.toLocaleString()}</td>
                   <td className="py-3">
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${statusColor[o.status]}`}>{o.status}</span>
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${statusColor[o.status]}`}>
+                      {t(`orders.${o.status?.toLowerCase()}`) || o.status}
+                    </span>
                   </td>
                 </tr>
               ))

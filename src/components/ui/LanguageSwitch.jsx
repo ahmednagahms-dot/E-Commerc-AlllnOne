@@ -37,14 +37,14 @@ const LanguageSwitcher = () => {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center gap-2 rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+        className="flex items-center gap-2 rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
         aria-label={i18n.language === "ar" ? "تغيير اللغة" : "Change language"}
       >
         <Globe size={20} />
 
         <ChevronDown
           size={16}
-          className={`transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`transition-transform text-gray-500 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 

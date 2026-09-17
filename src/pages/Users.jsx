@@ -86,12 +86,12 @@ const Users = () => {
               <div className="relative">
                 <Search
                   size={18}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                  className="absolute left-3.5 rtl:left-auto rtl:right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                 />
                 <input
                   type="text"
                   placeholder={t("pages.searchUsers") || "Search users..."}
-                  className="bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2 w-full sm:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-xs transition"
+                  className="bg-white border border-slate-200 rounded-xl pl-10 pr-4 rtl:pl-4 rtl:pr-10 py-2 w-full sm:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 shadow-xs transition"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />

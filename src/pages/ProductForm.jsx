@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, PackagePlus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import DashboardLayout from "../components/layout/DashboardLayout";
 import Button from "../components/ui/Button";
@@ -11,6 +12,7 @@ import PageLoader from "../components/ui/sessionLoader/PageLoader";
 import api from "../api/axios";
 
 export default function ProductForm() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const isEditMode = Boolean(id);
   const navigate = useNavigate();
@@ -90,7 +92,7 @@ export default function ProductForm() {
         if (err.name === "CanceledError" || err.code === "ERR_CANCELED") {
           return;
         }
-        toast.error("Failed to load product data.", {
+        toast.error(t("productForm.errors.loadFailed"), {
           toastId: "product-fetch-error",
         });
         navigate("/dashboard/products");
@@ -106,7 +108,7 @@ export default function ProductForm() {
     return () => {
       controller.abort();
     };
-  }, [id, isEditMode, reset, navigate]);
+  }, [id, isEditMode, reset, navigate, t]);
 
   // Clean up the post-submit navigation timer if the component unmounts
   useEffect(() => {
@@ -138,7 +140,7 @@ export default function ProductForm() {
       (!isEditMode && imageFiles.length === 0) ||
       (isEditMode && existingImages.length === 0 && imageFiles.length === 0)
     ) {
-      setFormError("At least one image is required.");
+      setFormError(t("productForm.errors.imageRequired"));
       return;
     }
 
@@ -146,7 +148,7 @@ export default function ProductForm() {
       formData.discountPrice &&
       Number(formData.discountPrice) >= Number(formData.price)
     ) {
-      setFormError("Discount price must be less than the original price.");
+      setFormError(t("productForm.errors.discountPriceError"));
       return;
     }
 
@@ -192,8 +194,8 @@ export default function ProductForm() {
 
       toast.success(
         isEditMode
-          ? "Product updated successfully!"
-          : "Product added successfully!",
+          ? t("productForm.messages.updateSuccess")
+          : t("productForm.messages.createSuccess"),
         {
           toastId: "product-save-success",
         }
@@ -205,7 +207,7 @@ export default function ProductForm() {
     } catch (err) {
       const message =
         err.response?.data?.message ||
-        "Something went wrong while saving the product.";
+        t("productForm.errors.saveFailed");
       setFormError(message);
       toast.error(message, {
         toastId: "product-save-error",
@@ -218,7 +220,7 @@ export default function ProductForm() {
   if (loadingProduct) {
     return (
       <DashboardLayout>
-        <PageLoader text="Loading product..." />
+        <PageLoader text={t("productForm.loadingProduct")} />
       </DashboardLayout>
     );
   }
@@ -227,32 +229,37 @@ export default function ProductForm() {
     <DashboardLayout>
       <div className="p-4 sm:p-6 w-full animate-fade-in">
         {/* Header */}
-        <div className="bg-slate-900 text-white rounded-2xl p-6 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
+        <div className="relative overflow-hidden bg-gradient-to-br from-[#E2ECF7]/90 via-[#F0F5FA]/90 to-white/95 dark:from-[#021A54] dark:via-[#082265] dark:to-[#05133d] backdrop-blur-md rounded-2xl p-6 mb-6 border border-slate-200/80 dark:border-blue-900/50 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all">
+          {/* Ambient decorative glow */}
+          <div className="absolute -top-10 -right-10 w-44 h-44 bg-[#93B4D7]/35 dark:bg-[#1E3A8A]/30 rounded-full blur-2xl pointer-events-none" />
+
+          <div className="relative z-10">
             <button
               type="button"
               onClick={() => navigate("/dashboard/products")}
-              className="inline-flex items-center gap-2 text-sm bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg mb-4 transition"
+              className="inline-flex items-center gap-2 text-sm bg-white/80 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg mb-4 transition font-medium shadow-xs border border-slate-200/60 dark:border-white/10 cursor-pointer"
             >
-              <ArrowLeft size={14} />
-              Back to products
+              <ArrowLeft size={14} className="rtl:rotate-180" />
+              {t("productForm.backToProducts")}
             </button>
 
             <div className="flex items-start gap-3">
-              <div className="w-11 h-11 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center shrink-0">
+              <div className="w-11 h-11 rounded-xl bg-white dark:bg-white/10 text-primary-600 dark:text-blue-300 shadow-xs border border-slate-200/60 dark:border-white/10 flex items-center justify-center shrink-0">
                 <PackagePlus size={20} />
               </div>
               <div>
-                <p className="text-xs font-semibold text-indigo-300 tracking-widest uppercase">
-                  {isEditMode ? "Edit Product" : "Create Product"}
-                </p>
-                <h1 className="text-2xl font-bold mt-0.5">
+                <p className="text-xs font-semibold text-primary-600 dark:text-blue-300 tracking-wider uppercase">
                   {isEditMode
-                    ? "Update product details"
-                    : "Add a new product"}
+                    ? t("productForm.editProductBadge")
+                    : t("productForm.createProductBadge")}
+                </p>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white mt-0.5 tracking-tight">
+                  {isEditMode
+                    ? t("productForm.updateTitle")
+                    : t("productForm.createTitle")}
                 </h1>
-                <p className="text-sm text-white/50 mt-1">
-                  Fill in the details, upload images, and save.
+                <p className="text-sm text-slate-500 dark:text-blue-200/70 mt-1">
+                  {t("productForm.headerSubtitle")}
                 </p>
               </div>
             </div>
@@ -287,14 +294,14 @@ export default function ProductForm() {
               onClick={() => navigate("/dashboard/products")}
               disabled={submitting}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={submitting}>
               {submitting
-                ? "Saving..."
+                ? t("common.saving")
                 : isEditMode
-                ? "Update Product"
-                : "Create Product"}
+                ? t("productForm.updateProductBtn")
+                : t("productForm.createProductBtn")}
             </Button>
           </div>
         </form>

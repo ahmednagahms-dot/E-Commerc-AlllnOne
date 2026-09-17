@@ -57,8 +57,8 @@ export default function Dashboard() {
       setCustomers(usersList.filter((u) => u.role === "customer"));
     } catch (err) {
       console.error("Dashboard error:", err);
-      setError("Failed to load dashboard data. Please try again.");
-      toast.error("Failed to load dashboard data");
+      setError(t("dashboard.loadFailed"));
+      toast.error(t("dashboard.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -177,11 +177,13 @@ export default function Dashboard() {
               <select
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
-                className="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition cursor-pointer"
               >
                 {months.map((m) => (
                   <option key={m} value={m}>
-                    {m}
+                    {m === "All"
+                      ? t("dashboard.allMonths")
+                      : t(`dashboard.months.${m}`, m)}
                   </option>
                 ))}
               </select>
@@ -189,7 +191,7 @@ export default function Dashboard() {
               <select
                 value={year}
                 onChange={(e) => setYear(Number(e.target.value))}
-                className="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                className="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition cursor-pointer"
               >
                 {availableYears.map((y) => (
                   <option key={y} value={y}>
@@ -201,7 +203,7 @@ export default function Dashboard() {
               <button
                 onClick={() => fetchAll(true)}
                 disabled={loading}
-                className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-sm border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {loading ? t("dashboard.refreshing") : t("common.refresh")}
               </button>
@@ -214,9 +216,9 @@ export default function Dashboard() {
               <p className="text-red-500 font-medium mb-3">{error}</p>
               <button
                 onClick={() => fetchAll()}
-                className="text-sm px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition"
+                className="text-sm px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition cursor-pointer"
               >
-                Try again
+                {t("common.tryAgain")}
               </button>
             </div>
           ) : (

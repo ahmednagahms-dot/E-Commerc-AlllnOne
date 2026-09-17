@@ -33,6 +33,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function SalesOverviewChart({ data }) {
+  const { t } = useTranslation();
   const chartData =
     data?.revenue?.map((d, i) => ({
       label: d.label,
@@ -44,24 +45,26 @@ export default function SalesOverviewChart({ data }) {
     <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 lg:col-span-2">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-sm font-semibold text-gray-800">Sales Overview</h3>
+        <h3 className="text-sm font-semibold text-gray-800">
+          {t("dashboard.salesOverview")}
+        </h3>
 
         <div className="flex items-center gap-5 text-xs text-gray-500">
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
-            Revenue
+            {t("dashboard.revenue")}
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+            {t("dashboard.orders")}
           </span>
-
         </div>
       </div>
 
       {/* Chart */}
       {chartData.length === 0 ? (
         <div className="h-[280px] flex items-center justify-center text-sm text-gray-400">
-          No sales data for this period
+          {t("dashboard.noSalesInPeriod")}
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={280}>
@@ -90,7 +93,7 @@ export default function SalesOverviewChart({ data }) {
             <Line
               type="monotone"
               dataKey="revenue"
-              name="Revenue"
+              name={t("dashboard.revenue")}
               stroke="#4f46e5"
               strokeWidth={2.5}
               dot={false}
@@ -99,7 +102,7 @@ export default function SalesOverviewChart({ data }) {
             <Line
               type="monotone"
               dataKey="orders"
-              name="Orders"
+              name={t("dashboard.orders")}
               stroke="#34d399"
               strokeWidth={2.5}
               dot={false}

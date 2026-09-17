@@ -17,7 +17,8 @@
     "refresh": "تحديث",
     "admin": "إدارة المتجر الإلكتروني",
     "darkMode": "تفعيل الوضع الداكن",
-    "lightMode": "تفعيل الوضع الفاتح"
+    "lightMode": "تفعيل الوضع الفاتح",
+    "saving": "جارٍ الحفظ..."
   },
 
   "navigation": {
@@ -53,7 +54,9 @@
     "massage" : "سجّل الدخول إلى حسابك للوصول إلى لوحة التحكم",
     "or" : "أو سجل الدخول باستخدام الايميل وكلمة المرور",
     "rememberMe": "تذكرني",
-    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+    "signingIn": "جارٍ تسجيل الدخول...",
+    "loginSuccess": "تم تسجيل الدخول بنجاح!"  
   },
 
   "bannar": {
@@ -88,7 +91,29 @@
     "priceLowToHigh": "السعر: من الأقل إلى الأعلى",
     "priceHighToLow": "السعر: من الأعلى إلى الأقل",
     "highestRated": "الأعلى تقييمًا",
-    "clearFilters": "مسح التصفية"
+    "clearFilters": "مسح التصفية",
+    "filters": "تصفية",
+    "view": "عرض",
+    "edit": "تعديل",
+    "quickEdit": "تعديل سريع",
+    "delete": "حذف",
+    "itemsInStock": "{{count}} متوفر",
+    "outOfStockLabel": "غير متوفر",
+    "offDiscount": "خصم ${{amount}}",
+    "deleteModal": {
+      "title": "حذف المنتج",
+      "confirm": "هل أنت متأكد من حذف",
+      "warning": "هذا الإجراء نهائي ولا يمكن التراجع عنه.",
+      "error": "فشل حذف المنتج. يرجى المحاولة مرة أخرى.",
+      "deleting": "جارٍ الحذف..."
+    },
+    "quickEditModal": {
+      "title": "تعديل سريع للمنتج",
+      "loading": "جارٍ تحميل بيانات المنتج...",
+      "imageRequired": "يجب إضافة صورة واحدة على الأقل.",
+      "success": "تم تحديث المنتج بنجاح",
+      "error": "فشل حفظ المنتج. يرجى المحاولة مرة أخرى."
+    }
   },
   "pages": {
     "adminManagement": "إدارة المشرف",
@@ -184,7 +209,43 @@
     "phone": "الهاتف",
     "orderItems": "منتجات الطلب",
     "free": "مجانًا",
-    "orders": "الطلبات"
+    "orders": "الطلبات",
+    "confirmed": "مؤكد",
+    "processing": "قيد المعالجة",
+    "shipped": "تم الشحن",
+    "delivered": "تم التوصيل",
+    "cancelled": "ملغي",
+    "unpaid": "غير مدفوع",
+    "info": "المعلومات",
+    "customer": "العميل",
+    "email": "البريد الإلكتروني",
+    "items": "المنتجات",
+    "itemsWithCount": "المنتجات ({{count}})",
+    "noItems": "لا توجد منتجات",
+    "subtotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "tax": "الضريبة",
+    "updateStatus": "تحديث الحالة",
+    "adminNotePlaceholder": "ملاحظة المشرف (اختياري)...",
+    "saveChanges": "حفظ التغييرات",
+    "statusUpdatedSuccess": "تم تحديث حالة الطلب بنجاح!",
+    "statusUpdateFailed": "فشل تحديث حالة الطلب.",
+    "currency": "{{amount}} ج.م",
+    "na": "غير متوفر",
+    "resetFilters": "إعادة تعيين الفلاتر",
+    "adjustFiltersHint": "جرب تعديل الفلاتر أو معايير البحث.",
+    "showingPage": "عرض الصفحة {{current}} من {{total}}",
+    "prevPage": "الصفحة السابقة",
+    "nextPage": "الصفحة التالية",
+    "goToPage": "الانتقال إلى الصفحة {{page}}",
+    "unauthorized": "غير مصرح (401): جلسة المشرف غير صالحة أو منتهية.",
+    "notFound": "العنوان غير موجود (404)",
+    "loadFailed": "فشل تحميل الطلبات من الخادم.",
+    "searchAria": "البحث عن الطلبات برقم الطلب أو اسم العميل",
+    "clearSearch": "مسح البحث",
+    "filterStatusAria": "تصفية حسب الحالة",
+    "filterPaymentAria": "تصفية حسب حالة الدفع",
+    "filterMethodAria": "تصفية حسب طريقة الدفع"
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -218,50 +279,302 @@
     "topProducts": "أفضل المنتجات",
     "noSales": "لا توجد مبيعات في هذه الفترة.",
     "sold": "تم بيع {{count}}",
-    "vsLastPeriod": "مقارنة بالفترة السابقة"
+    "vsLastPeriod": "مقارنة بالفترة السابقة",
+    "allMonths": "كل الشهور",
+    "noOrdersInPeriod": "لا توجد طلبات في هذه الفترة",
+    "ordersCount": "{{count}} طلبات",
+    "noSalesInPeriod": "لا توجد مبيعات في هذه الفترة",
+    "months": {
+      "January": "يناير",
+      "February": "فبراير",
+      "March": "مارس",
+      "April": "أبريل",
+      "May": "مايو",
+      "June": "يونيو",
+      "July": "يوليو",
+      "August": "أغسطس",
+      "September": "سبتمبر",
+      "October": "أكتوبر",
+      "November": "نوفمبر",
+      "December": "ديسمبر"
+    }
   },
-  "wishlists": {
-    "loading": "جارٍ تحميل قوائم الأمنيات...",
-    "title": "نظرة عامة على قوائم الأمنيات",
-    "description": "يتم عرض جميع قوائم الأمنيات النشطة التي أعادتها الخدمة مع أحدث تفاصيل العناصر.",
-    "empty": "لم تُرجع الخدمة أي قوائم أمنيات"
+  "categoryNames": {
+    "electronics": "إلكترونيات",
+    "phones": "هواتف",
+    "fashion": "أزياء",
+    "home": "منزل",
+    "beauty": "جمال وعناية",
+    "sports": "رياضة"
   },
-  "coupons": {
-    "loading": "جارٍ تحميل الكوبونات...",
-    "title": "نظرة عامة على الكوبونات",
-    "description": "يتم عرض جميع الكوبونات النشطة التي أعادتها الخدمة مع أحدث تفاصيل العناصر.",
-    "empty": "لم تُرجع الخدمة أي كوبونات"
+  "productForm": {
+    "loadingProduct": "جارٍ تحميل بيانات المنتج...",
+    "backToProducts": "العودة للمنتجات",
+    "createProductBadge": "إنشاء منتج",
+    "editProductBadge": "تعديل المنتج",
+    "createTitle": "إضافة منتج جديد",
+    "updateTitle": "تحديث بيانات المنتج",
+    "headerSubtitle": "املأ البيانات، وارفع الصور، ثم احفظ المنتج.",
+    "createProductBtn": "إنشاء المنتج",
+    "updateProductBtn": "تحديث المنتج",
+    "gallery": {
+      "title": "معرض صور المنتج",
+      "subtitle": "حتى 5 صور · الصورة الأولى هي صورة الغلاف",
+      "cover": "الغلاف",
+      "new": "جديدة",
+      "removeImage": "حذف الصورة",
+      "uploadPrompt": "انقر أو اسحب الصور إلى هنا",
+      "uploadFormats": "PNG, JPG, WEBP"
+    },
+    "organization": {
+      "title": "التنظيم والتصنيف",
+      "subtitle": "الفئة، العلامة التجارية، والوسوم",
+      "category": "الفئة",
+      "subcategory": "الفئة الفرعية",
+      "subcategoryPlaceholder": "مثال: صوتيات",
+      "brand": "العلامة التجارية",
+      "brandPlaceholder": "مثال: Sony"
+    },
+    "visibility": {
+      "title": "خيارات الظهور",
+      "featured": "منتج مميز",
+      "featuredSubtitle": "تمييز المنتج في المتجر",
+      "active": "مفعل",
+      "activeSubtitle": "متاح للشراء للعملاء"
+    },
+    "basicInfo": {
+      "title": "المعلومات الأساسية",
+      "name": "اسم المنتج",
+      "namePlaceholder": "آيفون 16 برو",
+      "shortDescription": "الوصف القصير",
+      "shortDescriptionPlaceholder": "ملخص مختصر وجذاب للمنتج",
+      "description": "الوصف الكامل",
+      "descriptionPlaceholder": "تفاصيل المنتج الكاملة، المواصفات، والمميزات...",
+      "charCount": "{{count}} حرف"
+    },
+    "pricing": {
+      "title": "التسعير والمخزون",
+      "price": "السعر",
+      "discountPrice": "سعر الخصم",
+      "stock": "المخزون",
+      "sku": "رمز التخزين (SKU)",
+      "optional": "اختياري"
+    },
+    "tags": {
+      "title": "الوسوم",
+      "placeholder": "اكتب وسماً ثم اضغط +",
+      "hint": "أضف وسماً أو أكثر للمساعدة في تنظيم وتصنيف المنتج."
+    },
+    "tip": {
+      "title": "نصيحة سريعة",
+      "content": "تسمية المنتج بوضوح ووضع صورة غلاف مميزة يساعدان على تحسين ظهوره في نتائج البحث وصفحات الأقسام."
+    },
+    "validation": {
+      "required": "هذا الحقل مطلوب",
+      "minChars": "الحد الأدنى {{count}} أحرف"
+    },
+    "errors": {
+      "loadFailed": "فشل تحميل بيانات المنتج.",
+      "imageRequired": "يجب إضافة صورة واحدة على الأقل.",
+      "discountPriceError": "يجب أن يكون سعر الخصم أقل من السعر الأصلي.",
+      "saveFailed": "حدث خطأ أثناء حفظ المنتج."
+    },
+    "messages": {
+      "createSuccess": "تمت إضافة المنتج بنجاح!",
+      "updateSuccess": "تم تحديث المنتج بنجاح!"
+    }
   },
-  "notifications": {
-    "loading": "جارٍ تحميل الإشعارات...",
-    "title": "نظرة عامة على الإشعارات",
-    "description": "يتم عرض جميع الإشعارات النشطة التي أعادتها الخدمة مع أحدث تفاصيل العناصر.",
-    "empty": "لم تُرجع الخدمة أي إشعارات"
+  "productView": {
+    "loading": "جارٍ تحميل تفاصيل المنتج...",
+    "loadErrorTitle": "تعذر تحميل المنتج",
+    "notFoundTitle": "المنتج غير موجود",
+    "loadFailed": "فشل تحميل تفاصيل المنتج.",
+    "notFoundMessage": "المنتج الذي تبحث عنه غير متوفر أو ربما تم حذفه.",
+    "backToProducts": "العودة للمنتجات",
+    "editProduct": "تعديل المنتج",
+    "noImage": "لا توجد صورة",
+    "featured": "منتج مميز",
+    "saveAmount": "وفر ${{amount}}",
+    "stock": "المخزون:",
+    "outOfStock": "نفد المخزون",
+    "available": "{{count}} متوفر",
+    "sku": "رمز التخزين (SKU)",
+    "brand": "العلامة التجارية",
+    "category": "الفئة",
+    "subcategory": "الفئة الفرعية",
+    "description": "وصف المنتج",
+    "noDescription": "لا يوجد وصف متاح لهذا المنتج.",
+    "tags": "الوسوم"
+  },
+  "users": {
+    "title": "المستخدمون",
+    "user": "المستخدم",
+    "role": "الدور",
+    "verified": "موثق",
+    "notVerified": "غير موثق",
+    "actions": "الإجراءات",
+    "customer": "عميل",
+    "admin": "مشرف",
+    "noUsers": "لم يتم العثور على مستخدمين!",
+    "editUser": "تعديل المستخدم",
+    "addUser": "إضافة مستخدم جديد",
+    "verifyUser": "توثيق المستخدم",
+    "removeVerification": "إلغاء التوثيق",
+    "deleteUser": "حذف المستخدم",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "Password123!",
+    "avatar": "الصورة الشخصية",
+    "clickToUpload": "انقر للرفع",
+    "uploading": "جارٍ الرفع...",
+    "updateUser": "تحديث المستخدم",
+    "saveUser": "حفظ المستخدم",
+    "updating": "جارٍ التحديث...",
+    "adding": "جارٍ الإضافة...",
+    "imageUploadSuccess": "تم رفع الصورة بنجاح",
+    "imageUploadError": "حدث خطأ أثناء رفع الصورة!",
+    "userCreatedSuccess": "تم إنشاء المستخدم بنجاح",
+    "userUpdatedSuccess": "تم تحديث المستخدم بنجاح",
+    "userSaveError": "حدثت مشكلة أثناء حفظ بيانات المستخدم.",
+    "userDeleteSuccess": "تم حذف المستخدم بنجاح",
+    "userDeleteError": "فشل حذف المستخدم",
+    "userVerifySuccess": "تم توثيق المستخدم بنجاح",
+    "userUnverifySuccess": "تم إلغاء توثيق المستخدم",
+    "userVerifyError": "فشل تحديث حالة توثيق المستخدم",
+    "deleteModal": {
+      "title": "هل أنت متأكد من حذف هذا المستخدم؟",
+      "warning": "عند الحذف، لن تتمكن من استعادة بياناته. هذه الخطوة نهائية.",
+      "deleting": "جارٍ الحذف..."
+    },
+    "view": {
+      "totalOrders": "إجمالي الطلبات",
+      "current": "الحالية",
+      "paid": "مدفوعة",
+      "cancelled": "ملغية",
+      "contactInfo": "معلومات الاتصال",
+      "addresses": "العناوين",
+      "noAddresses": "لا توجد عناوين مسجلة."
+    }
+  },
+  "profile": {
+    "accountSettings": "إعدادات الحساب",
+    "title": "الملف الشخصي",
+    "description": "تحديث ملفك الشخصي ومعلومات الاتصال الخاصة بك.",
+    "uploadPhoto": "رفع صورة جديدة",
+    "activeStatus": "حساب نشط",
+    "personalInfo": "المعلومات الشخصية",
+    "personalInfoDesc": "قم بتحديث اسم العرض ورقم الهاتف الخاص بك.",
+    "username": "اسم المستخدم",
+    "usernamePlaceholder": "اسم المستخدم الخاص بك",
+    "usernameRequired": "اسم المستخدم مطلوب",
+    "usernameMinLength": "يجب أن يتكون اسم المستخدم من 3 أحرف على الأقل",
+    "emailAddress": "البريد الإلكتروني",
+    "emailNotice": "لا يمكن تغيير البريد الإلكتروني مباشرةً. تواصل مع الدعم للمساعدة.",
+    "phoneNumber": "رقم الهاتف",
+    "phonePlaceholder": "+20 110 460 9842",
+    "phoneInvalid": "يرجى إدخال رقم هاتف صالح",
+    "saveInfo": "حفظ المعلومات الشخصية",
+    "saving": "جارٍ حفظ التغييرات...",
+    "invalidImage": "يرجى رفع ملف صورة صالح.",
+    "avatarUpdated": "تم رفع الصورة بنجاح! انقر على 'حفظ المعلومات الشخصية' للتطبيق.",
+    "avatarUploadFailed": "فشل رفع الصورة. يرجى المحاولة مرة أخرى.",
+    "profileUpdated": "تم تحديث الملف الشخصي بنجاح!",
+    "profileUpdateFailed": "فشل تحديث بيانات الملف الشخصي."
   },
   "reviews": {
-    "loading": "جارٍ تحميل المراجعات...",
-    "added": "تمت إضافة المراجعة بنجاح!",
-    "addFailed": "تعذرت إضافة المراجعة",
-    "addFailedRetry": "تعذرت إضافة المراجعة. حاول مرة أخرى.",
+    "title": "المراجعات والتقييمات",
+    "description": "عرض إجمالي {{count}} مراجعة من عملائك.",
     "add": "إضافة مراجعة",
-    "delete": "حذف المراجعة",
-    "deleteConfirm": "هل أنت متأكد من حذف هذه المراجعة؟ لا يمكن التراجع عن هذا الإجراء.",
+    "adding": "جارٍ الإضافة...",
+    "added": "تمت إضافة المراجعة بنجاح!",
+    "addFailedRetry": "فشلت إضافة المراجعة. يرجى المحاولة مرة أخرى.",
     "product": "المنتج",
     "selectProduct": "يرجى اختيار منتج",
-    "selectProductOption": "اختر منتجًا...",
+    "selectProductOption": "اختر منتجاً...",
     "rating": "التقييم",
     "comment": "التعليق",
     "commentRequired": "التعليق مطلوب",
-    "writeReview": "اكتب مراجعتك...",
-    "adding": "جارٍ الإضافة...",
-    "loadFailed": "تعذر تحميل المراجعات.",
-    "description": "مراجعات العملاء على جميع المنتجات. إجمالي المراجعات: {{count}}.",
+    "writeReview": "اكتب مراجعتك هنا...",
+    "delete": "حذف المراجعة",
+    "deleteConfirm": "هل أنت متأكد من حذف هذه المراجعة؟ لا يمكن التراجع عن هذا الإجراء.",
+    "deleteSuccess": "تم حذف المراجعة بنجاح.",
+    "deleteFailed": "فشل حذف المراجعة.",
     "averageRating": "متوسط التقييم",
     "total": "إجمالي المراجعات",
-    "search": "ابحث باسم العميل أو المنتج...",
+    "search": "البحث عن طريق العميل أو المنتج...",
     "customer": "العميل",
     "date": "التاريخ",
     "actions": "الإجراءات",
-    "empty": "لم يتم العثور على مراجعات"
+    "empty": "لم يتم العثور على مراجعات.",
+    "loading": "جارٍ تحميل المراجعات...",
+    "loadFailed": "فشل تحميل المراجعات."
+  },
+  "productView": {
+    "loading": "جارٍ تحميل تفاصيل المنتج...",
+    "loadFailed": "فشل تحميل تفاصيل المنتج.",
+    "loadErrorTitle": "فشل تحميل المنتج",
+    "notFoundTitle": "المنتج غير موجود",
+    "notFoundMessage": "المنتج المطلوب غير متوفر أو تم حذفه.",
+    "backToProducts": "الرجوع إلى المنتجات",
+    "editProduct": "تعديل المنتج",
+    "noImage": "لا توجد صورة متوفرة",
+    "featured": "مميز",
+    "saveAmount": "وفر ${{amount}}",
+    "stock": "المخزون:",
+    "outOfStock": "نفد من المخزون",
+    "available": "متوفر {{count}} قطعة",
+    "sku": "رمز التخزين (SKU)",
+    "brand": "العلامة التجارية",
+    "category": "التصنيف",
+    "subcategory": "التصنيف الفرعي",
+    "description": "وصف المنتج",
+    "noDescription": "لا يوجد وصف متاح لهذا المنتج.",
+    "tags": "الوسوم"
+  },
+  "coupons": {
+    "title": "الكوبونات",
+    "description": "إنشاء وإدارة كوبونات الخصم الترويجية لمتجرك.",
+    "loading": "جارٍ تحميل الكوبونات...",
+    "empty": "لا توجد كوبونات متاحة حالياً."
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "description": "عرض وإدارة جميع تنبيهات وتحديثات النظام.",
+    "loading": "جارٍ تحميل الإشعارات...",
+    "empty": "لا توجد إشعارات جديدة حالياً."
+  },
+  "wishlists": {
+    "title": "نظرة عامة على قوائم الرغبات",
+    "description": "جميع قوائم رغبات العملاء النشطة والمنتجات المحفوظة.",
+    "loading": "جارٍ تحميل قوائم الرغبات...",
+    "empty": "لم يتم العثور على قوائم رغبات",
+    "wishlistNumber": "قائمة رغبات رقم {{number}}",
+    "itemsCount": "{{count}} عناصر",
+    "user": "المستخدم",
+    "id": "المعرّف"
+  },
+  "categoryModal": {
+    "title": "إضافة تصنيف جديد",
+    "notice": "لا توجد نقطة نهاية (API) للتصنيفات في الخادم بعد، لذا يتم حفظ هذا التصنيف محلياً في متصفحك فقط. سيظهر في قائمة تصنيفات نموذج المنتج، ولكنه لن يتزامن مع أعضاء الفريق حتى تتم إضافة واجهة برمجية حقيقية للتصنيفات.",
+    "noticeBold": "محلياً في متصفحك",
+    "nameLabel": "اسم التصنيف",
+    "namePlaceholder": "مثال: إكسسوارات",
+    "nameRequired": "اسم التصنيف مطلوب",
+    "nameEmpty": "لا يمكن أن يكون اسم التصنيف مسافات فارغة",
+    "cancel": "إلغاء",
+    "save": "حفظ التصنيف",
+    "saving": "جارٍ الحفظ...",
+    "success": "تمت إضافة التصنيف \"{{name}}\" بنجاح",
+    "failed": "فشلت إضافة التصنيف"
+  },
+  "pagination": {
+    "showing": "عرض من {{start}} إلى {{end}} من إجمالي {{total}}",
+    "prev": "الصفحة السابقة",
+    "next": "الصفحة التالية"
+  },
+  "carts": {
+    "moreItems": "+{{count}} المزيد",
+    "unknown": "غير معروف"
   }
 }

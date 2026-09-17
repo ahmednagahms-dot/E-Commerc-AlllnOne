@@ -239,7 +239,7 @@ export default function Carts() {
                   <table className="w-full text-sm" role="table">
                     <thead>
                       <tr
-                        className="text-left text-gray-400 border-b"
+                        className="text-left rtl:text-right text-gray-400 border-b"
                         role="row"
                       >
                         <th className="py-2 font-medium" scope="col">
@@ -278,7 +278,7 @@ export default function Carts() {
                               </div>
                               <div>
                                 <p className="font-medium">
-                                  {cart.user?.username || "Unknown"}
+                                  {cart.user?.username || t("carts.unknown")}
                                 </p>
                                 <p className="text-xs text-gray-400">
                                   {cart.user?.email}
@@ -303,7 +303,9 @@ export default function Carts() {
                               ))}
                               {cart.items?.length > 2 && (
                                 <span className="text-xs text-gray-400">
-                                  +{cart.items.length - 2} more
+                                  {t("carts.moreItems", {
+                                    count: cart.items.length - 2,
+                                  })}
                                 </span>
                               )}
                             </div>
