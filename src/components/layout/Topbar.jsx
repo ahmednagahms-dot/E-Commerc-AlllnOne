@@ -1,6 +1,6 @@
 import { Bell, Menu, User, Sun, Moon } from "lucide-react";
 import * as Icons from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { sidebarLinks } from "../../data/sidebarLinks";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -22,7 +22,7 @@ export default function Topbar({ onMenuClick }) {
   const pageTitle = currentPage?.label || "navigation.dashboard";
 
   return (
-    <header className="h-16 bg-surface border-b border-border-subtle flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20 shadow-sm transition-colors">
+    <header className="h-16 bg-surface/80 backdrop-blur-md border-b border-border-subtle/70 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20 shadow-xs transition-colors">
       <div className="flex items-center gap-3">
         <button
           onClick={onMenuClick}
@@ -53,10 +53,15 @@ export default function Topbar({ onMenuClick }) {
         >
           {isDark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
-        <button className="relative text-gray-500 hover:bg-gray-100 p-2 rounded-lg">
+        <Link
+          to="/dashboard/notifications"
+          className="relative text-gray-500 hover:bg-gray-100 p-2 rounded-lg dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+          title={t("navigation.notifications")}
+          aria-label={t("navigation.notifications")}
+        >
           <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500"></span>
-        </button>
+          
+        </Link>
 
         <div className="w-px h-6 bg-gray-200 hidden sm:block"></div>
 

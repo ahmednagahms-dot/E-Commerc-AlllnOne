@@ -55,7 +55,7 @@ export default function Profile() {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      toast.error("Please upload a valid image file.");
+      toast.error(t("profile.invalidImage"));
       return;
     }
 
@@ -63,11 +63,9 @@ export default function Profile() {
       setUploading(true);
       const url = await uploadToCloudinary(file);
       setAvatar(url);
-      toast.success(
-        "Avatar updated successfully! Click 'Save Personal Info' to apply."
-      );
+      toast.success(t("profile.avatarUpdated"));
     } catch (err) {
-      toast.error(t("errors.uploadImage") || "Failed to upload image. Please try again.");
+      toast.error(t("profile.avatarUploadFailed"));
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -89,13 +87,12 @@ export default function Profile() {
 
       const updatedUser = response.data?.user || response.data;
       updateUser(updatedUser);
-      toast.success(t("pages.profileUpdated") || "Profile updated successfully!");
+      toast.success(t("profile.profileUpdated"));
     } catch (err) {
       console.error("Update Profile Error:", err.response?.data);
       toast.error(
         err.response?.data?.message ||
-          t("errors.updateProfile") ||
-          "Failed to update profile information."
+          t("profile.profileUpdateFailed")
       );
     } finally {
       setSavingProfile(false);
@@ -110,14 +107,13 @@ export default function Profile() {
         {/* Header */}
         <div>
           <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block mb-1">
-            {t("pages.userManagement") || "Account Settings"}
+            {t("profile.accountSettings")}
           </span>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-            {t("pages.profile") || "Account Settings"}
+            {t("profile.title")}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            {t("pages.profileDescription") ||
-              "Update your personal profile and contact information."}
+            {t("profile.description")}
           </p>
         </div>
 
@@ -144,8 +140,8 @@ export default function Profile() {
                 {/* Upload Button */}
                 <label
                   htmlFor="avatar-upload"
-                  className="absolute bottom-1 right-1 w-9 h-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center shadow-md cursor-pointer transition transform hover:scale-105"
-                  title="Upload New Photo"
+                  className="absolute bottom-1 right-1 rtl:right-auto rtl:left-1 w-9 h-9 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex items-center justify-center shadow-md cursor-pointer transition transform hover:scale-105"
+                  title={t("profile.uploadPhoto")}
                 >
                   <Camera size={16} />
                   <input
@@ -169,11 +165,11 @@ export default function Profile() {
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800 capitalize">
                   <ShieldCheck size={13} />
-                  {user.role || "User"}
+                  {t(`users.roles.${user.role?.toLowerCase()}`, { defaultValue: user.role }) || "User"}
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800">
                   <CheckCircle2 size={13} />
-                  Active Status
+                  {t("profile.activeStatus")}
                 </span>
               </div>
             </div>
@@ -188,10 +184,10 @@ export default function Profile() {
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-800 dark:text-white text-base">
-                    {t("pages.personalInformation") || "Personal Information"}
+                    {t("profile.personalInfo")}
                   </h3>
                   <p className="text-xs text-slate-400 dark:text-slate-400">
-                    Update your display name and contact phone number.
+                    {t("profile.personalInfoDesc")}
                   </p>
                 </div>
               </div>
@@ -203,24 +199,24 @@ export default function Profile() {
                 {/* Username */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                    {t("pages.username") || "Username"} <span className="text-rose-500">*</span>
+                    {t("profile.username")} <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <User
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                      className="absolute left-3.5 rtl:left-auto rtl:right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                       size={16}
                     />
                     <input
                       type="text"
-                      placeholder="Your username"
+                      placeholder={t("profile.usernamePlaceholder")}
                       {...registerProfile("username", {
-                        required: t("errors.usernameRequired") || "Username is required",
+                        required: t("profile.usernameRequired"),
                         minLength: {
                           value: 3,
-                          message: "Username must be at least 3 characters",
+                          message: t("profile.usernameMinLength"),
                         },
                       })}
-                      className="w-full bg-slate-50/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+                      className="w-full bg-slate-50/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 rtl:pl-3.5 rtl:pr-10 py-2.5 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
                     />
                   </div>
                   {profileErrors.username && (
@@ -233,11 +229,11 @@ export default function Profile() {
                 {/* Email Address */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                    {t("pages.emailAddress") || "Email Address"}
+                    {t("profile.emailAddress")}
                   </label>
                   <div className="relative">
                     <Mail
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                      className="absolute left-3.5 rtl:left-auto rtl:right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                       size={16}
                     />
                     <input
@@ -245,34 +241,34 @@ export default function Profile() {
                       value={user.email}
                       disabled
                       readOnly
-                      className="w-full bg-slate-100/70 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl pl-10 pr-3.5 py-2.5 text-sm cursor-not-allowed select-none"
+                      className="w-full bg-slate-100/70 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 rounded-xl pl-10 pr-3.5 rtl:pl-3.5 rtl:pr-10 py-2.5 text-sm cursor-not-allowed select-none"
                     />
                   </div>
                   <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
-                    Email cannot be changed directly. Contact support for assistance.
+                    {t("profile.emailNotice")}
                   </p>
                 </div>
 
                 {/* Phone Number */}
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                    {t("pages.phoneNumber") || "Phone Number"}
+                    {t("profile.phoneNumber")}
                   </label>
                   <div className="relative">
                     <Phone
-                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                      className="absolute left-3.5 rtl:left-auto rtl:right-3.5 top-1/2 -translate-y-1/2 text-slate-400"
                       size={16}
                     />
                     <input
                       type="text"
-                      placeholder="+20 110 460 9842"
+                      placeholder={t("profile.phonePlaceholder")}
                       {...registerProfile("phone", {
                         pattern: {
                           value: /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s./0-9]*$/,
-                          message: "Please enter a valid phone number",
+                          message: t("profile.phoneInvalid"),
                         },
                       })}
-                      className="w-full bg-slate-50/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
+                      className="w-full bg-slate-50/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 rtl:pl-3.5 rtl:pr-10 py-2.5 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-900 transition"
                     />
                   </div>
                   {profileErrors.phone && (
@@ -296,12 +292,12 @@ export default function Profile() {
                     {savingProfile ? (
                       <>
                         <Loader2 size={15} className="animate-spin" />
-                        <span>{t("pages.saving") || "Saving Changes..."}</span>
+                        <span>{t("profile.saving")}</span>
                       </>
                     ) : (
                       <>
                         <Save size={15} />
-                        <span>{t("pages.saveChanges") || "Save Personal Info"}</span>
+                        <span>{t("profile.saveInfo")}</span>
                       </>
                     )}
                   </button>

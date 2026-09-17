@@ -17,7 +17,8 @@
     "refresh": "Refresh",
     "admin": "E-commerce Admin",
     "darkMode": "Enable dark mode",
-    "lightMode": "Enable light mode"
+    "lightMode": "Enable light mode",
+    "saving": "Saving..."
   },
 
   "navigation": {
@@ -53,7 +54,9 @@
     "massage" : "Sign in to your account to access the admin dashboard",
     "or": "Sign in to your ShopEase admin account",
     "rememberMe": "Remember Me",
-    "invalidCredentials": "Invalid email or password"
+    "invalidCredentials": "Invalid email or password",
+    "signingIn": "Signing In...",
+    "loginSuccess": "Logged in successfully!"
   },
 
   "bannar": {
@@ -88,7 +91,29 @@
     "priceLowToHigh": "Price: Low to High",
     "priceHighToLow": "Price: High to Low",
     "highestRated": "Highest Rated",
-    "clearFilters": "Clear Filters"
+    "clearFilters": "Clear Filters",
+    "filters": "Filters",
+    "view": "View",
+    "edit": "Edit",
+    "quickEdit": "Quick Edit",
+    "delete": "Delete",
+    "itemsInStock": "{{count}} in stock",
+    "outOfStockLabel": "Out of stock",
+    "offDiscount": "-${{amount}} off",
+    "deleteModal": {
+      "title": "Delete Product",
+      "confirm": "Are you sure you want to delete",
+      "warning": "This action is permanent and cannot be undone.",
+      "error": "Failed to delete product. Please try again.",
+      "deleting": "Deleting..."
+    },
+    "quickEditModal": {
+      "title": "Quick Edit Product",
+      "loading": "Loading product...",
+      "imageRequired": "At least 1 image is required.",
+      "success": "Product updated successfully",
+      "error": "Failed to save product. Please try again."
+    }
   },
   "pages": {
     "adminManagement": "Admin · Management",
@@ -184,7 +209,43 @@
     "phone": "Phone",
     "orderItems": "Order Items",
     "free": "Free",
-    "orders": "Orders"
+    "orders": "Orders",
+    "confirmed": "Confirmed",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "unpaid": "Unpaid",
+    "info": "Info",
+    "customer": "Customer",
+    "email": "Email",
+    "items": "Items",
+    "itemsWithCount": "Items ({{count}})",
+    "noItems": "No items",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "updateStatus": "Update Status",
+    "adminNotePlaceholder": "Admin note (optional)...",
+    "saveChanges": "Save changes",
+    "statusUpdatedSuccess": "Order status updated successfully!",
+    "statusUpdateFailed": "Failed to update order status.",
+    "currency": "{{amount}} EGP",
+    "na": "N/A",
+    "resetFilters": "Reset Filters",
+    "adjustFiltersHint": "Try adjusting your filters or search criteria.",
+    "showingPage": "Showing page {{current}} of {{total}}",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "goToPage": "Go to page {{page}}",
+    "unauthorized": "Unauthorized (401): Invalid or expired admin session.",
+    "notFound": "Endpoint Not Found (404)",
+    "loadFailed": "Failed to load orders from server.",
+    "searchAria": "Search orders by ID or customer",
+    "clearSearch": "Clear search",
+    "filterStatusAria": "Filter by status",
+    "filterPaymentAria": "Filter by payment status",
+    "filterMethodAria": "Filter by payment method"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -218,50 +279,302 @@
     "topProducts": "Top Products",
     "noSales": "No sales in this period.",
     "sold": "{{count}} sold",
-    "vsLastPeriod": "vs last period"
+    "vsLastPeriod": "vs last period",
+    "allMonths": "All Months",
+    "noOrdersInPeriod": "No orders in this period",
+    "ordersCount": "{{count}} orders",
+    "noSalesInPeriod": "No sales in this period",
+    "months": {
+      "January": "January",
+      "February": "February",
+      "March": "March",
+      "April": "April",
+      "May": "May",
+      "June": "June",
+      "July": "July",
+      "August": "August",
+      "September": "September",
+      "October": "October",
+      "November": "November",
+      "December": "December"
+    }
   },
-  "wishlists": {
-    "loading": "Loading wishlists...",
-    "title": "Wishlists overview",
-    "description": "All active wishlists returned from the API are rendered here with their latest item details.",
-    "empty": "No wishlists returned from API"
+  "categoryNames": {
+    "electronics": "Electronics",
+    "phones": "Phones",
+    "fashion": "Fashion",
+    "home": "Home",
+    "beauty": "Beauty",
+    "sports": "Sports"
   },
-  "coupons": {
-    "loading": "Loading coupons...",
-    "title": "Coupons overview",
-    "description": "All active coupons returned from the API are rendered here with their latest item details.",
-    "empty": "No coupons returned from API"
+  "productForm": {
+    "loadingProduct": "Loading product...",
+    "backToProducts": "Back to products",
+    "createProductBadge": "Create Product",
+    "editProductBadge": "Edit Product",
+    "createTitle": "Add a new product",
+    "updateTitle": "Update product details",
+    "headerSubtitle": "Fill in the details, upload images, and save.",
+    "createProductBtn": "Create Product",
+    "updateProductBtn": "Update Product",
+    "gallery": {
+      "title": "Product Gallery",
+      "subtitle": "Up to 5 images · first image is the cover",
+      "cover": "COVER",
+      "new": "NEW",
+      "removeImage": "Remove image",
+      "uploadPrompt": "Click or drag images here",
+      "uploadFormats": "PNG, JPG, WEBP"
+    },
+    "organization": {
+      "title": "Organization",
+      "subtitle": "Category, brand, and tags",
+      "category": "Category",
+      "subcategory": "Subcategory",
+      "subcategoryPlaceholder": "e.g. audio",
+      "brand": "Brand",
+      "brandPlaceholder": "e.g. Sony"
+    },
+    "visibility": {
+      "title": "Visibility",
+      "featured": "Featured",
+      "featuredSubtitle": "Highlight in store",
+      "active": "Active",
+      "activeSubtitle": "Available for purchase"
+    },
+    "basicInfo": {
+      "title": "Basic Information",
+      "name": "Product Name",
+      "namePlaceholder": "iPhone 16 Pro",
+      "shortDescription": "Short Description",
+      "shortDescriptionPlaceholder": "A brief, catchy summary",
+      "description": "Description",
+      "descriptionPlaceholder": "Full product details, specs, and features...",
+      "charCount": "{{count}} characters"
+    },
+    "pricing": {
+      "title": "Pricing & Inventory",
+      "price": "Price",
+      "discountPrice": "Discount Price",
+      "stock": "Stock",
+      "sku": "SKU",
+      "optional": "Optional"
+    },
+    "tags": {
+      "title": "Tags",
+      "placeholder": "Type a tag and press +",
+      "hint": "Add one or more tags to organize the product."
+    },
+    "tip": {
+      "title": "Quick tip",
+      "content": "Clear product names and a cover image improve visibility in search and category pages."
+    },
+    "validation": {
+      "required": "Required",
+      "minChars": "Minimum {{count}} characters"
+    },
+    "errors": {
+      "loadFailed": "Failed to load product data.",
+      "imageRequired": "At least one image is required.",
+      "discountPriceError": "Discount price must be less than the original price.",
+      "saveFailed": "Something went wrong while saving the product."
+    },
+    "messages": {
+      "createSuccess": "Product added successfully!",
+      "updateSuccess": "Product updated successfully!"
+    }
   },
-  "notifications": {
-    "loading": "Loading notifications...",
-    "title": "Notifications overview",
-    "description": "All active notifications returned from the API are rendered here with their latest item details.",
-    "empty": "No notifications returned from API"
+  "productView": {
+    "loading": "Loading product...",
+    "loadErrorTitle": "Unable to load product",
+    "notFoundTitle": "Product Not Found",
+    "loadFailed": "Failed to load product details.",
+    "notFoundMessage": "The product you are looking for does not exist.",
+    "backToProducts": "Back to Products",
+    "editProduct": "Edit Product",
+    "noImage": "No image",
+    "featured": "Featured",
+    "saveAmount": "Save ${{amount}}",
+    "stock": "Stock:",
+    "outOfStock": "Out of Stock",
+    "available": "{{count}} available",
+    "sku": "SKU",
+    "brand": "Brand",
+    "category": "Category",
+    "subcategory": "Subcategory",
+    "description": "Product Description",
+    "noDescription": "No description available.",
+    "tags": "Tags"
+  },
+  "users": {
+    "title": "Users",
+    "user": "User",
+    "role": "Role",
+    "verified": "Verified",
+    "notVerified": "Not Verified",
+    "actions": "Actions",
+    "customer": "Customer",
+    "admin": "Admin",
+    "noUsers": "No users found!",
+    "editUser": "Edit User",
+    "addUser": "Add New User",
+    "verifyUser": "Verify User",
+    "removeVerification": "Remove Verification",
+    "deleteUser": "Delete User",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordPlaceholder": "Password123!",
+    "avatar": "Avatar",
+    "clickToUpload": "Click to Upload",
+    "uploading": "Uploading...",
+    "updateUser": "Update User",
+    "saveUser": "Save User",
+    "updating": "Updating...",
+    "adding": "Adding...",
+    "imageUploadSuccess": "Image uploaded successfully",
+    "imageUploadError": "Error uploading image!",
+    "userCreatedSuccess": "User created successfully",
+    "userUpdatedSuccess": "User updated successfully",
+    "userSaveError": "There was a problem saving the user.",
+    "userDeleteSuccess": "User deleted successfully",
+    "userDeleteError": "Failed to delete user",
+    "userVerifySuccess": "User verified successfully",
+    "userUnverifySuccess": "User verification removed",
+    "userVerifyError": "Failed to update user verification",
+    "deleteModal": {
+      "title": "Are you sure you want to delete this user?",
+      "warning": "If you delete it, you won't be able to recover its data. This step is final.",
+      "deleting": "Deleting..."
+    },
+    "view": {
+      "totalOrders": "Total Orders",
+      "current": "Current",
+      "paid": "Paid",
+      "cancelled": "Cancelled",
+      "contactInfo": "Contact Info",
+      "addresses": "Addresses",
+      "noAddresses": "No saved addresses."
+    }
+  },
+  "profile": {
+    "accountSettings": "Account Settings",
+    "title": "Profile",
+    "description": "Update your personal profile and contact information.",
+    "uploadPhoto": "Upload New Photo",
+    "activeStatus": "Active Status",
+    "personalInfo": "Personal Information",
+    "personalInfoDesc": "Update your display name and contact phone number.",
+    "username": "Username",
+    "usernamePlaceholder": "Your username",
+    "usernameRequired": "Username is required",
+    "usernameMinLength": "Username must be at least 3 characters",
+    "emailAddress": "Email Address",
+    "emailNotice": "Email cannot be changed directly. Contact support for assistance.",
+    "phoneNumber": "Phone Number",
+    "phonePlaceholder": "+20 110 460 9842",
+    "phoneInvalid": "Please enter a valid phone number",
+    "saveInfo": "Save Personal Info",
+    "saving": "Saving Changes...",
+    "invalidImage": "Please upload a valid image file.",
+    "avatarUpdated": "Avatar updated successfully! Click 'Save Personal Info' to apply.",
+    "avatarUploadFailed": "Failed to upload image. Please try again.",
+    "profileUpdated": "Profile updated successfully!",
+    "profileUpdateFailed": "Failed to update profile information."
   },
   "reviews": {
-    "loading": "Loading reviews...",
-    "added": "Review added successfully!",
-    "addFailed": "Failed to add review",
-    "addFailedRetry": "Failed to add review. Please try again.",
+    "title": "Reviews",
+    "description": "Showing {{count}} total reviews from your customers.",
     "add": "Add Review",
-    "delete": "Delete Review",
-    "deleteConfirm": "Are you sure you want to delete this review? This action cannot be undone.",
+    "adding": "Adding...",
+    "added": "Review added successfully!",
+    "addFailedRetry": "Failed to add review. Please try again.",
     "product": "Product",
     "selectProduct": "Please select a product",
     "selectProductOption": "Select a product...",
     "rating": "Rating",
     "comment": "Comment",
     "commentRequired": "Comment is required",
-    "writeReview": "Write your review...",
-    "adding": "Adding...",
-    "loadFailed": "Failed to load reviews.",
-    "description": "Customer reviews across all products. {{count}} reviews total.",
+    "writeReview": "Write your review here...",
+    "delete": "Delete Review",
+    "deleteConfirm": "Are you sure you want to delete this review? This action cannot be undone.",
+    "deleteSuccess": "Review deleted successfully.",
+    "deleteFailed": "Failed to delete review.",
     "averageRating": "Average Rating",
     "total": "Total Reviews",
-    "search": "Search by customer or product...",
+    "search": "Search by reviewer or product...",
     "customer": "Customer",
     "date": "Date",
     "actions": "Actions",
-    "empty": "No reviews found"
+    "empty": "No reviews found.",
+    "loading": "Loading reviews...",
+    "loadFailed": "Failed to load reviews."
+  },
+  "productView": {
+    "loading": "Loading product details...",
+    "loadFailed": "Failed to load product details.",
+    "loadErrorTitle": "Failed to load product",
+    "notFoundTitle": "Product not found",
+    "notFoundMessage": "The requested product could not be found or has been removed.",
+    "backToProducts": "Back to Products",
+    "editProduct": "Edit Product",
+    "noImage": "No image available",
+    "featured": "Featured",
+    "saveAmount": "Save ${{amount}}",
+    "stock": "Stock:",
+    "outOfStock": "Out of stock",
+    "available": "{{count}} units available",
+    "sku": "SKU",
+    "brand": "Brand",
+    "category": "Category",
+    "subcategory": "Subcategory",
+    "description": "Product Description",
+    "noDescription": "No description provided for this product.",
+    "tags": "Tags"
+  },
+  "coupons": {
+    "title": "Coupons",
+    "description": "Create and manage promotional discount coupons for your store.",
+    "loading": "Loading coupons...",
+    "empty": "No coupons available right now."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "View and manage all system updates and activity alerts.",
+    "loading": "Loading notifications...",
+    "empty": "No notifications right now."
+  },
+  "wishlists": {
+    "title": "Wishlists Overview",
+    "description": "All active customer wishlists and saved items.",
+    "loading": "Loading wishlists...",
+    "empty": "No wishlists found",
+    "wishlistNumber": "Wishlist #{{number}}",
+    "itemsCount": "{{count}} Items",
+    "user": "User",
+    "id": "ID"
+  },
+  "categoryModal": {
+    "title": "Add Category",
+    "notice": "There's no categories endpoint in the backend yet, so this is saved locally on your browser only. It will appear in the product form's category list, but won't sync with other team members until a real Categories API is added.",
+    "noticeBold": "locally on your browser",
+    "nameLabel": "Category Name",
+    "namePlaceholder": "e.g. Accessories",
+    "nameRequired": "Category name is required",
+    "nameEmpty": "Category name cannot be empty spaces",
+    "cancel": "Cancel",
+    "save": "Save Category",
+    "saving": "Saving...",
+    "success": "Category \"{{name}}\" added successfully",
+    "failed": "Failed to add category"
+  },
+  "pagination": {
+    "showing": "Showing {{start}} to {{end}} of {{total}}",
+    "prev": "Previous page",
+    "next": "Next page"
+  },
+  "carts": {
+    "moreItems": "+{{count}} more",
+    "unknown": "Unknown"
   }
 }

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import { uploadToCloudinary } from "../../api/cloudinary";
 import { addUser, updateUser } from "../../api/user.api";
 
 const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
+  const { t } = useTranslation();
   const [showModal, setShowModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -49,12 +51,12 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
     try {
       const imageUrl = await uploadToCloudinary(file);
       setFormData((prev) => ({ ...prev, image: imageUrl }));
-      toast.success("Image uploaded successfully", {
+      toast.success(t("users.imageUploadSuccess"), {
         toastId: "avatar-upload-success",
       });
     } catch (error) {
       console.error(error);
-      toast.error("Error uploading image!", {
+      toast.error(t("users.imageUploadError"), {
         toastId: "avatar-upload-error",
       });
     } finally {
@@ -95,7 +97,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
           )
         );
 
-        toast.success("User updated successfully", {
+        toast.success(t("users.userUpdatedSuccess"), {
           toastId: "user-update-success",
         });
       } else {
@@ -108,7 +110,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
 
         setUsers((prev) => [...prev, createdUser]);
 
-        toast.success("User created successfully", {
+        toast.success(t("users.userCreatedSuccess"), {
           toastId: "user-create-success",
         });
       }
@@ -118,7 +120,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
       const backendError =
         error.response?.data?.message ||
         error.response?.data?.error ||
-        "There was a problem saving the user.";
+        t("users.userSaveError");
 
       toast.error(backendError, {
         toastId: "user-save-error",
@@ -140,7 +142,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
         }`}
       >
         <h2 className="text-2xl font-bold mb-6 text-slate-900">
-          {editingUser ? "Edit User" : "Add New User"}
+          {editingUser ? t("users.editUser") : t("users.addUser")}
         </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Avatar Upload */}
@@ -149,7 +151,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
               {isUploading ? (
                 <div className="text-slate-500 text-xs text-center flex flex-col items-center gap-1">
                   <span className="animate-spin text-lg">⏳</span>
-                  Uploading...
+                  {t("users.uploading")}
                 </div>
               ) : formData.image ? (
                 <img
@@ -160,7 +162,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
               ) : (
                 <div className="text-slate-400 text-xs text-center px-2 group-hover:text-indigo-600 transition-colors">
                   <span className="text-2xl block mb-1">📸</span>
-                  Click to Upload
+                  {t("users.clickToUpload")}
                 </div>
               )}
 
@@ -177,7 +179,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
           {/* Name Field */}
           <div>
             <label className="block text-sm font-medium text-slate-600 mb-1">
-              Name
+              {t("users.name")}
             </label>
             <input
               type="text"
@@ -193,7 +195,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
           {/* Email Field */}
           <div>
             <label className="block text-sm font-medium text-slate-600 mb-1">
-              Email
+              {t("users.email")}
             </label>
             <input
               type="email"
@@ -210,11 +212,11 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
           {!editingUser && (
             <div>
               <label className="block text-sm font-medium text-slate-600 mb-1">
-                Password
+                {t("users.password")}
               </label>
               <input
                 type="password"
-                placeholder="Password123!"
+                placeholder={t("users.passwordPlaceholder")}
                 className="w-full border border-slate-200 bg-slate-50/50 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                 value={formData.password}
                 onChange={(e) =>
@@ -227,17 +229,17 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
           {/* Role Selection */}
           <div>
             <label className="block text-sm font-medium text-slate-600 mb-1">
-              Role
+              {t("users.role")}
             </label>
             <select
-              className="w-full border border-slate-200 bg-slate-50/50 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+              className="w-full border border-slate-200 bg-slate-50/50 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition cursor-pointer"
               value={formData.role}
               onChange={(e) =>
                 setFormData({ ...formData, role: e.target.value })
               }
             >
-              <option value="customer">Customer</option>
-              <option value="admin">Admin</option>
+              <option value="customer">{t("users.customer")}</option>
+              <option value="admin">{t("users.admin")}</option>
             </select>
           </div>
 
@@ -248,7 +250,7 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
               onClick={handleCloseAnimation}
               className="w-1/2 bg-slate-100 text-slate-700 py-2.5 rounded-xl text-sm font-semibold hover:bg-slate-200 transition-colors cursor-pointer"
             >
-              Cancel
+              {t("common.cancel")}
             </button>
 
             <button
@@ -278,12 +280,12 @@ const UserFormModal = ({ closeModal, setUsers, editingUser }) => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  {editingUser ? "Updating..." : "Adding..."}
+                  {editingUser ? t("users.updating") : t("users.adding")}
                 </>
               ) : editingUser ? (
-                "Update User"
+                t("users.updateUser")
               ) : (
-                "Save User"
+                t("users.saveUser")
               )}
             </button>
           </div>

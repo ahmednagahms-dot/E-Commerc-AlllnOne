@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
   Package,
@@ -18,6 +19,7 @@ import api from "../api/axios";
 import PageLoader from "../components/ui/sessionLoader/PageLoader";
 
 export default function ProductView() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -62,7 +64,7 @@ export default function ProductView() {
           return;
         }
         const message =
-          err.response?.data?.message || "Failed to load product details.";
+          err.response?.data?.message || t("productView.loadFailed");
         setError(message);
         toast.error(message, { toastId: "product-view-fetch-error" });
       } finally {
@@ -75,7 +77,7 @@ export default function ProductView() {
     fetchProduct();
 
     return () => controller.abort();
-  }, [id]);
+  }, [id, t]);
 
   const getImageUrl = (image) => {
     if (typeof image === "string") return image;
@@ -85,7 +87,7 @@ export default function ProductView() {
   if (loading) {
     return (
       <DashboardLayout>
-        <PageLoader text="Loading product..." />
+        <PageLoader text={t("productView.loading")} />
       </DashboardLayout>
     );
   }
@@ -97,18 +99,18 @@ export default function ProductView() {
           <div className="max-w-lg mx-auto mt-16">
             <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-sm">
               <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                {error ? "Unable to load product" : "Product Not Found"}
+                {error ? t("productView.loadErrorTitle") : t("productView.notFoundTitle")}
               </h2>
               <p className="text-sm text-gray-500 mb-6">
-                {error || "The product you are looking for does not exist."}
+                {error || t("productView.notFoundMessage")}
               </p>
               <button
                 type="button"
                 onClick={() => navigate("/dashboard/products")}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition cursor-pointer"
               >
-                <ArrowLeft size={16} />
-                Back to Products
+                <ArrowLeft size={16} className="rtl:rotate-180" />
+                {t("productView.backToProducts")}
               </button>
             </div>
           </div>
@@ -134,16 +136,16 @@ export default function ProductView() {
   const stock = Math.max(0, Number(product.stock || 0));
 
   const infoCards = [
-    product.sku && { icon: Hash, label: "SKU", value: product.sku },
-    product.brand && { icon: Building2, label: "Brand", value: product.brand },
+    product.sku && { icon: Hash, label: t("productView.sku"), value: product.sku },
+    product.brand && { icon: Building2, label: t("productView.brand"), value: product.brand },
     product.category && {
       icon: Layers,
-      label: "Category",
-      value: product.category,
+      label: t("productView.category"),
+      value: t(`categoryNames.${product.category}`, product.category),
     },
     product.subcategory && {
       icon: Tag,
-      label: "Subcategory",
+      label: t("productView.subcategory"),
       value: product.subcategory,
     },
   ].filter(Boolean);
@@ -156,19 +158,19 @@ export default function ProductView() {
           <button
             type="button"
             onClick={() => navigate("/dashboard/products")}
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition"
+            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition cursor-pointer"
           >
-            <ArrowLeft size={18} />
-            Back to Products
+            <ArrowLeft size={18} className="rtl:rotate-180" />
+            {t("productView.backToProducts")}
           </button>
 
           <button
             type="button"
             onClick={() => navigate(`/dashboard/products/${id}/edit`)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition cursor-pointer"
           >
             <Pencil size={15} />
-            Edit Product
+            {t("productView.editProduct")}
           </button>
         </div>
 
@@ -187,7 +189,7 @@ export default function ProductView() {
                 ) : (
                   <div className="flex flex-col items-center gap-2 text-gray-300">
                     <Package size={48} />
-                    <span className="text-sm">No image</span>
+                    <span className="text-sm">{t("productView.noImage")}</span>
                   </div>
                 )}
               </div>
@@ -199,7 +201,7 @@ export default function ProductView() {
                       key={`${image}-${index}`}
                       type="button"
                       onClick={() => setSelectedImage(image)}
-                      className={`w-18 h-18 sm:w-20 sm:h-20 shrink-0 rounded-xl overflow-hidden border-2 transition ${
+                      className={`w-18 h-18 sm:w-20 sm:h-20 shrink-0 rounded-xl overflow-hidden border-2 transition cursor-pointer ${
                         selectedImage === image
                           ? "border-indigo-500 ring-2 ring-indigo-100"
                           : "border-gray-200 hover:border-gray-300"
@@ -222,13 +224,13 @@ export default function ProductView() {
               <div className="flex flex-wrap items-center gap-2 mb-3">
                 {product.category && (
                   <span className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-medium capitalize">
-                    {product.category}
+                    {t(`categoryNames.${product.category}`, product.category)}
                   </span>
                 )}
                 {product.featured && (
                   <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-600 text-xs font-medium">
                     <Star size={12} fill="currentColor" />
-                    Featured
+                    {t("productView.featured")}
                   </span>
                 )}
               </div>
@@ -256,7 +258,9 @@ export default function ProductView() {
                       ${price.toFixed(2)}
                     </span>
                     <span className="text-sm font-medium text-emerald-600">
-                      Save ${(price - discountPrice).toFixed(2)}
+                      {t("productView.saveAmount", {
+                        amount: (price - discountPrice).toFixed(2),
+                      })}
                     </span>
                   </>
                 )}
@@ -265,7 +269,7 @@ export default function ProductView() {
               {/* Stock */}
               <div className="flex items-center gap-2 mt-4">
                 <Package size={16} className="text-gray-400" />
-                <span className="text-sm text-gray-500">Stock:</span>
+                <span className="text-sm text-gray-500">{t("productView.stock")}</span>
                 <span
                   className={`text-sm font-semibold ${
                     stock === 0
@@ -275,7 +279,9 @@ export default function ProductView() {
                       : "text-emerald-600"
                   }`}
                 >
-                  {stock === 0 ? "Out of Stock" : `${stock} available`}
+                  {stock === 0
+                    ? t("productView.outOfStock")
+                    : t("productView.available", { count: stock })}
                 </span>
               </div>
 
@@ -309,11 +315,11 @@ export default function ProductView() {
             <div className="flex items-center gap-2 mb-4">
               <ShoppingBag size={18} className="text-indigo-500" />
               <h2 className="text-base font-semibold text-gray-900">
-                Product Description
+                {t("productView.description")}
               </h2>
             </div>
             <p className="text-sm text-gray-600 leading-7 whitespace-pre-line">
-              {product.description || "No description available."}
+              {product.description || t("productView.noDescription")}
             </p>
           </div>
 
@@ -321,7 +327,7 @@ export default function ProductView() {
           {Array.isArray(product.tags) && product.tags.length > 0 && (
             <div className="border-t border-gray-100 p-5 sm:p-7">
               <h2 className="text-base font-semibold text-gray-900 mb-3">
-                Tags
+                {t("productView.tags")}
               </h2>
               <div className="flex flex-wrap gap-2">
                 {product.tags.map((tag, index) => (

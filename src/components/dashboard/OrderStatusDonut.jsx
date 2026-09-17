@@ -29,14 +29,17 @@ const STATUS_ORDER = [
 
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null;
+  const { t } = useTranslation();
 
   const { status, count, percent } = payload[0].payload;
 
   return (
     <div className="bg-white/95 backdrop-blur-sm border border-gray-100 shadow-xl rounded-xl px-3.5 py-2.5 text-sm">
-      <p className="font-semibold capitalize text-gray-900">{status}</p>
+      <p className="font-semibold capitalize text-gray-900">
+        {t(`orders.${status}`) || status}
+      </p>
       <p className="text-gray-500 mt-0.5">
-        {count} orders · {percent}%
+        {t("dashboard.ordersCount", { count })} · {percent}%
       </p>
     </div>
   );
@@ -58,7 +61,7 @@ export default function OrderStatusDonut({ data = [] }) {
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/80 h-full flex flex-col">
+      <div className="bg-white rounded-2xl p-5 shadow-sm  h-full flex flex-col">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-gray-800">
             {t("dashboard.ordersByStatus")}
@@ -69,14 +72,14 @@ export default function OrderStatusDonut({ data = [] }) {
           <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center">
             <span className="text-lg">—</span>
           </div>
-          <p className="text-sm">No orders in this period</p>
+          <p className="text-sm">{t("dashboard.noOrdersInPeriod")}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100/80 h-full flex flex-col">
+    <div className="bg-white rounded-2xl p-5 shadow-sm  h-full flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-800">
@@ -131,7 +134,9 @@ export default function OrderStatusDonut({ data = [] }) {
               className="w-2 h-2 rounded-full shrink-0"
               style={{ backgroundColor: COLORS[item.status] }}
             />
-            <span className="capitalize text-gray-600">{item.status}</span>
+            <span className="capitalize text-gray-600">
+              {t(`orders.${item.status}`) || item.status}
+            </span>
             <span className="font-semibold text-gray-800">{item.count}</span>
           </div>
         ))}

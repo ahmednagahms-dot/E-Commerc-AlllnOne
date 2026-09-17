@@ -340,7 +340,7 @@ export default function Products() {
                     </option>
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
-                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                        {t(`categoryNames.${cat}`, cat.charAt(0).toUpperCase() + cat.slice(1))}
                       </option>
                     ))}
                   </select>
@@ -464,8 +464,8 @@ export default function Products() {
                           }`}
                         >
                           {item.stock > 0
-                            ? `${item.stock} in stock`
-                            : "Out of stock"}
+                            ? t("products.itemsInStock", { count: item.stock }) || `${item.stock} in stock`
+                            : t("products.outOfStockLabel") || "Out of stock"}
                         </span>
                       </div>
 
@@ -475,7 +475,11 @@ export default function Products() {
                         </h3>
 
                         <p className="text-xs text-gray-400 mt-1 capitalize">
-                          {[item.category, item.subcategory, item.brand]
+                          {[
+                            item.category ? t(`categoryNames.${item.category}`, item.category) : null,
+                            item.subcategory,
+                            item.brand,
+                          ]
                             .filter(Boolean)
                             .join(" · ")}
                         </p>
@@ -492,7 +496,7 @@ export default function Products() {
                           </span>
                           {hasDiscount && (
                             <span className="text-xs font-medium text-emerald-600">
-                              -${discountAmount} off
+                              {t("products.offDiscount", { amount: discountAmount }) || `-${discountAmount} off`}
                             </span>
                           )}
                         </div>
@@ -515,32 +519,32 @@ export default function Products() {
                             onClick={() =>
                               navigate(`/dashboard/products/${item._id}/view`)
                             }
-                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-gray-50 flex items-center justify-center gap-1.5 transition cursor-pointer"
+                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-surface-hover hover:text-gray-900 flex items-center justify-center gap-1.5 transition cursor-pointer"
                           >
-                            <Eye size={14} /> View
+                            <Eye size={14} /> {t("products.view") || "View"}
                           </button>
 
                           <button
                             onClick={() =>
                               navigate(`/dashboard/products/${item._id}/edit`)
                             }
-                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 flex items-center justify-center gap-1.5 transition cursor-pointer"
+                            className="flex-1 h-9 rounded-xl border border-gray-200 text-xs font-medium text-gray-600 hover:bg-surface-hover hover:text-indigo-600 hover:border-indigo-300 dark:hover:border-indigo-500 flex items-center justify-center gap-1.5 transition cursor-pointer"
                           >
-                            <Pencil size={14} /> Edit
+                            <Pencil size={14} /> {t("products.edit") || "Edit"}
                           </button>
 
                           <button
                             onClick={() => handleQuickEdit(item)}
-                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 flex items-center justify-center transition cursor-pointer"
-                            title="Quick Edit"
+                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-surface-hover hover:text-amber-600 hover:border-amber-300 dark:hover:border-amber-500 flex items-center justify-center transition cursor-pointer"
+                            title={t("products.quickEdit") || "Quick Edit"}
                           >
                             <SlidersHorizontal size={14} />
                           </button>
 
                           <button
                             onClick={() => handleDelete(item)}
-                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 flex items-center justify-center transition cursor-pointer"
-                            title="Delete"
+                            className="h-9 w-9 rounded-xl border border-gray-200 text-gray-500 hover:bg-surface-hover hover:text-red-600 hover:border-red-300 dark:hover:border-red-500 flex items-center justify-center transition cursor-pointer"
+                            title={t("products.delete") || "Delete"}
                           >
                             <Trash2 size={14} />
                           </button>

@@ -13,11 +13,11 @@ export default function Sidebar({ onClose }) {
   const { t } = useTranslation();
 
   return (
-    <aside className="w-64 h-screen bg-white text-slate-600 flex flex-col border-r border-slate-200">
+    <aside className="w-64 h-screen bg-surface/80 backdrop-blur-md text-slate-600 flex flex-col border-r border-border-subtle/70 transition-colors">
       {/* Logo */}
-      <div className="px-5 pt-5 pb-4 flex items-center justify-between border-b border-slate-100">
+      <div className="px-5 pt-5 pb-4 flex items-center justify-between border-b border-border-subtle/70">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 p-1.5 shrink-0 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-surface/60 border border-border-subtle/70 p-1.5 shrink-0 flex items-center justify-center">
             <img
               src={STORE_LOGO_URL}
               alt="AllInOne"
@@ -40,7 +40,7 @@ export default function Sidebar({ onClose }) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3">
+      <nav className="flex-1 overflow-y-auto no-scrollbar py-4 px-3">
         {sidebarLinks.map((group) => (
           <div key={group.section} className="mb-4">
             <p className="px-3 text-[11px] text-slate-400 mb-2 font-semibold uppercase tracking-wider">
@@ -57,8 +57,8 @@ export default function Sidebar({ onClose }) {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 mb-0.5 rounded-xl text-sm font-medium transition ${
                       isActive
-                        ? "bg-indigo-50 text-indigo-600 font-semibold"
-                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                        ? "bg-primary-50 text-primary-600 font-semibold"
+                        : "text-slate-600 hover:bg-surface-hover/80 hover:text-slate-900"
                     }`
                   }
                 >
@@ -72,9 +72,9 @@ export default function Sidebar({ onClose }) {
       </nav>
 
       {/* User + Logout */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+      <div className="p-4 border-t border-border-subtle/70 bg-surface/40">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden shadow-xs">
+          <div className="w-9 h-9 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-semibold shrink-0 overflow-hidden shadow-xs">
             {user?.avatar ? (
               <img
                 src={user.avatar}

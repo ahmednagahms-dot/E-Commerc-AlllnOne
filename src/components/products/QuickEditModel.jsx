@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import Modal from "../ui/Modal";
 import Button from "../ui/Button";
 import ProductFormFields from "./ProductFormFields";
@@ -12,6 +13,7 @@ export default function QuickEditModal({
   productId,
   onUpdated,
 }) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -80,7 +82,7 @@ export default function QuickEditModal({
       } catch (err) {
         setSubmitError(
           err.response?.data?.message ||
-            "Failed to fetch product details. Please try again."
+            t("productForm.errors.loadFailed")
         );
       } finally {
         setLoading(false);
@@ -88,7 +90,7 @@ export default function QuickEditModal({
     };
 
     fetchProduct();
-  }, [isOpen, productId, reset]);
+  }, [isOpen, productId, reset, t]);
 
   // =========================
   // Delete existing image
@@ -108,7 +110,7 @@ export default function QuickEditModal({
 
     // At least one image required
     if (existingImages.length === 0 && imageFiles.length === 0) {
-      setSubmitError("At least 1 image is required.");
+      setSubmitError(t("products.quickEditModal.imageRequired"));
       return;
     }
 
@@ -150,18 +152,16 @@ export default function QuickEditModal({
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("Product updated successfully");
+      toast.success(t("products.quickEditModal.success"));
       onUpdated?.();
       handleClose();
     } catch (err) {
       console.error("Quick Edit Error:", err.response?.data || err);
-      setSubmitError(
+      const errMsg =
         err.response?.data?.message ||
-          "Failed to save product. Please try again."
-      );
-      toast.error(
-        err.response?.data?.message || "Failed to save product"
-      );
+        t("products.quickEditModal.error");
+      setSubmitError(errMsg);
+      toast.error(errMsg);
     } finally {
       setSaving(false);
     }
@@ -183,10 +183,10 @@ export default function QuickEditModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Quick Edit Product">
+    <Modal isOpen={isOpen} onClose={handleClose} title={t("products.quickEditModal.title")}>
       {loading ? (
         <p className="text-sm text-gray-500 py-10 text-center">
-          Loading product...
+          {t("products.quickEditModal.loading")}
         </p>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -210,7 +210,7 @@ export default function QuickEditModal({
 
           <div className="flex items-center gap-3 pt-6 mt-6 border-t border-gray-100">
             <Button type="submit" disabled={saving}>
-              {saving ? "Saving..." : "Save Changes"}
+              {saving ? t("common.saving") : t("pages.saveChanges")}
             </Button>
             <Button
               type="button"
@@ -218,7 +218,7 @@ export default function QuickEditModal({
               onClick={handleClose}
               disabled={saving}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
           </div>
         </form>

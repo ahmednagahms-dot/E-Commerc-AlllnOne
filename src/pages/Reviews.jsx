@@ -252,7 +252,7 @@ const Reviews = () => {
       setReviews(results.flat());
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error("Failed to load reviews.", { toastId: "reviews-fetch-error" });
+      toast.error(t("reviews.loadFailed"), { toastId: "reviews-fetch-error" });
       setReviews([]);
     } finally {
       setLoading(false);
@@ -274,14 +274,14 @@ const Reviews = () => {
 
       setIsDeleteModalOpen(false);
       setSelectedReview(null);
-      toast.success("Review deleted successfully.", {
+      toast.success(t("reviews.deleteSuccess"), {
         toastId: "review-delete-success",
       });
       fetchData();
     } catch (error) {
       console.error('Error deleting review:', error);
       toast.error(
-        error.response?.data?.message || t("reviews.loadFailed") || "Failed to delete review.",
+        error.response?.data?.message || t("reviews.deleteFailed"),
         { toastId: "review-delete-error" }
       );
     } finally {
@@ -355,7 +355,7 @@ const Reviews = () => {
 
           <div className="relative">
             <FiSearch
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 text-gray-400"
               size={18}
             />
             <input
@@ -363,51 +363,49 @@ const Reviews = () => {
               placeholder={t("reviews.search")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white shadow-sm rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+              className="w-full pl-10 pr-4 rtl:pl-4 rtl:pr-10 py-2.5 bg-white shadow-sm rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
           </div>
 
           <div
-            className={`bg-white rounded-xl shadow-sm overflow-hidden transition-opacity duration-150 ${
+            className={`bg-white dark:bg-slate-900/60 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-hidden transition-opacity duration-150 ${
               refreshing ? "opacity-50 pointer-events-none" : "opacity-100"
             }`}
           >
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left rtl:text-right border-collapse">
               <thead>
-                <tr className="bg-gray-50/50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <tr className="bg-gray-50/50 dark:bg-slate-800/40 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   <th className="py-3.5 px-4">{t("reviews.customer")}</th>
                   <th className="py-3.5 px-4">{t("reviews.product")}</th>
                   <th className="py-3.5 px-4">{t("reviews.rating")}</th>
                   <th className="py-3.5 px-4">{t("reviews.comment")}</th>
                   <th className="py-3.5 px-4">{t("reviews.date")}</th>
-                  <th className="py-3.5 px-4 text-right">{t("reviews.actions")}</th>
+                  <th className="py-3.5 px-4 text-right rtl:text-left">{t("reviews.actions")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 text-sm">
+              <tbody className="divide-y divide-gray-100 dark:divide-slate-800 text-sm">
                 {filteredReviews.length > 0 ? (
                   filteredReviews.map((review) => (
                     <tr
                       key={review._id || review.id}
-                      className="hover:bg-gray-50/50 transition"
+                      className="hover:bg-gray-50/50 dark:hover:bg-slate-800/40 transition"
                     >
-                      <td className="py-3.5 px-4 font-medium text-gray-900">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800">
-                          {review.user?.name || review.customerName || 'ADMIN'} ✓
-                        </span>
+                      <td className="py-3.5 px-4 font-medium text-gray-900 dark:text-gray-100">
+                        {review.user?.name || review.customerName || 'ADMIN'}
                       </td>
-                      <td className="py-3.5 px-4 text-gray-600">
+                      <td className="py-3.5 px-4 text-gray-600 dark:text-gray-300">
                         {review.productName}
                       </td>
                       <td className="py-3.5 px-4">
                         <StarRating rating={review.rating} />
                       </td>
-                      <td className="py-3.5 px-4 text-gray-500 max-w-xs truncate">
+                      <td className="py-3.5 px-4 text-gray-500 dark:text-gray-400 max-w-xs truncate">
                         {review.comment}
                       </td>
-                      <td className="py-3.5 px-4 text-gray-500">
+                      <td className="py-3.5 px-4 text-gray-500 dark:text-gray-400">
                         {formatDate(review.createdAt || review.date, i18n.language)}
                       </td>
-                      <td className="py-3.5 px-4 text-right">
+                      <td className="py-3.5 px-4 text-right rtl:text-left">
                         <button
                           onClick={() => {
                             setSelectedReview(review);

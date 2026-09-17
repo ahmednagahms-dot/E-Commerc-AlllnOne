@@ -1,23 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary-50: #eef2ff;
-  --color-primary-500: #4f46e5;
-  --color-primary-600: #4338ca;
+  --color-primary-50: #EEF4FA;
+  --color-primary-500: #1E3A8A;
+  --color-primary-600: #172E6C;
   --color-sidebar: #0f172a;
-  --color-success: #22c55e;
+  --color-success: #10b981;
   --color-warning: #f59e0b;
   --color-danger: #ef4444;
 
   /* Semantic tokens بتتغير حسب الوضع (light/dark) */
-  --color-surface: #ffffff;
-  --color-surface-alt: #f8fafc;
-  --color-surface-hover: #f3f4f6;
-  --color-border-subtle: #f1f5f9;
-  --color-text-primary: #111827;
-  --color-text-secondary: #6b7280;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F1F4F9;
+  --color-surface-hover: #EEF2F7;
+  --color-border-subtle: #E2E8F0;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #64748B;
 }
 
 :root {
@@ -32,8 +33,47 @@ body {
   transition: background-color 180ms ease, color 180ms ease;
 }
 
-html[dir="rtl"] body {
-  font-family: "Tahoma", "Segoe UI", sans-serif;
+/* تأثير التدرج الضبابي السماوي في الوضع الفاتح مستوحى من تصميم Payno */
+html:not(.dark) body,
+html:not(.dark) .bg-surface-alt {
+  background-color: #F1F4F9;
+  background-image: 
+    radial-gradient(ellipse 90% 480px at 50% -40px, rgba(132, 163, 199, 0.45) 0%, rgba(175, 198, 224, 0.22) 50%, transparent 85%),
+    radial-gradient(circle 500px at 90% -20px, rgba(154, 182, 214, 0.28) 0%, transparent 70%),
+    radial-gradient(circle 450px at 10% -20px, rgba(142, 172, 206, 0.22) 0%, transparent 65%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* تأثير التدرج الضبابي الكحلي الليلي في الوضع الداكن - يعطي نفس الفخامة والعمق الزجاجي */
+html.dark body,
+html.dark .bg-surface-alt {
+  background-color: #060a17;
+  background-image: 
+    radial-gradient(ellipse 90% 480px at 50% -40px, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 62, 0.25) 50%, transparent 85%),
+    radial-gradient(circle 500px at 90% -20px, rgba(37, 99, 235, 0.2) 0%, transparent 70%),
+    radial-gradient(circle 450px at 10% -20px, rgba(30, 64, 175, 0.18) 0%, transparent 65%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+html[dir="rtl"],
+html[lang="ar"] {
+  --font-sans: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html[dir="rtl"] body,
+html[dir="rtl"] button,
+html[dir="rtl"] input,
+html[dir="rtl"] select,
+html[dir="rtl"] textarea,
+html[lang="ar"] body,
+html[lang="ar"] button,
+html[lang="ar"] input,
+html[lang="ar"] select,
+html[lang="ar"] textarea {
+  font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 html[dir="rtl"] .text-left {
@@ -45,12 +85,15 @@ html[dir="rtl"] .text-right {
 }
 
 .dark {
-  --color-surface: #1e293b;
-  --color-surface-alt: #0f172a;
-  --color-surface-hover: #334155;
-  --color-border-subtle: #334155;
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
+  --color-surface: #0a1329;       /* كروت وسايد بار كحلي ليلي زجاجي فاخر */
+  --color-surface-alt: #060a17;   /* خلفية ليلية عميقة تعطي عمق ثلاثي الأبعاد */
+  --color-surface-hover: #142040; /* تفاعل وهوفر أزرق كحلي أنيق */
+  --color-border-subtle: #19274c; /* حدود ناعمة متناسقة بدقة مع الكحلي */
+  --color-text-primary: #f8fafc;  /* نصوص بيضاء نقية ومريحة للقراءة */
+  --color-text-secondary: #94a3b8;/* نصوص ثانوية هادئة */
+  --color-primary-50: rgba(37, 99, 235, 0.18);
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
 }
 
 .dark .bg-white,
@@ -72,7 +115,7 @@ html[dir="rtl"] .text-right {
 .dark .bg-slate-50\/70,
 .dark .bg-slate-50\/80,
 .dark .bg-slate-100\/70 {
-  background-color: rgb(15 23 42 / 0.5);
+  background-color: rgb(10 19 41 / 0.6);
 }
 
 .dark .text-gray-900,
@@ -104,10 +147,24 @@ html[dir="rtl"] .text-right {
 }
 
 .dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-gray-50\/50:hover,
 .dark .hover\:bg-gray-100:hover,
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-50\/50:hover,
+.dark .hover\:bg-slate-50\/60:hover,
+.dark .hover\:bg-slate-50\/70:hover,
+.dark .hover\:bg-slate-50\/80:hover,
 .dark .hover\:bg-slate-100:hover,
-.dark .hover\:bg-slate-200:hover {
-  background-color: var(--color-surface-hover);
+.dark .hover\:bg-slate-100\/70:hover,
+.dark .hover\:bg-slate-200:hover,
+.dark .hover\:bg-indigo-50:hover,
+.dark .hover\:bg-amber-50:hover,
+.dark .hover\:bg-red-50:hover,
+.dark .hover\:bg-rose-50:hover,
+.dark .hover\:bg-emerald-50:hover,
+.dark .hover\:bg-teal-50:hover,
+.dark .hover\:bg-blue-50:hover {
+  background-color: var(--color-surface-hover) !important;
 }
 
 .dark input,
@@ -195,5 +252,14 @@ html[dir="rtl"] .text-right {
 }
 
 .dark .sidebar-edge {
-  border-inline-end-color: #64748b;
+  border-inline-end-color: #19274c;
+}
+
+/* heddin scroll bar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
