@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Pages
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/profile";
@@ -18,9 +20,10 @@ import Reviews from "./pages/Reviews";
 import Users from "./pages/Users";
 import Categories from "./pages/Categories";
 
+// Routes
 import ProtectedRoute from "./routes/ProtectedRoute";
 
-// ✅ قائمة الـ routes المحمية (كلها تحت /dashboard)
+// قائمة الـ routes المحمية
 const protectedRoutes = [
   { path: "/dashboard", element: <Dashboard /> },
   { path: "/dashboard/profile", element: <Profile /> },
@@ -48,10 +51,20 @@ function App() {
   return (
     <>
       <Routes>
+        {/* =========================
+            Public Routes
+        ========================== */}
 
+        {/* Home Page */}
+        <Route path="/" element={<Home />} />
+
+        {/* Login */}
         <Route path="/login" element={<Login />} />
 
-     
+        {/* =========================
+            Protected Routes
+        ========================== */}
+
         {protectedRoutes.map(({ path, element }) => (
           <Route
             key={path}
@@ -60,10 +73,15 @@ function App() {
           />
         ))}
 
-      
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        {/* =========================
+            Fallback
+        ========================== */}
+
+        {/* أي Route غير موجود يرجع للـ Home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
+      {/* Toast Notifications */}
       <ToastContainer
         position="top-right"
         autoClose={3000}

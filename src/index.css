@@ -32,6 +32,58 @@ body {
   transition: background-color 180ms ease, color 180ms ease;
 }
 
+/* =========================================================
+   Navbar Search
+   ========================================================= */
+
+.navbar-search-input {
+  background-color: transparent !important;
+  color: #000000 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.navbar-search-input:hover {
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.navbar-search-input:focus,
+.navbar-search-input:focus-visible,
+.navbar-search-input:active {
+  background-color: transparent !important;
+  color: #000000 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+}
+
+.navbar-search-input::placeholder {
+  color: #000000 !important;
+  opacity: 1;
+}
+
+.navbar-search-input-bordered {
+  border: 1px solid #d1d5db !important;
+  border-radius: 9999px;
+  padding: 0.35rem 0.65rem;
+}
+
+.footer-links a {
+  font-size: 0.75rem !important;
+}
+
+/* =========================================================
+   RTL
+   ========================================================= */
+
 html[dir="rtl"] body {
   font-family: "Tahoma", "Segoe UI", sans-serif;
 }
@@ -44,6 +96,10 @@ html[dir="rtl"] .text-right {
   text-align: left;
 }
 
+/* =========================================================
+   Dark Mode
+   ========================================================= */
+
 .dark {
   --color-surface: #1e293b;
   --color-surface-alt: #0f172a;
@@ -52,6 +108,8 @@ html[dir="rtl"] .text-right {
   --color-text-primary: #f1f5f9;
   --color-text-secondary: #94a3b8;
 }
+
+/* Background colors */
 
 .dark .bg-white,
 .dark .bg-gray-50,
@@ -75,6 +133,8 @@ html[dir="rtl"] .text-right {
   background-color: rgb(15 23 42 / 0.5);
 }
 
+/* Text colors */
+
 .dark .text-gray-900,
 .dark .text-gray-800,
 .dark .text-gray-700,
@@ -93,6 +153,8 @@ html[dir="rtl"] .text-right {
   color: var(--color-text-secondary);
 }
 
+/* Border colors */
+
 .dark .border-gray-100,
 .dark .border-gray-200,
 .dark .border-gray-300,
@@ -103,6 +165,8 @@ html[dir="rtl"] .text-right {
   border-color: var(--color-border-subtle);
 }
 
+/* Hover backgrounds */
+
 .dark .hover\:bg-gray-50:hover,
 .dark .hover\:bg-gray-100:hover,
 .dark .hover\:bg-slate-100:hover,
@@ -110,7 +174,12 @@ html[dir="rtl"] .text-right {
   background-color: var(--color-surface-hover);
 }
 
-.dark input,
+/* =========================================================
+   Form Inputs - Dark Mode
+   Navbar Search is excluded
+   ========================================================= */
+
+.dark input:not(.navbar-search-input),
 .dark select,
 .dark textarea {
   background-color: var(--color-surface);
@@ -118,16 +187,23 @@ html[dir="rtl"] .text-right {
   border-color: var(--color-border-subtle);
 }
 
-.dark input::placeholder,
+.dark input:not(.navbar-search-input)::placeholder,
 .dark textarea::placeholder {
   color: var(--color-text-secondary);
 }
+
+/* =========================================================
+   Divide
+   ========================================================= */
 
 .dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]) {
   border-color: var(--color-border-subtle);
 }
 
-/* Legacy page palettes use arbitrary Tailwind colors; remap them in dark mode. */
+/* =========================================================
+   Legacy Page Palettes
+   ========================================================= */
+
 .dark .page-surface {
   background-color: var(--color-surface-alt) !important;
 }
@@ -158,37 +234,66 @@ html[dir="rtl"] .text-right {
   color: var(--color-text-secondary) !important;
 }
 
-.dark .page-surface [class*="border-[#"] ,
+.dark .page-surface [class*="border-[#"],
 .dark .page-surface [class*="border-gray-"] {
   border-color: var(--color-border-subtle) !important;
 }
 
-/* حركات الأنيميشن بتاعت السايد بار والخلفية */
+/* =========================================================
+   Sidebar & Background Animations
+   ========================================================= */
+
 @keyframes slideInRight {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
+
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 .animate-slide-in-right {
   animation: slideInRight 0.4s ease-out forwards;
 }
+
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
-/* /////////////////////////////////////////// */
 
-/* حركة شريط التحميل المستمرة (من الشمال لليمين وبيتعاد) */
+/* =========================================================
+   Progress Bar Animation
+   ========================================================= */
+
 @keyframes progress-sweep {
-  0% { left: -50%; width: 40%; }
-  100% { left: 110%; width: 40%; }
+  0% {
+    left: -50%;
+    width: 40%;
+  }
+
+  100% {
+    left: 110%;
+    width: 40%;
+  }
 }
 
 .animate-progress-sweep {
   animation: progress-sweep 1.2s infinite ease-in-out;
 }
+
+/* =========================================================
+   Sidebar Edge
+   ========================================================= */
 
 .sidebar-edge {
   border-inline-end: 1px solid #1e293b;
