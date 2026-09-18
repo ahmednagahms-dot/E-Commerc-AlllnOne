@@ -48,14 +48,14 @@ export default function Topbar({ onMenuClick }) {
         <LanguageSwitcher />
         <button
           onClick={toggleTheme}
-          className="text-gray-500 hover:bg-gray-100 p-2 rounded-lg dark:text-gray-300 dark:hover:bg-gray-800"
+          className="text-gray-500 hover:bg-gray-200 p-2 rounded-lg dark:text-gray-300 cursor-pointer dark:hover:bg-slate-700 transition-colors"
           aria-label={t(isDark ? "common.lightMode" : "common.darkMode")}
         >
           {isDark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
         <Link
           to="/dashboard/notifications"
-          className="relative text-gray-500 hover:bg-gray-100 p-2 rounded-lg dark:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+          className="relative text-gray-500 hover:bg-gray-200 p-2 rounded-lg dark:hover:bg-slate-700 transition-colors"
           title={t("navigation.notifications")}
           aria-label={t("navigation.notifications")}
         >
