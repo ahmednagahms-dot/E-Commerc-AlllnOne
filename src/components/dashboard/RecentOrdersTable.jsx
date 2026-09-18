@@ -11,7 +11,7 @@ export default function RecentOrdersTable({ orders }) {
     <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 lg:col-span-2">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold">{t("dashboard.recentOrders")}</h3>
-        <button onClick={() => navigate("/dashboard/orders")} className="text-xs text-primary-500">{t("dashboard.viewAllOrders")}</button>
+        <button onClick={() => navigate("/dashboard/orders")} className="text-xs text-primary-500 cursor-pointer hover:opacity-90 transition-opacity">{t("dashboard.viewAllOrders")}</button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">

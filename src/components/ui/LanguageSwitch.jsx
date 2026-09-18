@@ -37,7 +37,7 @@ const LanguageSwitcher = () => {
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center gap-2 rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+        className="flex items-center gap-2 rounded-lg p-2 text-gray-500 hover:bg-gray-200 cursor-pointer dark:hover:bg-slate-700 transition"
         aria-label={i18n.language === "ar" ? "تغيير اللغة" : "Change language"}
       >
         <Globe size={20} />

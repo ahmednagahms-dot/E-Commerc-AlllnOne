@@ -59,10 +59,10 @@ export default function Wishlists() {
       {loading ? (
         <PageLoader text={t("wishlists.loading") || "Loading wishlists..."} />
       ) : (
-        <div className="animate-fade-in w-full page-surface">
-          <div className="min-h-screen bg-[#f5f7fa] p-6 page-surface">
+        <div className="animate-fade-in w-full ">
+          <div className="min-h-screen   p-6 ">
             {/* Header */}
-            <div className="mb-6 rounded-2xl bg-white p-6 shadow-md">
+            <div className="mb-6  p-6  bg-gradient-to-br from-[#E2ECF7]/90 via-[#F0F5FA]/90 to-white/95 dark:from-[#021A54] dark:via-[#082265] dark:to-[#05133d] backdrop-blur-md rounded-2xl p-6 mb-6 border border-slate-200/80 dark:border-blue-900/50 shadow-xs">
               <p className="mb-2 text-xs font-semibold tracking-[0.3em] text-primary-600">
                 {t("navigation.wishlists") || "WISHLISTS"}
               </p>
@@ -79,7 +79,7 @@ export default function Wishlists() {
 
             {/* Empty State */}
             {wishlists.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-white p-12">
+              <div className="flex flex-col items-center justify-center  bg-gradient-to-br from-[#E2ECF7]/90 via-[#F0F5FA]/90 to-white/95 dark:from-[#021A54] dark:via-[#082265] dark:to-[#05133d] backdrop-blur-md rounded-2xl p-6 mb-6 border border-slate-200/80 dark:border-blue-900/50 shadow-xs p-12">
                 <h2 className="text-lg font-semibold text-gray-400">
                   {t("wishlists.empty") || "No wishlists found"}
                 </h2>

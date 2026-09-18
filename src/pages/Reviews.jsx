@@ -91,7 +91,7 @@ const AddReviewModal = ({ isOpen, onClose, products, onReviewAdded }) => {
             </label>
             <select
               {...register('productId', { required: t("reviews.selectProduct") })}
-              className="w-full bg-gray-50 border-0 rounded-lg p-2.5 text-sm shadow-inner focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+              className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-sm shadow-inner focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
             >
               <option value="">{t("reviews.selectProductOption")}</option>
               {products.map((product) => (
@@ -125,7 +125,7 @@ const AddReviewModal = ({ isOpen, onClose, products, onReviewAdded }) => {
               {...register('comment', { required: t("reviews.commentRequired") })}
               rows="4"
               placeholder={t("reviews.writeReview")}
-              className="w-full bg-gray-50 border-0 rounded-lg p-2.5 text-sm shadow-inner focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+              className="w-full bg-gray-50 border border-gray-300 rounded-lg p-2.5 text-sm shadow-inner focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
             ></textarea>
             {errors.comment && (
               <p className="text-red-500 text-xs mt-1">{errors.comment.message}</p>
@@ -169,14 +169,14 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, deleting }) => {
           <button
             onClick={onClose}
             disabled={deleting}
-            className="px-4 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition disabled:opacity-50"
+            className="px-4 py-2 rounded-lg cursor-pointer text-sm text-gray-600 hover:bg-gray-100 transition disabled:opacity-50"
           >
             {t("common.cancel")}
           </button>
           <button
             onClick={onConfirm}
             disabled={deleting}
-            className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg shadow hover:bg-red-700 transition disabled:opacity-60"
+            className="px-4 py-2 bg-red-600 cursor-pointer text-white text-sm font-medium rounded-lg shadow hover:bg-red-700 transition disabled:opacity-60"
           >
             {deleting ? (t("common.deleting") || 'Deleting...') : (t("common.delete") || 'Delete')}
           </button>
